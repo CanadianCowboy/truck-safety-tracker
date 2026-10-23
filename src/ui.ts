@@ -391,6 +391,36 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
         padding: 26px 24px 80px;
       }
 
+      .site-footer {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 8px;
+        max-width: 1340px;
+        margin: 0 auto;
+        padding: 0 24px 28px;
+        color: var(--text-muted);
+        font-size: 0.8rem;
+        text-align: center;
+      }
+
+      .site-footer a {
+        color: var(--text-secondary);
+        text-decoration: none;
+        text-underline-offset: 3px;
+        transition: color 0.16s var(--ease-snappy);
+      }
+
+      .site-footer a:hover {
+        color: var(--accent);
+        text-decoration: underline;
+      }
+
+      .site-footer-separator {
+        color: var(--text-muted);
+        user-select: none;
+      }
+
       /* KPI STATUS CARDS (Bento Specular Strip) */
       .kpi-grid {
         display: grid;
@@ -1382,7 +1412,8 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
       .tools-menu { position: static; }
       .tools-panel { right: 0; top: calc(100% + 8px); width: min(280px, 100%); }
       .header-actions > .btn { flex: 1 1 auto; padding: 10px; }
-      .container { padding: 16px 12px 48px; }
+      .container { padding: 16px 12px 36px; }
+      .site-footer { flex-wrap: wrap; padding: 0 12px 24px; }
       .toolbar { padding: 12px; }
       .toolbar-left { min-width: 0; width: 100%; }
       .search-input { width: 100%; min-width: 0; flex-basis: 100%; }
@@ -1580,6 +1611,11 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
         </div>
       </section>
     </main>
+    <footer class="site-footer">
+      <span>Open source under the MIT License</span>
+      <span class="site-footer-separator" aria-hidden="true">·</span>
+      <a href="https://github.com/CanadianCowboy/truck-safety-tracker" target="_blank" rel="noopener noreferrer" aria-label="View Truck Safety Tracker on GitHub (opens in a new tab)">View on GitHub <span aria-hidden="true">↗</span></a>
+    </footer>
   </div>
 
   <!-- MODAL: ADD / EDIT TRUCK -->
