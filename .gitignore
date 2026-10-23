@@ -1,0 +1,11 @@
+node_modules/
+.cloudflare/
+.agents/
+skills-lock.json
+dist/
+test-results/
+playwright-report/
+.dev.vars*
+.env*
+!.env.example
+*.log
