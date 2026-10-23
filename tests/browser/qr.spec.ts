@@ -24,7 +24,7 @@ test('optional UUID labels print at 1.5 inches and open units only after unlocki
   let popup;
   try {
     await page.goto(base + '/');
-    await page.locator('.truck-card').filter({ hasText: truck.unit_number }).getByRole('button', { name: 'Details / QR' }).click();
+    await page.locator('.truck-card').filter({ hasText: truck.unit_number }).getByRole('button', { name: 'Details' }).click();
     await expect(page.locator('#modal-unit')).toBeVisible();
     await expect(page.locator('#unit-title')).toHaveText('Unit #' + truck.unit_number);
     await expect(page.locator('#unit-details')).toContainText('QR unit detail note');

@@ -20,10 +20,23 @@ test('theme and list preferences persist; list uses the same filters and actions
   page.on('pageerror', error => errors.push(error.message));
   await page.goto(base + '/');
   await expect(page.locator('#app-view')).toBeVisible();
+  await expect(page.locator('.site-footer a')).toHaveAttribute('href', 'https://github.com/CanadianCowboy/truck-safety-tracker');
+  await expect(page.locator('.site-footer')).toContainText('View on');
+  await expect(page.locator('.site-footer > span').nth(2)).toHaveText('View on');
+  await expect(page.locator('.site-footer-logo-dark')).toHaveAttribute('src', '/truck-safety/github-lockup-white.svg');
+  await expect(page.locator('.site-footer-logo-dark')).toBeVisible();
+  await expect(page.locator('.site-footer-logo-dark')).toHaveJSProperty('naturalWidth', 416);
+  await expect(page.locator('.site-footer-logo-light')).toBeHidden();
+  await expect(page.locator('.site-footer')).toHaveCSS('font-family', /Mona Sans Footer/);
+  await expect.poll(() => page.evaluate(() => document.fonts.check('400 12px "Mona Sans Footer"'))).toBe(true);
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
   await expect(page.locator('.truck-card').first()).toContainText('OVERDUE by 8 days');
   await page.getByRole('button', { name: 'Switch to light mode', exact: true }).click();
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
+  await expect(page.locator('.site-footer-logo-light')).toBeVisible();
+  await expect(page.locator('.site-footer-logo-light')).toHaveAttribute('src', '/truck-safety/github-lockup-black.svg');
+  await expect(page.locator('.site-footer-logo-light')).toHaveJSProperty('naturalWidth', 416);
+  await expect(page.locator('.site-footer-logo-dark')).toBeHidden();
   expect(await page.locator('body').evaluate(el => getComputedStyle(el).backgroundColor)).toBe('rgb(241, 245, 249)');
   await page.getByRole('button', { name: 'Compact list', exact: true }).click();
   await expect(page.locator('#fleet-grid')).toBeHidden();
@@ -35,6 +48,7 @@ test('theme and list preferences persist; list uses the same filters and actions
   await page.locator('#fleet-table-body [data-details]').click();
   await expect(page.locator('#unit-title')).toHaveText('Unit #10');
   await expect(page.locator('#unit-details')).toContainText('Check brake paperwork');
+  await expect(page.locator('#unit-actions [data-delete]')).toBeVisible();
   await page.locator('#modal-unit [data-close]').click();
   await page.locator('#fleet-table-body [data-edit]').click();
   await expect(page.locator('#truck-id')).toHaveValue(uuid);
@@ -68,6 +82,8 @@ test('theme and list preferences persist; list uses the same filters and actions
   await expect(page.locator('#fleet-table-wrap')).toBeVisible();
   await expect(page.locator('#view-list')).toHaveAttribute('aria-pressed', 'true');
   await page.getByRole('button', { name: 'Switch to dark mode', exact: true }).click();
+  await expect(page.locator('.site-footer-logo-dark')).toBeVisible();
+  await expect(page.locator('.site-footer-logo-light')).toBeHidden();
   await page.getByRole('button', { name: 'Cards', exact: true }).click();
   await page.reload();
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
@@ -118,6 +134,50 @@ test('light and dark themes have readable status colors and large touch targets 
   }
   await page.setViewportSize({ width: 390, height: 844 });
   await page.screenshot({ path: testInfo.outputPath('phone-dark-cards.png'), fullPage: true });
+});
+
+test('phone layouts offer compact rows, dense cards, and full cards with a saved preference', async ({ page }) => {
+  const errors: string[] = [];
+  page.on('pageerror', error => errors.push(error.message));
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto(base + '/');
+  await expect(page.locator('#app-view')).toBeVisible();
+
+  const fleet = page.locator('#fleet-container');
+  const layoutButtons = ['rows', 'dense', 'full'].map(name => page.locator('#mobile-layout-' + name));
+  await expect(layoutButtons[0]).toBeVisible();
+  await expect(layoutButtons[1]).toHaveAttribute('aria-pressed', 'true');
+  await expect(fleet.locator('.truck-card')).toHaveCount(3);
+  await expect(fleet.locator('.truck-card .meta-grid').first()).toBeHidden();
+  for (const selector of ['#mobile-layout-rows', '#mobile-layout-dense', '#mobile-layout-full']) {
+    expect((await page.locator(selector).boundingBox())!.height).toBeGreaterThanOrEqual(44);
+  }
+
+  await layoutButtons[0].click();
+  await expect(fleet).toHaveAttribute('data-mobile-layout', 'rows');
+  await expect(layoutButtons[0]).toHaveAttribute('aria-pressed', 'true');
+  await expect(fleet.locator('#fleet-grid')).toBeHidden();
+  await expect(fleet.locator('#fleet-table-wrap')).toBeVisible();
+  await expect(fleet.locator('#fleet-table-body tr')).toHaveCount(3);
+  for (const selector of ['#fleet-table-body [data-details]', '#fleet-table-body [data-inspect]', '#fleet-table-body [data-history]']) {
+    expect((await page.locator(selector).first().boundingBox())!.height).toBeGreaterThanOrEqual(44);
+  }
+
+  await layoutButtons[2].click();
+  await expect(fleet).toHaveAttribute('data-mobile-layout', 'full');
+  await expect(fleet.locator('#fleet-grid')).toBeVisible();
+  await expect(fleet.locator('#fleet-table-wrap')).toBeHidden();
+  await expect(fleet.locator('.truck-card .meta-grid').first()).toBeVisible();
+  await expect(fleet.locator('.truck-card [data-delete]')).toHaveCount(0);
+  for (const selector of ['.truck-card [data-details]', '.truck-card [data-inspect]', '.truck-card [data-history]']) {
+    expect((await page.locator(selector).first().boundingBox())!.height).toBeGreaterThanOrEqual(44);
+  }
+
+  await layoutButtons[1].click();
+  await page.reload();
+  await expect(fleet).toHaveAttribute('data-mobile-layout', 'dense');
+  await expect(page.locator('#mobile-layout-dense')).toHaveAttribute('aria-pressed', 'true');
+  expect(errors).toEqual([]);
 });
 
 test('saved theme is applied on the passcode gate without showing fleet data', async ({ page }) => {

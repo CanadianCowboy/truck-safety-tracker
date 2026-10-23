@@ -73,7 +73,8 @@ export function renderQrScript(): string {
           '<div class="meta-grid">' + fields.map(([label, value]) => '<div class="meta-item"><span>' + escapeHtml(label) + '</span><strong>' + escapeHtml(value || '—') + '</strong></div>').join('') + '</div>';
         actions.innerHTML = '<button type="button" class="btn btn-success" data-inspect="' + escapeHtml(t.id) + '">Log Safety</button>' +
           '<button type="button" class="btn btn-secondary" data-history="' + escapeHtml(t.id) + '">History / certificates</button>' +
-          '<button type="button" class="btn btn-secondary" data-edit="' + escapeHtml(t.id) + '">Edit unit</button>';
+          '<button type="button" class="btn btn-secondary" data-edit="' + escapeHtml(t.id) + '">Edit unit</button>' +
+          '<button type="button" class="btn btn-danger" data-delete="' + escapeHtml(t.id) + '">Delete unit</button>';
         print.href = API_BASE + '/trucks/' + encodeURIComponent(t.id) + '/label';
         print.classList.remove('hidden');
       } catch (err) {

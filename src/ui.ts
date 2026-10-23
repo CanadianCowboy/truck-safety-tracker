@@ -84,6 +84,15 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
   <link rel="manifest" href="${basePath}/manifest.json" />
   <link rel="icon" type="image/svg+xml" href="${basePath}/icon.svg" />
   <link rel="apple-touch-icon" href="${basePath}/icon-192.png" />
+  <style>
+    @font-face {
+      font-family: "Mona Sans Footer";
+      src: url("${basePath}/fonts/MonaSansVF-opsz-wght.woff2") format("woff2");
+      font-style: normal;
+      font-weight: 200 900;
+      font-display: swap;
+    }
+  </style>
   <script>
     // Apply the saved theme before first paint; storage restrictions never block the app.
     try { document.documentElement.dataset.theme = localStorage.getItem('truck_safety_theme') === 'light' ? 'light' : 'dark'; }
@@ -392,6 +401,8 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
       }
 
       .site-footer {
+        font-family: "Mona Sans Footer", var(--font-sans);
+        font-optical-sizing: auto;
         display: flex;
         justify-content: center;
         align-items: center;
@@ -405,10 +416,32 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
       }
 
       .site-footer a {
+        font-family: "Mona Sans Footer", var(--font-sans);
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
         color: var(--text-secondary);
         text-decoration: none;
         text-underline-offset: 3px;
         transition: color 0.16s var(--ease-snappy);
+      }
+
+      .site-footer-logo {
+        display: none;
+        width: auto;
+        height: 20px;
+      }
+
+      .site-footer-logo-dark {
+        display: block;
+      }
+
+      :root[data-theme="light"] .site-footer-logo-dark {
+        display: none;
+      }
+
+      :root[data-theme="light"] .site-footer-logo-light {
+        display: block;
       }
 
       .site-footer a:hover {
@@ -748,6 +781,35 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
         font-size: 0.85rem;
         font-weight: 500;
         font-variant-numeric: tabular-nums;
+      }
+
+      /* PHONE LAYOUT CHOOSER (shown only on compact screens) */
+      .mobile-layout-switch {
+        display: none;
+        gap: 3px;
+        align-items: center;
+        background: var(--input-bg);
+        padding: 3px;
+        border-radius: 11px;
+        border: 1px solid var(--border);
+      }
+
+      .mobile-layout-switch .btn {
+        border: none;
+        background: transparent;
+        box-shadow: none;
+        min-height: 44px;
+        padding: 6px 10px;
+        border-radius: 8px;
+        color: var(--text-muted);
+        flex: 1 1 0;
+        font-size: 0.76rem;
+      }
+
+      .mobile-layout-switch .btn[aria-pressed="true"] {
+        background: var(--accent);
+        color: var(--on-accent);
+        box-shadow: 0 2px 8px var(--accent-glow);
       }
 
       /* SEGMENTED VIEW SWITCHER */
@@ -1406,6 +1468,104 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
       #fleet-container[data-view="list"] .fleet-table-wrap:not(.hidden) { display: block; }
     }
 
+    @media (max-width: 959px) {
+      .mobile-layout-switch { display: flex; width: 100%; }
+
+      #fleet-container[data-mobile-layout="rows"] #fleet-grid { display: none; }
+      #fleet-container[data-mobile-layout="rows"] .fleet-table-wrap:not(.hidden) { display: block; }
+
+      #fleet-container[data-mobile-layout="dense"] .fleet-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+      }
+
+      #fleet-container[data-mobile-layout="dense"] .truck-card {
+        padding: 12px;
+        gap: 8px;
+      }
+
+      #fleet-container[data-mobile-layout="dense"] .truck-top { display: block; }
+      #fleet-container[data-mobile-layout="dense"] .truck-top > div:first-child { margin-bottom: 7px; }
+      #fleet-container[data-mobile-layout="dense"] .unit-title { font-size: 0.98rem; gap: 5px; }
+      #fleet-container[data-mobile-layout="dense"] .type-pill,
+      #fleet-container[data-mobile-layout="dense"] .op-pill { font-size: 0.61rem; padding: 2px 6px; }
+      #fleet-container[data-mobile-layout="dense"] .truck-sub,
+      #fleet-container[data-mobile-layout="dense"] .meta-grid,
+      #fleet-container[data-mobile-layout="dense"] .truck-notes { display: none; }
+      #fleet-container[data-mobile-layout="dense"] .truck-card .safety-badge {
+        width: 100%;
+        margin: 0;
+        padding: 7px 8px;
+        font-size: 0.82rem;
+        gap: 3px;
+      }
+      #fleet-container[data-mobile-layout="dense"] .safety-badge small { font-size: 0.7rem; }
+      #fleet-container[data-mobile-layout="dense"] .truck-actions {
+        gap: 4px;
+        padding-top: 7px;
+      }
+      #fleet-container[data-mobile-layout="dense"] .truck-actions .btn {
+        flex: 1 1 calc(50% - 4px);
+        min-width: 0;
+        min-height: 44px;
+        padding: 5px 6px;
+        font-size: 0.68rem;
+        white-space: normal;
+      }
+
+      #fleet-container[data-mobile-layout="rows"] .fleet-table-wrap {
+        border-radius: 12px;
+      }
+      #fleet-container[data-mobile-layout="rows"] .fleet-table {
+        display: block;
+        font-size: 0.78rem;
+      }
+      #fleet-container[data-mobile-layout="rows"] .fleet-table caption {
+        padding: 10px 12px;
+        font-size: 0.82rem;
+      }
+      #fleet-container[data-mobile-layout="rows"] .fleet-table thead { display: none; }
+      #fleet-container[data-mobile-layout="rows"] .fleet-table tbody { display: block; }
+      #fleet-container[data-mobile-layout="rows"] .fleet-table tbody tr {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        align-items: center;
+        gap: 4px 8px;
+        padding: 8px 10px;
+        border-bottom: 1px solid var(--border);
+      }
+      #fleet-container[data-mobile-layout="rows"] .fleet-table tbody tr:last-child { border-bottom: 0; }
+      #fleet-container[data-mobile-layout="rows"] .fleet-table td {
+        width: auto;
+        padding: 0;
+        border: 0;
+      }
+      #fleet-container[data-mobile-layout="rows"] .fleet-table td:nth-child(1) { grid-column: 1; grid-row: 1; }
+      #fleet-container[data-mobile-layout="rows"] .fleet-table td:nth-child(2) { grid-column: 2; grid-row: 1; }
+      #fleet-container[data-mobile-layout="rows"] .fleet-table td:nth-child(3) { display: none; }
+      #fleet-container[data-mobile-layout="rows"] .fleet-table td:nth-child(4) { grid-column: 1 / -1; grid-row: 2; }
+      #fleet-container[data-mobile-layout="rows"] .fleet-table .list-sub { font-size: 0.7rem; }
+      #fleet-container[data-mobile-layout="rows"] .fleet-table .safety-badge {
+        display: block;
+        padding: 5px 7px;
+        font-size: 0.69rem;
+        white-space: nowrap;
+      }
+      #fleet-container[data-mobile-layout="rows"] .fleet-table .safety-badge small { font-size: 0.65rem; }
+      #fleet-container[data-mobile-layout="rows"] .list-actions { gap: 4px; }
+      #fleet-container[data-mobile-layout="rows"] .list-actions .btn {
+        flex: 1 1 auto;
+        min-width: 0;
+        min-height: 44px;
+        padding: 4px 7px;
+        font-size: 0.68rem;
+      }
+    }
+
+    @media (max-width: 379px) {
+      #fleet-container[data-mobile-layout="dense"] .fleet-grid { grid-template-columns: 1fr; }
+    }
+
     @media (max-width: 700px) {
       .app-header { position: static; padding: 12px; }
       .header-actions { width: 100%; gap: 8px; position: relative; }
@@ -1582,6 +1742,11 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
           <p id="filter-help" class="filter-help">“Within” includes today, but not overdue units. “Close” uses the warning days in Settings.</p>
         </div>
         <div class="toolbar-right">
+          <div class="mobile-layout-switch" role="group" aria-label="Phone unit layout">
+            <button type="button" id="mobile-layout-rows" class="btn btn-secondary btn-sm" aria-pressed="false" title="Compact rows show the most units at once">Rows</button>
+            <button type="button" id="mobile-layout-dense" class="btn btn-secondary btn-sm" aria-pressed="true" title="Dense cards show more units with key status information">Dense</button>
+            <button type="button" id="mobile-layout-full" class="btn btn-secondary btn-sm" aria-pressed="false" title="Full cards show every unit detail">Full</button>
+          </div>
           <div class="view-switch" role="group" aria-label="Desktop fleet view">
             <button type="button" id="view-cards" class="btn btn-secondary btn-sm" aria-pressed="true">Cards</button>
             <button type="button" id="view-list" class="btn btn-secondary btn-sm" aria-pressed="false">Compact list</button>
@@ -1614,7 +1779,8 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
     <footer class="site-footer">
       <span>Open source under the MIT License</span>
       <span class="site-footer-separator" aria-hidden="true">·</span>
-      <a href="https://github.com/CanadianCowboy/truck-safety-tracker" target="_blank" rel="noopener noreferrer" aria-label="View Truck Safety Tracker on GitHub (opens in a new tab)">View on GitHub <span aria-hidden="true">↗</span></a>
+      <span>View on</span>
+      <a href="https://github.com/CanadianCowboy/truck-safety-tracker" target="_blank" rel="noopener noreferrer" aria-label="GitHub"><img class="site-footer-logo site-footer-logo-dark" src="${basePath}/github-lockup-white.svg" alt="GitHub" /><img class="site-footer-logo site-footer-logo-light" src="${basePath}/github-lockup-black.svg" alt="GitHub" /></a>
     </footer>
   </div>
 
@@ -1897,6 +2063,7 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
     let fleetData = [];
     let appSettings = { warning_days: 30, webhook_url: '', webhook_type: 'auto' };
     let activeHistoryTruckId = null;
+    let mobileLayout = readPreference('truck_safety_mobile_layout', 'dense');
 
     function readPreference(key, fallback) {
       try { return localStorage.getItem(key) || fallback; } catch { return fallback; }
@@ -1936,8 +2103,25 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
       }
     }
     setFleetView(readPreference('truck_safety_view', 'cards'));
-    document.getElementById('view-cards').addEventListener('click', () => setFleetView('cards'));
-    document.getElementById('view-list').addEventListener('click', () => setFleetView('list'));
+    document.getElementById('view-cards').addEventListener('click', () => { setFleetView('cards'); renderFleet(); });
+    document.getElementById('view-list').addEventListener('click', () => { setFleetView('list'); renderFleet(); });
+
+    function setMobileLayout(layout, persist = true) {
+      mobileLayout = ['rows', 'dense', 'full'].includes(layout) ? layout : 'dense';
+      const fleet = document.getElementById('fleet-container');
+      fleet.dataset.mobileLayout = mobileLayout;
+      ['rows', 'dense', 'full'].forEach(option => {
+        document.getElementById('mobile-layout-' + option).setAttribute('aria-pressed', String(option === mobileLayout));
+      });
+      if (persist) {
+        savePreference('truck_safety_mobile_layout', mobileLayout);
+        renderFleet();
+      }
+    }
+    setMobileLayout(mobileLayout, false);
+    ['rows', 'dense', 'full'].forEach(layout => {
+      document.getElementById('mobile-layout-' + layout).addEventListener('click', () => setMobileLayout(layout));
+    });
     const tools = document.getElementById('header-tools');
     tools.addEventListener('click', event => {
       if (event.target.closest('button')) tools.open = false;
@@ -2174,7 +2358,9 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
       const empty = document.getElementById('fleet-empty');
       const tableBody = document.getElementById('fleet-table-body');
       const tableWrap = document.getElementById('fleet-table-wrap');
-      tableWrap.classList.toggle('hidden', filtered.length === 0);
+      const desktopList = window.matchMedia('(min-width: 960px)').matches && document.getElementById('fleet-container').dataset.view === 'list';
+      const phoneRows = window.matchMedia('(max-width: 959px)').matches && mobileLayout === 'rows';
+      tableWrap.classList.toggle('hidden', filtered.length === 0 || !(desktopList || phoneRows));
       tableBody.innerHTML = filtered.map(t => {
         const id = escapeHtml(t.id);
         const dueLabel = t.next_due_date ? 'Due ' + escapeHtml(t.next_due_date) : 'Inspection date pending';
@@ -2183,7 +2369,7 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
           '<td><strong>Unit #' + escapeHtml(t.unit_number) + '</strong><span class="list-sub">' + escapeHtml(t.vehicle_type) + (t.status !== 'Active' ? ' · ' + escapeHtml(t.status) : '') + '</span><span class="list-sub">' + escapeHtml(vehicleLine) + '</span></td>' +
           '<td><span class="safety-badge ' + escapeHtml(t.safety_status) + '">' + escapeHtml(formatDaysBadge(t)) + '<small>' + dueLabel + '</small></span></td>' +
           '<td>' + escapeHtml(t.last_inspection_date || '—') + '<span class="list-sub">' + escapeHtml(t.license_plate || '') + '</span></td>' +
-          '<td><div class="list-actions"><button type="button" class="btn btn-secondary btn-sm" data-details="' + id + '">Details / QR</button><button type="button" class="btn btn-success btn-sm" data-inspect="' + id + '">Log Safety</button><button type="button" class="btn btn-secondary btn-sm" data-history="' + id + '">Files (' + (t.attachment_count || 0) + ')</button><button type="button" class="btn btn-secondary btn-sm" data-edit="' + id + '">Edit</button><button type="button" class="btn btn-danger btn-sm" data-delete="' + id + '" aria-label="Delete Unit #' + escapeHtml(t.unit_number) + '">Delete</button></div></td></tr>';
+          '<td><div class="list-actions"><button type="button" class="btn btn-secondary btn-sm" data-details="' + id + '">Details</button><button type="button" class="btn btn-success btn-sm" data-inspect="' + id + '">Log Safety</button><button type="button" class="btn btn-secondary btn-sm" data-history="' + id + '">Files (' + (t.attachment_count || 0) + ')</button><button type="button" class="btn btn-secondary btn-sm" data-edit="' + id + '">Edit</button></div></td></tr>';
       }).join('');
       const hasFleet = fleetData.length > 0;
       document.getElementById('fleet-empty-title').textContent = hasFleet ? 'No units match these filters' : 'No trucks or trailers found';
@@ -2258,12 +2444,11 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
               </div>
 
               <div class="truck-actions">
-                <button type="button" class="btn btn-secondary btn-sm" data-details="\${escapeHtml(t.id)}">Details / QR</button>
+                <button type="button" class="btn btn-secondary btn-sm" data-details="\${escapeHtml(t.id)}">Details</button>
                 <button type="button" class="btn btn-success btn-sm" data-inspect="\${escapeHtml(t.id)}">✓ Log Safety</button>
                 \${latestFileBtn}
                 <button type="button" class="btn btn-secondary btn-sm" data-history="\${escapeHtml(t.id)}">📂 Files (\${t.attachment_count || 0})</button>
                 <button type="button" class="btn btn-secondary btn-sm" data-edit="\${escapeHtml(t.id)}">✎ Edit</button>
-                <button type="button" class="btn btn-danger btn-sm" style="flex:0;" data-delete="\${escapeHtml(t.id)}" title="Delete Unit" aria-label="Delete Unit #\${escapeHtml(t.unit_number)}">🗑</button>
               </div>
             </article>
           \`;
