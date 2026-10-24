@@ -5,26 +5,64 @@ export function renderQrScript(): string {
     const uuidPattern = new RegExp(${JSON.stringify(UNIT_UUID_PATTERN)}, 'i');
     let pendingUnitId = null;
     let overviewRequest = 0;
+    let selectedUnitId = null;
     let cameraStream = null;
     let cameraTimer = null;
     let cameraRequest = 0;
     let readerPromise = null;
 
-    function setPendingUnit(id) {
+    function setPendingUnit(id, pushHistory = false) {
       pendingUnitId = id;
       const url = new URL(location.href);
+      const currentUnit = url.searchParams.get('unit');
       url.searchParams.set('unit', id);
-      history.replaceState(null, '', url);
+      if (pushHistory && currentUnit !== id) {
+        history.pushState({ unit: id }, '', url);
+      } else {
+        history.replaceState({ unit: id }, '', url);
+      }
       document.getElementById('pending-unit-message').classList.remove('hidden');
     }
 
-    function clearPendingUnit() {
+    function clearPendingUnit(fromPopState = false) {
       pendingUnitId = null;
+      selectedUnitId = null;
+      activeHistoryTruckId = null;
       overviewRequest++;
-      const url = new URL(location.href);
-      url.searchParams.delete('unit');
-      history.replaceState(null, '', url);
+      if (!fromPopState) {
+        const url = new URL(location.href);
+        url.searchParams.delete('unit');
+        history.replaceState(null, '', url);
+      }
       document.getElementById('pending-unit-message').classList.add('hidden');
+      const panel = document.getElementById('modal-unit');
+      panel.classList.add('hidden');
+      panel.removeAttribute('data-has-selection');
+      const emptyBox = document.getElementById('detail-empty-state');
+      const contentBox = document.getElementById('detail-selected-content');
+      if (emptyBox) emptyBox.classList.remove('hidden');
+      if (contentBox) contentBox.classList.add('hidden');
+      document.getElementById('unit-title').textContent = 'Select a unit';
+      document.getElementById('unit-details').innerHTML = '';
+      document.getElementById('unit-actions').innerHTML = '';
+      const secActions = document.getElementById('unit-secondary-actions');
+      if (secActions) secActions.innerHTML = '';
+      const badgeHost = document.getElementById('unit-status-badge-host');
+      if (badgeHost) badgeHost.innerHTML = '';
+      const subHost = document.getElementById('unit-subtitle-host');
+      if (subHost) subHost.textContent = '';
+      const print = document.getElementById('unit-print-label');
+      print.classList.add('hidden');
+      print.removeAttribute('href');
+      updateSelectedUnitHighlight();
+    }
+
+    function updateSelectedUnitHighlight() {
+      document.querySelectorAll('[data-unit-row]').forEach(el => {
+        const isSel = selectedUnitId && el.getAttribute('data-unit-row') === selectedUnitId;
+        el.classList.toggle('is-selected', Boolean(isSel));
+        el.setAttribute('aria-selected', String(Boolean(isSel)));
+      });
     }
 
     async function openPendingUnit() {
@@ -34,21 +72,47 @@ export function renderQrScript(): string {
       await openUnitOverview(id);
     }
 
-    async function openUnitOverview(id) {
-      setPendingUnit(id);
+    async function openUnitOverview(id, options = {}) {
+      setPendingUnit(id, !options.fromPopState && !document.getElementById('gate-view').classList.contains('hidden') === false);
       if (!document.getElementById('gate-view').classList.contains('hidden')) return;
       pendingUnitId = null;
+      selectedUnitId = id;
+      activeHistoryTruckId = id;
       const generation = ++overviewRequest;
       const modal = document.getElementById('modal-unit');
+      const emptyBox = document.getElementById('detail-empty-state');
+      const contentBox = document.getElementById('detail-selected-content');
       const details = document.getElementById('unit-details');
       const actions = document.getElementById('unit-actions');
+      const secActions = document.getElementById('unit-secondary-actions');
+      const badgeHost = document.getElementById('unit-status-badge-host');
+      const subHost = document.getElementById('unit-subtitle-host');
       const print = document.getElementById('unit-print-label');
-      document.getElementById('unit-title').textContent = 'Unit overview';
+      const historyList = document.getElementById('detail-history-list');
+      const uploadSection = document.getElementById('detail-upload-section');
+
+      if (emptyBox) emptyBox.classList.add('hidden');
+      if (contentBox) contentBox.classList.remove('hidden');
+      modal.setAttribute('data-has-selection', 'true');
+      modal.classList.remove('hidden');
+      updateSelectedUnitHighlight();
+
+      const cachedUnit = fleetData.find(unit => unit.id === id);
+      document.getElementById('unit-title').textContent = cachedUnit ? ('Unit #' + cachedUnit.unit_number) : 'Unit overview';
+      if (subHost) {
+        subHost.textContent = cachedUnit
+          ? [cachedUnit.vehicle_type, cachedUnit.equipment_type, [cachedUnit.year, cachedUnit.make, cachedUnit.model].filter(Boolean).join(' ')].filter(Boolean).join(' · ')
+          : 'Loading unit details…';
+      }
+      if (badgeHost) badgeHost.innerHTML = '';
       details.textContent = 'Loading unit…';
       actions.innerHTML = '';
+      if (secActions) secActions.innerHTML = '';
       print.classList.add('hidden');
       print.removeAttribute('href');
-      modal.classList.remove('hidden');
+      if (uploadSection) uploadSection.classList.add('hidden');
+      if (historyList) historyList.innerHTML = '<p class="muted-note">Loading inspection history…</p>';
+
       try {
         const response = await apiFetch('/trucks/' + encodeURIComponent(id));
         const { truck: t } = await response.json();
@@ -58,28 +122,84 @@ export function renderQrScript(): string {
         if (existing >= 0) {
           const previous = fleetData[existing];
           fleetData[existing] = { ...t, attachment_count: previous.attachment_count, latest_attachment: previous.latest_attachment };
-        } else fleetData.push(t);
+        } else {
+          fleetData.push(t);
+        }
+        selectedUnitId = t.id;
+        activeHistoryTruckId = t.id;
+        updateSelectedUnitHighlight();
+
         document.getElementById('unit-title').textContent = 'Unit #' + t.unit_number;
-        const fields = [
-          ['Vehicle type', t.vehicle_type], ['Equipment / body type', t.equipment_type], ['Operational status', t.status],
-          ['Safety status', formatDaysBadge(t)], ['Next safety due', t.next_due_date || 'No date set'],
-          ['Last inspection', t.last_inspection_date || 'No date set'], ['Inspection interval', t.interval_months + ' months'],
-          ['Vehicle', [t.year, t.make, t.model].filter(Boolean).join(' ')],
-          ['Plate', t.license_plate], ['VIN', t.vin], ['GVWR', t.gvwr],
-          ['Shop / mechanic', t.shop_name], ['Sticker / certificate', t.sticker_number],
-          ['Notes', t.notes], ['Permanent unit UUID', t.id],
+        if (subHost) {
+          subHost.textContent = [t.vehicle_type, t.equipment_type, [t.year, t.make, t.model].filter(Boolean).join(' '), t.license_plate ? ('Plate ' + t.license_plate) : ''].filter(Boolean).join(' · ');
+        }
+        if (badgeHost) {
+          const dueNote = t.next_due_date ? ('Due ' + escapeHtml(t.next_due_date)) : 'No due date set';
+          badgeHost.innerHTML = '<div class="safety-badge ' + escapeHtml(t.safety_status) + '"><span>' + escapeHtml(formatStatusWithIcon(t)) + '</span><small>' + dueNote + '</small></div>';
+        }
+
+        const summaryFields = [
+          ['Safety status', formatDaysBadge(t)],
+          ['Next safety due', t.next_due_date || 'No date set'],
+          ['Last inspection', t.last_inspection_date || 'No date set'],
+          ['Inspection interval', (t.interval_months || 12) + ' months'],
         ];
-        details.innerHTML = (t.status === 'Inactive' ? '<p role="status" class="truck-notes">This unit is inactive.</p>' : '') +
-          '<div class="meta-grid">' + fields.map(([label, value]) => '<div class="meta-item"><span>' + escapeHtml(label) + '</span><strong>' + escapeHtml(value || '—') + '</strong></div>').join('') + '</div>';
-        actions.innerHTML = '<button type="button" class="btn btn-success" data-inspect="' + escapeHtml(t.id) + '">Log Safety</button>' +
-          '<button type="button" class="btn btn-secondary" data-history="' + escapeHtml(t.id) + '">History / certificates</button>' +
-          '<button type="button" class="btn btn-secondary" data-edit="' + escapeHtml(t.id) + '">Edit unit</button>' +
-          '<button type="button" class="btn btn-danger" data-delete="' + escapeHtml(t.id) + '">Delete unit</button>';
+        const unitFields = [
+          ['Vehicle type', t.vehicle_type],
+          ['Equipment / body type', t.equipment_type],
+          ['Operational status', t.status],
+          ['Vehicle', [t.year, t.make, t.model].filter(Boolean).join(' ')],
+          ['Plate', t.license_plate],
+          ['GVWR', t.gvwr],
+          ['VIN', t.vin],
+          ['Shop / mechanic', t.shop_name],
+          ['Sticker / certificate', t.sticker_number],
+          ['Permanent unit UUID', t.id],
+        ];
+        details.innerHTML =
+          (t.status === 'Inactive' ? '<p role="status" class="truck-notes" style="margin-bottom:10px;">This unit is inactive.</p>' : '') +
+          (t.notes ? '<div class="truck-notes" style="margin-bottom:10px;"><strong>Notes:</strong> ' + escapeHtml(t.notes) + '</div>' : '') +
+          '<div class="detail-section-label">Inspection Summary</div>' +
+          '<div class="meta-grid detail-summary-grid">' + summaryFields.map(([label, value]) => '<div class="meta-item"><span>' + escapeHtml(label) + '</span><strong>' + escapeHtml(value || '—') + '</strong></div>').join('') + '</div>' +
+          '<details class="detail-disclosure" open style="margin-top:12px;">' +
+            '<summary>Unit Information & Specifications</summary>' +
+            '<div class="detail-disclosure-body">' +
+              '<div class="meta-grid">' + unitFields.map(([label, value]) => '<div class="meta-item"><span>' + escapeHtml(label) + '</span><strong>' + escapeHtml(value || '—') + '</strong></div>').join('') + '</div>' +
+            '</div>' +
+          '</details>';
+
+        const latestCertBtn = (fleetData[existing >= 0 ? existing : fleetData.length - 1]?.latest_attachment)
+          ? '<button type="button" class="btn btn-secondary btn-sm" data-view-file="' + escapeHtml(fleetData[existing >= 0 ? existing : fleetData.length - 1].latest_attachment.id) + '" data-file-name="' + escapeHtml(fleetData[existing >= 0 ? existing : fleetData.length - 1].latest_attachment.file_name) + '" data-file-type="' + escapeHtml(fleetData[existing >= 0 ? existing : fleetData.length - 1].latest_attachment.content_type) + '">📄 View Latest Cert</button>'
+          : '';
+
+        actions.innerHTML =
+          '<button type="button" class="btn btn-success btn-sm" data-inspect="' + escapeHtml(t.id) + '">Log Safety</button>' +
+          latestCertBtn +
+          '<button type="button" class="btn btn-secondary btn-sm" data-history="' + escapeHtml(t.id) + '">History / certificates</button>' +
+          '<button type="button" class="btn btn-secondary btn-sm" data-edit="' + escapeHtml(t.id) + '">Edit unit</button>' +
+          '<div class="danger-zone-box" style="width:100%; flex-basis:100%; margin-top:8px;">' +
+            '<span style="font-size:0.78rem; color:var(--text-muted);">Permanent removal</span>' +
+            '<button type="button" class="btn btn-danger btn-sm" data-delete="' + escapeHtml(t.id) + '" style="flex:0 0 auto;">Delete unit</button>' +
+          '</div>';
+
         print.href = API_BASE + '/trucks/' + encodeURIComponent(t.id) + '/label';
         print.classList.remove('hidden');
+        if (uploadSection) uploadSection.classList.remove('hidden');
+
+        if (typeof loadDetailHistory === 'function') {
+          await loadDetailHistory(t.id, generation);
+        }
+        if (options && options.scrollToHistory) {
+          const histSec = document.getElementById('detail-history-section');
+          if (histSec) histSec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
       } catch (err) {
         if (err.message === 'Unauthorized') { setPendingUnit(id); return; }
         if (generation !== overviewRequest || !document.getElementById('gate-view').classList.contains('hidden')) return;
+        if (subHost) subHost.textContent = 'Lookup error';
+        if (badgeHost) badgeHost.innerHTML = '';
+        if (uploadSection) uploadSection.classList.add('hidden');
+        if (historyList) historyList.innerHTML = '';
         details.textContent = err.message === 'Truck not found'
           ? 'Unit not found or deleted. This UUID is not linked to a unit in Safety Tracker. No record was created.'
           : 'Unable to open unit: ' + err.message;
@@ -204,6 +324,16 @@ export function renderQrScript(): string {
     window.addEventListener('pagehide', stopUnitCamera);
     document.addEventListener('visibilitychange', () => {
       if (document.visibilityState === 'hidden') stopUnitCamera();
+    });
+    window.addEventListener('popstate', () => {
+      if (document.getElementById('gate-view').classList.contains('hidden')) {
+        const unitParam = new URL(location.href).searchParams.get('unit');
+        if (unitParam && uuidPattern.test(unitParam)) {
+          openUnitOverview(unitParam.toLowerCase(), { fromPopState: true });
+        } else if (selectedUnitId) {
+          clearPendingUnit(true);
+        }
+      }
     });
     const requestedUnit = new URL(location.href).searchParams.get('unit');
     if (requestedUnit && uuidPattern.test(requestedUnit)) setPendingUnit(requestedUnit.toLowerCase());

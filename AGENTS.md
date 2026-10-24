@@ -43,8 +43,8 @@ This file provides comprehensive architectural, security, UI, testing, and opera
 | `src/push.ts` & `src/push-ui.ts` | RFC 8030 / RFC 8291 (`aes128gcm`) / RFC 8292 (VAPID) native Web Push implementation using `@block65/webcrypto-web-push`, push host allowlist (SSRF protection), atomic D1 rate-limiting/daily deduplication, and the Alerts UI / `/truck-safety/push-test` diagnostic page. |
 | `src/types.ts` | TypeScript interfaces for `Env`, `TruckRow`, `EnrichedTruck`, `InspectionRow`, `AttachmentRow`, and `AppSettings`. |
 | `migrations/` | Additive SQL migrations for D1 (`0001_init.sql`, `0002_web_push.sql`). |
-| `tests/utils.test.ts` | Vitest unit tests for date calculations, month-end expiry rules, auth token signing/expiry, `.ics` generation, and webhook formatting. |
-| `tests/push.test.ts` | Vitest unit tests for Web Push encryption, VAPID signatures, push-service status handling (`201` vs `404`/`410`), and daily cron deduplication. |
+| `tests/utils.test.ts` | Pure date calculations, month-end expiry, input validation and real HMAC token signing/expiry tests. Live fleet/calendar coverage is in `tests/browser/app.spec.ts`. |
+| `tests/push.test.ts` | Pure timezone, payload privacy and push endpoint validation tests; no simulated delivery or subscriptions. |
 | `tests/browser/*.spec.ts` | Playwright end-to-end browser tests (`app.spec.ts`, `ui.spec.ts`, `filters.spec.ts`, `qr.spec.ts`, `push.spec.ts`, `security.spec.ts`). |
 
 ---
@@ -84,7 +84,7 @@ When modifying features or fixing bugs, preserve these tested invariants:
 # 1. Typecheck Worker + Browser code (runs cf workers types && tsc)
 npm run typecheck
 
-# 2. Run fast unit tests (Vitest)
+# 2. Run pure logic tests and live NHTSA integration (requires internet)
 npm test
 
 # 3. Start local standalone dev server (local D1 + R2 in .cloudflare/state)
@@ -94,21 +94,29 @@ npm run dev:local
 npm run dev
 
 # 5. Run Playwright E2E suite (requires dev server running on 127.0.0.1:5173)
-npm run test:e2e
+APP_URL=http://127.0.0.1:5173 APP_PASSCODE=<actual-passcode> npm run test:e2e
 
 # 6. Production build check
 npm run build
 ```
 
+### Real Data Only — User Requirement
+
+- Never introduce, seed, or display mock/demo/sample fleet records in the app or its development databases.
+- Never fabricate VIN decode results or intercept API responses to demonstrate or verify user-facing behavior. Use the real configured backend and real NHTSA responses; report unavailable services as blockers instead of substituting fake data.
+- Do not create or run mocked-data tests without explicit user authorization. Existing test fixtures do not override this requirement. When replacing legacy mocked tests, retain meaningful assertions and replace them with real integration coverage rather than deleting or weakening checks.
+- Do not create temporary fleet units or modify production data for verification without explicit permission. Preserve real user records during cleanup and identify test records before removing them.
+
 ### Testing Guidelines for Agents
 
-- Always run `npm run typecheck` and `npm test` after any TypeScript or UI change.
+- Run `npm run typecheck` and `npm test` after TypeScript/UI changes. `npm test` uses pure logic and the real NHTSA API; an external outage is a failure/blocker, never a reason to substitute data.
 - When editing `src/ui.ts`, `src/qr-ui.ts`, or `src/push-ui.ts`:
   - `src/ui.ts` embeds client-side JavaScript inside a template literal. Escape backticks (`\``) and template interpolations (`\${...}`) carefully so browser scripts remain valid, and verify with `tsc -p tsconfig.browser.json` (included in `npm run typecheck`).
-  - Run `npm run test:e2e -- tests/browser/ui.spec.ts tests/browser/filters.spec.ts` to verify contrast, touch target sizes, theme persistence, and filter behavior.
-- **Important Safety Rule for Live vs. Local Databases:**
-  - `tests/browser/ui.spec.ts` and `tests/browser/filters.spec.ts` mock API routes and are safe against any server.
-  - `tests/browser/security.spec.ts` rotates the passcode and tests rate limits—**only** run it against a local `dev:local` instance, never against a live production backend.
+  - Run the real browser suites with `APP_URL` and `APP_PASSCODE` set. They log into the actual backend, never intercept API responses, and do not insert/update/delete fleet records.
+- **Coverage and safety:**
+  - Browser tests use real records when present; an empty fleet must stay empty. Data-dependent branches record coverage limitations rather than inventing units.
+  - No suite rotates passcodes, uploads certificates, subscribes devices, sends alerts, or changes fleet data. Authentication tests only create/end their own sessions.
+  - CRUD, certificate consistency on failed writes, live push delivery/deduplication, camera lifecycle and provider outage paths require dedicated authorized integration/manual checks; do not claim them as covered by read-only checks. See `tests/README.md`.
 
 ---
 

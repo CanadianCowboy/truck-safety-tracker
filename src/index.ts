@@ -30,6 +30,7 @@ import { InputError, validateDates, validateTruck, validateFile, validateWebhook
 import { renderUnitLabel } from './qr';
 import qrReaderSource from 'jsqr/dist/jsQR.js?raw';
 import { handlePushApi, localReminderTime, pushConfigured, sendFleetPush } from './push';
+import { decodeVin } from './vin';
 
 const corsHeaders: Record<string, string> = {
   'Cache-Control': 'no-store',
@@ -283,6 +284,11 @@ export default {
         // GET /api/auth/verify
         if (request.method === "GET" && subPath === "/api/auth/verify") {
           return jsonResponse({ ok: true });
+        }
+
+        // Explicit POST avoids putting VINs in app URLs, history or query logs; shared write limiter applies.
+        if (request.method === 'POST' && subPath === '/api/vin/decode') {
+          return jsonResponse({ decoded: await decodeVin(await request.json()) });
         }
 
         // GET /api/trucks

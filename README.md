@@ -24,6 +24,13 @@ A sleek, mobile-first, passcode-protected fleet safety inspection and certificat
 - **Permanent UUID QR Labels & In-Browser Scanner:**
   - Generate and print **1.5" × 1.5"** QR labels (including a 4-module quiet zone) containing only the unit's immutable UUID—no URLs, passcodes, or sensitive data embedded on the sticker.
   - Scan labels in-app using the device camera (decoded locally in the browser via `jsQR`) or paste a UUID directly.
+- **VIN Decoder (NHTSA vPIC):**
+  - Open **Tools → VIN decoder** for a standalone lookup, or **Decode VIN…** beside the VIN field in Add/Edit Unit.
+  - Preview year, make, model, body type, GVWR class/range, manufacturer, engine and fuel details, including partial-decode warnings. Compare current form values (including unsaved edits) beside decoded values in Add/Edit Unit. Choose individual fields using the preview checkboxes (available fields start selected), or use **Select all** / **Clear selection**, confirm replacements for checked fields only, then use **Save Unit**. Unchecked or missing values never erase your entries; Apply is disabled when no fields are selected.
+  - Warns when the decoded VIN matches another unit in the currently loaded fleet (case-insensitive, ignoring surrounding whitespace), excluding the unit being edited. The warning is advisory, not a database uniqueness check, and does not block applying or saving.
+  - A live-region connection panel shows **not checked**, **checking**, **connected (last lookup)** or **NHTSA temporarily unavailable**. Provider timeouts, rate limits and failed responses include an explicit **Retry VIN lookup** action and manual-entry guidance, without changing form values. App/network failures are labelled separately because they cannot confirm NHTSA's status. No polling, automatic retries or fallback data; the provider request is limited to 15 seconds and the browser stops waiting after 20 seconds.
+  - Supports full 17-character VINs for 1981+ vehicles, with an optional model year hint. This is not a title/history report or proof of inspection; verify GVWR against the vehicle label.
+  - No API key or new dependency. Only an explicit lookup sends VIN/year to [NHTSA vPIC](https://vpic.nhtsa.dot.gov/api/) through the authenticated, rate-limited `POST /truck-safety/api/vin/decode` route. No fleet data or credentials are forwarded; results are not cached or automatically saved.
 - **Reminders & Calendar Export:**
   - **Native Web Push (RFC 8030 / 8291 / 8292):** Zero-dependency Web Crypto push notifications (`@block65/webcrypto-web-push`) with no Firebase SDK or third-party push platform required.
   - **Outgoing Webhooks:** Optional daily digest and test alerts for **ntfy**, **Discord**, **Slack**, or generic HTTPS endpoints.
@@ -241,17 +248,19 @@ Open any unit's **Details / QR** modal and click **Print QR label**:
 # Generate Worker types and typecheck both Worker and Browser TypeScript
 npm run typecheck
 
-# Run unit tests (date math, month-end defaults, auth tokens, RFC 8291 Web Push, webhooks)
+# Run pure logic checks and real NHTSA integration (requires internet)
 npm test
 
 # Install Chromium for Playwright E2E tests (first time only)
 npx playwright install chromium
 
-# Run Playwright browser tests (start a local server in another terminal first)
-npm run test:e2e
+# Run real browser integrations (start the app first; never seed test fleet records)
+APP_URL=http://127.0.0.1:5180 APP_PASSCODE=<actual-passcode> npm run test:e2e
 ```
 
 ---
+
+Tests use real APIs and the actual loaded fleet, without mocks, seeded records or fake device APIs. An empty fleet stays empty. See [`tests/README.md`](./tests/README.md) for setup and explicit coverage limitations requiring real fleet records or physical devices.
 
 ## Project Structure
 
@@ -274,7 +283,7 @@ npm run test:e2e
 │   └── types.ts                # Shared TypeScript interfaces
 └── tests/
     ├── utils.test.ts           # Core logic unit tests
-    ├── push.test.ts            # Web Push encryption, VAPID, rate-limit & dedupe unit tests
+    ├── push.test.ts            # Pure reminder timezone, payload privacy & endpoint validation
     └── browser/                # Playwright E2E tests (app, UI, filters, QR, push, security)
 ```
 

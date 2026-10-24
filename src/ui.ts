@@ -107,30 +107,31 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
         --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
         --font-mono: "JetBrains Mono", "SF Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 
-        /* Linear Carbon & Specular Glass Dark Palette */
-        --bg: #080a0f;
-        --bg-elev: rgba(16, 20, 29, 0.78);
-        --bg-card: rgba(18, 23, 35, 0.72);
-        --bg-card-solid: #111622;
-        --bg-hover: rgba(30, 39, 58, 0.85);
+        /* Industrial Graphite & Neutral Operations Dark Palette */
+        --bg: #0b0e14;
+        --bg-nav: #0f131c;
+        --bg-elev: #141923;
+        --bg-card: #141923;
+        --bg-card-solid: #141923;
+        --bg-hover: #1c2433;
         --input-bg: #0b0f19;
-        --header-bg: rgba(8, 10, 15, 0.78);
-        --gate-glow: rgba(56, 189, 248, 0.16);
-        --meta-bg: rgba(10, 14, 23, 0.68);
+        --header-bg: #0f131c;
+        --gate-glow: rgba(56, 189, 248, 0.12);
+        --meta-bg: #10151f;
         --spec-strip-bg: rgba(255, 255, 255, 0.025);
         --notes-bg: rgba(30, 41, 59, 0.45);
 
-        --border: rgba(255, 255, 255, 0.085);
-        --border-strong: rgba(255, 255, 255, 0.16);
-        --specular-top: inset 0 1px 0 0 rgba(255, 255, 255, 0.09);
+        --border: rgba(255, 255, 255, 0.09);
+        --border-strong: rgba(255, 255, 255, 0.18);
+        --specular-top: inset 0 1px 0 0 rgba(255, 255, 255, 0.06);
 
         --text: #f8fafc;
         --text-secondary: #cbd5e1;
-        --text-muted: #8b9bb4;
+        --text-muted: #94a3b8;
 
         --accent: #38bdf8;
         --accent-hover: #0ea5e9;
-        --accent-glow: rgba(56, 189, 248, 0.24);
+        --accent-glow: rgba(56, 189, 248, 0.22);
         --on-accent: #041e30;
         --blue-text: #7dd3fc;
 
@@ -155,13 +156,13 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
         --nodate-border: rgba(148, 163, 184, 0.28);
         --nodate-text: #e2e8f0;
 
-        --shadow-sm: 0 2px 8px -2px rgba(0, 0, 0, 0.45);
-        --shadow: 0 14px 34px -8px rgba(0, 0, 0, 0.55), var(--specular-top);
-        --shadow-lg: 0 28px 64px -12px rgba(0, 0, 0, 0.78), var(--specular-top);
+        --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.35);
+        --shadow: 0 4px 14px -2px rgba(0, 0, 0, 0.45);
+        --shadow-lg: 0 16px 38px -8px rgba(0, 0, 0, 0.65);
 
-        --radius-sm: 8px;
-        --radius: 14px;
-        --radius-lg: 18px;
+        --radius-sm: 6px;
+        --radius: 10px;
+        --radius-lg: 12px;
         --radius-pill: 9999px;
 
         --ease-spring: cubic-bezier(0.22, 1, 0.36, 1);
@@ -172,19 +173,20 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
         color-scheme: light;
         /* Keep exact rgb(241, 245, 249) body & rgb(248, 250, 252) input-bg for test verification & crisp Alabaster look */
         --bg: #f1f5f9;
-        --bg-elev: rgba(255, 255, 255, 0.92);
+        --bg-nav: #1e2430;
+        --bg-elev: #ffffff;
         --bg-card: #ffffff;
         --bg-card-solid: #ffffff;
         --bg-hover: #e2e8f0;
         --input-bg: #f8fafc;
-        --header-bg: rgba(255, 255, 255, 0.86);
-        --gate-glow: rgba(14, 165, 233, 0.14);
+        --header-bg: #ffffff;
+        --gate-glow: rgba(14, 165, 233, 0.10);
         --meta-bg: #f8fafc;
         --spec-strip-bg: #f1f5f9;
         --notes-bg: #f1f5f9;
 
-        --border: rgba(15, 23, 42, 0.11);
-        --border-strong: rgba(15, 23, 42, 0.22);
+        --border: rgba(15, 23, 42, 0.12);
+        --border-strong: rgba(15, 23, 42, 0.24);
         --specular-top: inset 0 1px 0 0 rgba(255, 255, 255, 0.8);
 
         --text: #090d16;
@@ -217,9 +219,9 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
         --nodate-border: #cbd5e1;
         --nodate-text: #0f172a;
 
-        --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.05);
-        --shadow: 0 8px 24px -6px rgba(15, 23, 42, 0.07), 0 2px 6px -1px rgba(15, 23, 42, 0.04);
-        --shadow-lg: 0 24px 54px -12px rgba(15, 23, 42, 0.16);
+        --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.05);
+        --shadow: 0 4px 12px -2px rgba(15, 23, 42, 0.07);
+        --shadow-lg: 0 16px 36px -8px rgba(15, 23, 42, 0.16);
       }
 
       @supports (color: oklch(0.5 0.1 200)) {
@@ -259,9 +261,14 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
         font-feature-settings: "cv02", "cv03", "cv04", "cv11";
       }
 
-      /* Lock page scroll automatically when any modal is open using modern :has() */
-      body:has(.modal-backdrop:not(.hidden)) {
+      /* Lock page scroll automatically when any modal dialog is open using modern :has() */
+      body:has(.modal-backdrop:not(.workspace-detail):not(.hidden)) {
         overflow: hidden;
+      }
+      @media (max-width: 1199px) {
+        body:has(#modal-unit.workspace-detail:not(.hidden)) {
+          overflow: hidden;
+        }
       }
 
       button, input, select, textarea {
@@ -342,48 +349,59 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
         top: 0;
         z-index: 30;
         background: var(--header-bg);
-        backdrop-filter: blur(20px) saturate(180%);
-        -webkit-backdrop-filter: blur(20px) saturate(180%);
         border-bottom: 1px solid var(--border);
-        box-shadow: 0 1px 0 0 rgba(255, 255, 255, 0.03);
-        padding: 12px 24px;
+        padding: 10px 20px;
       }
 
       .header-inner {
-        max-width: 1340px;
+        max-width: 100%;
         margin: 0 auto;
         display: flex;
         flex-wrap: wrap;
         align-items: center;
         justify-content: space-between;
-        gap: 14px;
+        gap: 12px;
       }
 
       .brand {
         display: flex;
         align-items: center;
-        gap: 13px;
+        gap: 11px;
         min-width: 0;
       }
 
       .brand img {
-        width: 40px;
-        height: 40px;
-        border-radius: 11px;
-        box-shadow: 0 4px 14px var(--accent-glow), 0 0 0 1px var(--border-strong);
+        width: 34px;
+        height: 34px;
+        border-radius: 8px;
+        border: 1px solid var(--border-strong);
       }
 
       .brand-title {
-        font-size: 1.12rem;
+        font-size: 1.02rem;
         font-weight: 750;
-        letter-spacing: -0.022em;
+        letter-spacing: -0.02em;
         line-height: 1.2;
       }
 
       .brand-sub {
-        font-size: 0.76rem;
+        font-size: 0.73rem;
         color: var(--text-muted);
         overflow-wrap: anywhere;
+      }
+
+      .header-search-wrap {
+        flex: 1 1 280px;
+        max-width: 480px;
+        min-width: 180px;
+        display: flex;
+        align-items: center;
+      }
+
+      .header-search-wrap .search-input {
+        width: 100%;
+        min-width: 0;
+        min-height: 44px;
       }
 
       .header-actions {
@@ -393,11 +411,112 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
         gap: 8px;
       }
 
-      /* MAIN CONTENT */
-      .container {
-        max-width: 1340px;
-        margin: 0 auto;
-        padding: 26px 24px 80px;
+      /* WORKSPACE THREE-REGION SHELL */
+      .workspace-shell {
+        display: grid;
+        grid-template-columns: 224px minmax(0, 1fr) 420px;
+        align-items: start;
+        min-height: calc(100vh - 65px);
+        width: 100%;
+      }
+
+      /* LEFT REGION: GRAPHITE NAVIGATION & QUICK FLEET VIEWS */
+      .workspace-nav {
+        background: var(--bg-nav);
+        color: #f8fafc;
+        border-right: 1px solid rgba(255, 255, 255, 0.08);
+        padding: 16px 12px;
+        position: sticky;
+        top: 65px;
+        min-height: calc(100vh - 65px);
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+      }
+
+      .nav-section-title {
+        font-size: 0.68rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.07em;
+        color: #94a3b8;
+        padding: 0 10px;
+        margin-bottom: 6px;
+      }
+
+      .nav-list {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        list-style: none;
+      }
+
+      .nav-view-btn, .nav-tool-btn {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        padding: 9px 11px;
+        min-height: 44px;
+        border-radius: var(--radius-sm);
+        background: transparent;
+        border: 1px solid transparent;
+        color: #cbd5e1;
+        font-size: 0.85rem;
+        font-weight: 600;
+        text-align: left;
+        cursor: pointer;
+        transition: background-color 0.14s ease, color 0.14s ease, border-color 0.14s ease;
+      }
+
+      .nav-view-btn:hover, .nav-tool-btn:hover {
+        background: rgba(255, 255, 255, 0.06);
+        color: #ffffff;
+      }
+
+      .nav-view-btn[aria-current="true"], .nav-view-btn.active-nav {
+        background: rgba(56, 189, 248, 0.15);
+        border-color: rgba(56, 189, 248, 0.4);
+        color: #ffffff;
+      }
+
+      .nav-view-label {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        min-width: 0;
+      }
+
+      .nav-count {
+        font-family: var(--font-mono);
+        font-size: 0.75rem;
+        font-weight: 700;
+        padding: 2px 7px;
+        border-radius: var(--radius-pill);
+        background: rgba(255, 255, 255, 0.09);
+        color: #e2e8f0;
+        font-variant-numeric: tabular-nums;
+      }
+
+      .status-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        display: inline-block;
+        flex-shrink: 0;
+      }
+      .status-dot.overdue { background: #f43f5e; }
+      .status-dot.due_soon { background: #f59e0b; }
+      .status-dot.good { background: #10b981; }
+      .status-dot.no_date { background: #94a3b8; }
+      .status-dot.all { background: #38bdf8; }
+
+      /* CENTER REGION: MAIN FLEET WORKSPACE */
+      .container, .workspace-main {
+        min-width: 0;
+        width: 100%;
+        padding: 18px 20px 64px;
       }
 
       .site-footer {
@@ -407,9 +526,10 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
         justify-content: center;
         align-items: center;
         gap: 8px;
-        max-width: 1340px;
+        width: 100%;
         margin: 0 auto;
-        padding: 0 24px 28px;
+        padding: 18px 24px 28px;
+        border-top: 1px solid var(--border);
         color: var(--text-muted);
         font-size: 0.8rem;
         text-align: center;
@@ -454,17 +574,23 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
         user-select: none;
       }
 
-      /* KPI STATUS CARDS (Bento Specular Strip) */
+      /* COMPACT SUMMARY STRIP */
       .kpi-grid {
         display: grid;
-        grid-template-columns: repeat(4, 1fr);
-        gap: 14px;
-        margin-bottom: 22px;
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        gap: 8px;
+        margin-bottom: 14px;
       }
 
-      @media (max-width: 820px) {
+      @media (max-width: 900px) {
         .kpi-grid {
-          grid-template-columns: repeat(2, 1fr);
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+      }
+
+      @media (max-width: 560px) {
+        .kpi-grid {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
         }
       }
 
@@ -472,17 +598,15 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
       .toolbar {
         display: flex;
         flex-wrap: wrap;
-        gap: 12px;
+        gap: 10px;
         align-items: flex-end;
         justify-content: space-between;
         background: var(--bg-elev);
-        backdrop-filter: blur(16px);
-        -webkit-backdrop-filter: blur(16px);
         border: 1px solid var(--border);
-        border-radius: var(--radius-lg);
-        padding: 14px 16px;
-        margin-bottom: 22px;
-        box-shadow: var(--shadow-sm), var(--specular-top);
+        border-radius: var(--radius);
+        padding: 12px 14px;
+        margin-bottom: 14px;
+        box-shadow: var(--shadow-sm);
       }
 
       .toolbar-left, .toolbar-right {
@@ -505,13 +629,577 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
 
       .fleet-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
-        gap: 18px;
+        grid-template-columns: repeat(auto-fill, minmax(330px, 1fr));
+        gap: 14px;
       }
 
       @container fleet (max-width: 480px) {
         .fleet-grid {
           grid-template-columns: 1fr;
+        }
+      }
+
+      /* RIGHT REGION: PERSISTENT VEHICLE-DETAIL WORKSPACE PANEL */
+      .workspace-detail-col {
+        border-left: 1px solid var(--border);
+        background: var(--bg-elev);
+        position: sticky;
+        top: 65px;
+        height: calc(100vh - 65px);
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+      }
+
+      /* Override .modal-backdrop when #modal-unit is docked inside .workspace-detail-col on wide desktop */
+      @media (min-width: 1200px) {
+        .workspace-detail-col:has(#modal-unit:not(.hidden)) #detail-empty-state {
+          display: none;
+        }
+        #modal-unit.workspace-detail:not(.hidden) {
+          position: static !important;
+          inset: auto !important;
+          z-index: 10 !important;
+          background: transparent !important;
+          backdrop-filter: none !important;
+          -webkit-backdrop-filter: none !important;
+          padding: 0 !important;
+          display: flex !important;
+          align-items: stretch !important;
+          justify-content: flex-start !important;
+          flex: 1;
+        }
+        #modal-unit.workspace-detail .detail-panel-inner {
+          max-width: none;
+          max-height: none;
+          height: auto;
+          border: none;
+          border-radius: 0;
+          box-shadow: none;
+          padding: 18px;
+          background: transparent;
+        }
+      }
+
+      /* Intermediate widths (tablet / compact laptop): collapse left nav, present details as slide-over drawer */
+      @media (max-width: 1199px) {
+        .workspace-shell {
+          grid-template-columns: minmax(0, 1fr);
+        }
+        .workspace-detail-col {
+          border-left: none;
+          position: static;
+          height: auto;
+          overflow: visible;
+          background: transparent;
+        }
+        #detail-empty-state {
+          display: none !important;
+        }
+        .workspace-nav {
+          position: static;
+          min-height: auto;
+          padding: 10px 16px;
+          border-right: none;
+          border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+          flex-direction: row;
+          align-items: center;
+          justify-content: space-between;
+          flex-wrap: wrap;
+          gap: 10px;
+        }
+        .workspace-nav .nav-section-title,
+        .workspace-nav .nav-tools-group {
+          display: none;
+        }
+        .workspace-nav .nav-list {
+          flex-direction: row;
+          flex-wrap: wrap;
+          gap: 6px;
+          width: 100%;
+        }
+        .workspace-nav .nav-view-btn {
+          width: auto;
+          flex: 1 1 auto;
+          padding: 7px 10px;
+          min-height: 40px;
+          font-size: 0.8rem;
+        }
+        #modal-unit.workspace-detail:not(.hidden) {
+          position: fixed;
+          inset: 0;
+          z-index: 60;
+          height: auto;
+          background: rgba(3, 6, 14, 0.68);
+          backdrop-filter: blur(6px);
+          -webkit-backdrop-filter: blur(6px);
+          display: flex;
+          justify-content: flex-end;
+          align-items: stretch;
+          padding: 0;
+        }
+        #modal-unit.workspace-detail .detail-panel-inner {
+          width: min(520px, 100vw);
+          max-width: 100vw;
+          height: 100%;
+          max-height: 100dvh;
+          border-radius: 0;
+          border-top: none;
+          border-bottom: none;
+          border-right: none;
+          padding: 18px;
+          overflow-y: auto;
+        }
+      }
+
+      /* MOBILE APPLICATION SHELL, BOTTOM NAV, FILTER SHEET & FULL-SCREEN VIEWS */
+      .mobile-fleet-bar,
+      .mobile-bottom-nav,
+      .mobile-back-btn,
+      .mobile-tools-extras,
+      .mobile-filter-sheet-btn,
+      .mobile-sheet-header,
+      .mobile-sheet-footer {
+        display: none;
+      }
+
+      .form-error-banner {
+        background: var(--red-bg);
+        border: 1px solid var(--red-border);
+        color: var(--red-text);
+        border-radius: 10px;
+        padding: 10px 12px;
+        font-size: 0.84rem;
+        font-weight: 600;
+        margin-bottom: 14px;
+      }
+
+      .detail-disclosure {
+        border: 1px solid var(--border);
+        border-radius: 11px;
+        background: var(--bg-card-solid);
+        margin-top: 12px;
+        overflow: hidden;
+      }
+
+      .detail-disclosure > summary {
+        list-style: none;
+        padding: 11px 14px;
+        font-size: 0.76rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.055em;
+        color: var(--text-secondary);
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        background: var(--meta-bg);
+        min-height: 44px;
+        user-select: none;
+      }
+
+      .detail-disclosure > summary::-webkit-details-marker {
+        display: none;
+      }
+
+      .detail-disclosure > summary::after {
+        content: '▾';
+        font-size: 0.9rem;
+        color: var(--text-muted);
+        transition: transform 0.16s ease;
+      }
+
+      .detail-disclosure:not([open]) > summary::after {
+        transform: rotate(-90deg);
+      }
+
+      .detail-disclosure-body {
+        padding: 12px;
+        border-top: 1px solid var(--border);
+      }
+
+      .danger-zone-box {
+        margin-top: 16px;
+        padding: 12px 14px;
+        border-radius: 11px;
+        border: 1px dashed var(--red-border);
+        background: rgba(244, 63, 94, 0.05);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+
+      @media (max-width: 700px) {
+        #modal-unit.workspace-detail .detail-panel-inner {
+          width: 100vw;
+          height: 100dvh;
+          max-height: 100dvh;
+          padding: calc(12px + env(safe-area-inset-top, 0px)) 14px calc(36px + env(safe-area-inset-bottom, 0px));
+        }
+
+        .mobile-back-btn {
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+          min-height: 44px;
+          min-width: 44px;
+          padding: 6px 12px;
+          font-size: 0.84rem;
+          font-weight: 700;
+        }
+
+        .brand {
+          flex: 1 1 auto;
+          gap: 8px;
+          min-width: 0;
+        }
+
+        .brand img {
+          width: 28px;
+          height: 28px;
+          flex-shrink: 0;
+        }
+
+        .brand-title {
+          font-size: 0.94rem;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+
+        .brand-sub {
+          display: none;
+        }
+
+        .header-inner {
+          gap: 6px;
+        }
+
+        .header-search-wrap {
+          order: 3;
+          flex: 1 1 100%;
+          max-width: 100%;
+          min-width: 0;
+        }
+
+        .header-actions {
+          order: 2;
+          width: auto !important;
+          flex-wrap: wrap;
+          max-width: 100%;
+          gap: 5px;
+          flex-shrink: 0;
+        }
+
+        /* Keep phone header compact: Scan QR + Tools overflow menu. Add Unit is placed in the fleet workspace bar below. */
+        .header-actions > [data-theme-toggle] {
+          display: none;
+        }
+
+        #btn-scan-unit {
+          font-size: 0;
+          padding: 8px 10px;
+          gap: 0;
+        }
+        #btn-scan-unit::before {
+          content: "⌗ Scan QR";
+          font-size: 0.78rem;
+          font-weight: 650;
+        }
+
+        #header-tools > summary {
+          padding: 8px 10px;
+          font-size: 0.78rem;
+        }
+
+        #btn-lock {
+          font-size: 0;
+          padding: 8px 10px;
+          gap: 0;
+        }
+        #btn-lock::before {
+          content: "🔒";
+          font-size: 0.88rem;
+        }
+
+        .mobile-tools-extras {
+          display: contents;
+        }
+
+        /* Keep Left Nav out of the way on mobile since compact status pills + Bottom Nav handle navigation */
+        .workspace-nav {
+          display: none !important;
+        }
+
+        /* Compact status filter pills on mobile (All, Overdue, Due Soon, No Date Set) */
+        .kpi-grid {
+          display: flex !important;
+          flex-wrap: nowrap;
+          overflow-x: auto;
+          gap: 6px;
+          margin-bottom: 10px;
+          padding-bottom: 2px;
+          scrollbar-width: none;
+        }
+        .kpi-grid::-webkit-scrollbar {
+          display: none;
+        }
+        .kpi-card {
+          flex: 0 0 auto;
+          padding: 7px 11px !important;
+          border-radius: 999px;
+          display: inline-flex;
+          flex-direction: row;
+          align-items: center;
+          gap: 6px;
+          min-height: 40px;
+        }
+        .kpi-card::before {
+          display: none;
+        }
+        .kpi-card > div {
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+        }
+        .kpi-label {
+          margin-bottom: 0;
+          font-size: 0.74rem !important;
+          white-space: nowrap;
+        }
+        .kpi-val {
+          font-size: 0.8rem;
+          padding: 1px 7px;
+          border-radius: 999px;
+          background: var(--meta-bg);
+          border: 1px solid var(--border);
+        }
+        .kpi-sub {
+          display: none;
+        }
+        /* Put Total Fleet ("All") first on mobile status pill bar, and hide Up to Date pill so the 4 primary filters fit cleanly */
+        .kpi-card.kpi-all { order: -1; }
+        .kpi-card.kpi-good { display: none; }
+
+        /* Mobile Filter Sheet Trigger & Action Bar */
+        .toolbar:not(.mobile-sheet-open) {
+          position: relative;
+          padding: 6px 8px !important;
+          margin-bottom: 10px;
+          border-radius: 12px;
+        }
+
+        .toolbar:not(.mobile-sheet-open) .toolbar-right {
+          width: 100%;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          flex-wrap: wrap;
+          gap: 6px;
+        }
+
+        .toolbar:not(.mobile-sheet-open) #btn-clear-filters,
+        .toolbar:not(.mobile-sheet-open) #btn-refresh {
+          display: none;
+        }
+
+        .mobile-filter-sheet-btn {
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+          min-height: 44px;
+          padding: 8px 12px;
+          font-size: 0.8rem;
+          flex-shrink: 0;
+        }
+
+        .filter-badge-count {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          min-width: 20px;
+          height: 20px;
+          padding: 0 6px;
+          border-radius: 999px;
+          background: var(--accent);
+          color: #041019;
+          font-size: 0.72rem;
+          font-weight: 800;
+        }
+
+        /* Visually collapse full toolbar on mobile unless Filter Sheet is toggled open, while keeping controls ≥ 44×44px and accessible to assistive tech / tests */
+        .toolbar:not(.mobile-sheet-open) .toolbar-left {
+          position: absolute;
+          left: 0;
+          top: 0;
+          width: 100%;
+          height: 44px;
+          overflow: hidden;
+          opacity: 0;
+          pointer-events: none;
+          z-index: -1;
+        }
+
+        .toolbar {
+          position: relative;
+          padding: 8px 10px !important;
+          margin-bottom: 10px;
+        }
+
+        .toolbar.mobile-sheet-open {
+          position: fixed;
+          inset: 0;
+          z-index: 65;
+          margin: 0;
+          border-radius: 0;
+          background: var(--bg-card-solid);
+          padding: calc(16px + env(safe-area-inset-top, 0px)) 16px calc(28px + env(safe-area-inset-bottom, 0px)) !important;
+          display: flex;
+          flex-direction: column;
+          align-items: stretch;
+          justify-content: flex-start;
+          overflow-y: auto;
+        }
+
+        .toolbar.mobile-sheet-open .toolbar-left {
+          position: static;
+          width: 100%;
+          height: auto;
+          overflow: visible;
+          opacity: 1;
+          pointer-events: auto;
+          z-index: auto;
+          display: flex;
+          flex-direction: column;
+          align-items: stretch;
+          gap: 12px;
+        }
+
+        .mobile-sheet-header,
+        .mobile-sheet-footer {
+          display: none;
+        }
+
+        .toolbar.mobile-sheet-open .mobile-sheet-header {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          padding-bottom: 12px;
+          margin-bottom: 6px;
+          border-bottom: 1px solid var(--border);
+        }
+
+        .toolbar.mobile-sheet-open .mobile-sheet-footer {
+          display: flex;
+          gap: 10px;
+          margin-top: auto;
+          padding-top: 16px;
+          border-top: 1px solid var(--border);
+        }
+
+        .toolbar.mobile-sheet-open .mobile-sheet-footer .btn {
+          flex: 1;
+        }
+
+        /* Full-screen focused forms on mobile (#modal-truck, #modal-inspect, #modal-scan, #modal-history, #modal-settings) */
+        #modal-truck.modal-backdrop,
+        #modal-inspect.modal-backdrop,
+        #modal-vin.modal-backdrop,
+        #modal-scan.modal-backdrop,
+        #modal-history.modal-backdrop,
+        #modal-settings.modal-backdrop {
+          padding: 0;
+          align-items: stretch;
+        }
+
+        #modal-truck .modal-panel,
+        #modal-inspect .modal-panel,
+        #modal-vin .modal-panel,
+        #modal-scan .modal-panel,
+        #modal-history .modal-panel,
+        #modal-settings .modal-panel {
+          max-width: 100vw;
+          width: 100vw;
+          min-height: 100dvh;
+          max-height: 100dvh;
+          border-radius: 0;
+          border: none;
+          padding: calc(14px + env(safe-area-inset-top, 0px)) 16px calc(24px + env(safe-area-inset-bottom, 0px));
+          display: flex;
+          flex-direction: column;
+        }
+
+        #modal-truck .modal-footer,
+        #modal-inspect .modal-footer,
+        #modal-settings .modal-footer {
+          position: sticky;
+          bottom: calc(-24px - env(safe-area-inset-bottom, 0px));
+          background: var(--bg-card-solid);
+          padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+          z-index: 5;
+        }
+
+        /* Safe-area Bottom Navigation Bar */
+        .mobile-bottom-nav {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          position: fixed;
+          bottom: 0;
+          left: 0;
+          right: 0;
+          z-index: 45;
+          background: var(--bg-nav);
+          border-top: 1px solid rgba(255, 255, 255, 0.12);
+          padding: 4px 8px calc(4px + env(safe-area-inset-bottom, 0px));
+          box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.35);
+        }
+
+        .mobile-nav-item {
+          background: transparent;
+          border: none;
+          color: #94a3b8;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          gap: 2px;
+          min-height: 48px;
+          padding: 4px 6px;
+          border-radius: 10px;
+          font-size: 0.72rem;
+          font-weight: 650;
+          cursor: pointer;
+          touch-action: manipulation;
+        }
+
+        .mobile-nav-item .mobile-nav-icon {
+          font-size: 1.05rem;
+          line-height: 1;
+        }
+
+        .mobile-nav-item[aria-current="page"],
+        .mobile-nav-item.active {
+          color: #38bdf8;
+          background: rgba(56, 189, 248, 0.12);
+        }
+
+        /* Hide bottom nav during focused full-screen workflows so it never competes with Save/Camera/Detail actions */
+        body:has(.modal-backdrop:not(.hidden)) .mobile-bottom-nav,
+        body:has(.toolbar.mobile-sheet-open) .mobile-bottom-nav {
+          display: none !important;
+        }
+
+        /* Ensure bottom nav never obscures the last fleet item or footer */
+        .container, .workspace-main {
+          padding: 12px 12px calc(84px + env(safe-area-inset-bottom, 0px)) !important;
+        }
+
+        .site-footer {
+          padding-bottom: calc(84px + env(safe-area-inset-bottom, 0px)) !important;
         }
       }
     }
@@ -659,22 +1347,21 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
         outline-offset: 2px;
       }
 
-      /* KPI CARDS */
+      /* COMPACT SUMMARY STRIP CARDS */
       .kpi-card {
         position: relative;
         overflow: hidden;
         background: var(--bg-elev);
-        backdrop-filter: blur(16px);
-        -webkit-backdrop-filter: blur(16px);
         border: 1px solid var(--border);
-        border-radius: var(--radius-lg);
-        padding: 18px 20px;
+        border-radius: var(--radius);
+        padding: 10px 14px;
         cursor: pointer;
-        box-shadow: var(--shadow);
-        transition: transform 0.22s var(--ease-spring), border-color 0.18s var(--ease-snappy), box-shadow 0.18s var(--ease-snappy);
+        box-shadow: var(--shadow-sm);
+        transition: border-color 0.16s var(--ease-snappy), box-shadow 0.16s var(--ease-snappy), background-color 0.16s var(--ease-snappy);
         display: flex;
         align-items: center;
         justify-content: space-between;
+        gap: 8px;
       }
 
       .kpi-card::before {
@@ -683,67 +1370,87 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
         left: 0;
         top: 0;
         bottom: 0;
-        width: 4px;
-        border-radius: 4px 0 0 4px;
+        width: 3px;
+        border-radius: 3px 0 0 3px;
       }
 
       .kpi-card:hover {
-        transform: translateY(-2px);
+        background: var(--bg-hover);
         border-color: var(--border-strong);
       }
 
       .kpi-card.active-filter {
         border-color: var(--accent);
-        box-shadow: 0 0 0 2px var(--accent), var(--shadow);
+        box-shadow: 0 0 0 2px var(--accent), var(--shadow-sm);
       }
 
       .kpi-card.kpi-overdue::before { background: var(--red); }
-      .kpi-card.kpi-overdue {
-        background: radial-gradient(120% 100% at 0% 0%, rgba(244, 63, 94, 0.12) 0%, var(--bg-elev) 75%);
-      }
-
       .kpi-card.kpi-due-soon::before { background: var(--yellow); }
-      .kpi-card.kpi-due-soon {
-        background: radial-gradient(120% 100% at 0% 0%, rgba(245, 158, 11, 0.12) 0%, var(--bg-elev) 75%);
-      }
-
       .kpi-card.kpi-good::before { background: var(--green); }
-      .kpi-card.kpi-good {
-        background: radial-gradient(120% 100% at 0% 0%, rgba(16, 185, 129, 0.12) 0%, var(--bg-elev) 75%);
-      }
-
+      .kpi-card.kpi-nodate::before { background: #64748b; }
       .kpi-card.kpi-all::before { background: var(--accent); }
-      .kpi-card.kpi-all {
-        background: radial-gradient(120% 100% at 0% 0%, rgba(56, 189, 248, 0.10) 0%, var(--bg-elev) 75%);
-      }
 
       .kpi-label {
-        font-size: 0.75rem;
+        font-size: 0.72rem;
         font-weight: 650;
         text-transform: uppercase;
-        letter-spacing: 0.06em;
+        letter-spacing: 0.055em;
         color: var(--text-muted);
-        margin-bottom: 6px;
+        margin-bottom: 2px;
       }
 
       .kpi-val {
-        font-size: 2rem;
+        font-size: 1.45rem;
         font-weight: 800;
-        line-height: 1.05;
-        letter-spacing: -0.03em;
+        line-height: 1.1;
+        letter-spacing: -0.025em;
         font-variant-numeric: tabular-nums;
       }
 
       .kpi-sub {
-        font-size: 0.76rem;
+        font-size: 0.72rem;
         color: var(--text-muted);
-        margin-top: 4px;
+        margin-top: 2px;
       }
 
       /* TOOLBAR ITEMS */
       .search-input {
         flex: 1 1 240px;
-        min-width: 200px;
+        min-width: 180px;
+      }
+
+      .active-filter-bar {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        padding: 8px 12px;
+        margin-bottom: 12px;
+        background: rgba(56, 189, 248, 0.08);
+        border: 1px solid rgba(56, 189, 248, 0.28);
+        border-radius: var(--radius-sm);
+        font-size: 0.82rem;
+      }
+
+      .active-filter-chips {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .active-filter-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 2px 8px;
+        border-radius: var(--radius-pill);
+        background: var(--bg-elev);
+        border: 1px solid var(--border);
+        font-size: 0.76rem;
+        font-weight: 600;
+        color: var(--text);
       }
 
       .filter-field {
@@ -1049,6 +1756,59 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
         font-size: 0.85rem;
       }
 
+      .vin-connectivity {
+        margin-bottom: 14px;
+        padding: 12px;
+        border: 1px solid var(--border-strong);
+        border-radius: var(--radius);
+        background: var(--meta-bg);
+        color: var(--text-secondary);
+        overflow-wrap: anywhere;
+      }
+
+      .vin-connectivity strong { display: block; margin-bottom: 4px; }
+      .vin-connectivity p { font-size: 0.85rem; }
+      .vin-connectivity[data-state="connected"] {
+        color: var(--green-text); background: var(--green-bg); border-color: var(--green-border);
+      }
+      .vin-connectivity[data-state="checking"] {
+        color: var(--yellow-text); background: var(--yellow-bg); border-color: var(--yellow-border);
+      }
+      .vin-connectivity[data-state="unavailable"], .vin-connectivity[data-state="app-unreachable"] {
+        color: var(--red-text); background: var(--red-bg); border-color: var(--red-border);
+      }
+
+      .vin-field-option {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        min-height: 44px;
+        cursor: pointer;
+      }
+
+      .vin-field-option input {
+        width: 18px;
+        height: 18px;
+        flex-shrink: 0;
+        margin-top: 2px;
+        accent-color: var(--accent);
+      }
+
+      .vin-field-option > div { min-width: 0; flex: 1; }
+
+      #vin-details .vin-comparison-row { grid-column: 1 / -1; }
+
+      .vin-field-values {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+        margin-top: 8px;
+      }
+
+      .vin-field-values > div { min-width: 0; overflow-wrap: anywhere; }
+
+      .vin-field-option:focus-within { outline: 2px solid var(--accent); outline-offset: -2px; }
+
       .meta-item:first-child strong {
         font-size: 0.92rem;
         color: var(--accent);
@@ -1082,59 +1842,67 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
         flex: 1 1 110px;
       }
 
+      .truck-card.is-selected {
+        border-color: var(--accent);
+        box-shadow: 0 0 0 2px var(--accent), var(--shadow);
+      }
+
       /* COMPACT TABLE VIEW */
       .fleet-table-wrap {
         display: none;
         border: 1px solid var(--border);
-        border-radius: var(--radius-lg);
+        border-radius: var(--radius);
         background: var(--bg-card);
-        backdrop-filter: blur(16px);
-        -webkit-backdrop-filter: blur(16px);
-        box-shadow: var(--shadow);
-        overflow: hidden;
+        box-shadow: var(--shadow-sm);
+        overflow: visible;
       }
 
       .fleet-table {
         border-collapse: collapse;
         width: 100%;
         table-layout: fixed;
-        font-size: 0.88rem;
+        font-size: 0.86rem;
         font-variant-numeric: tabular-nums;
       }
 
       .fleet-table caption {
-        padding: 14px 16px;
+        padding: 11px 14px;
         text-align: left;
         font-weight: 700;
-        font-size: 0.92rem;
+        font-size: 0.88rem;
         border-bottom: 1px solid var(--border);
         background: var(--meta-bg);
       }
 
       .fleet-table th, .fleet-table td {
-        padding: 12px 16px;
+        padding: 10px 14px;
         text-align: left;
         border-bottom: 1px solid var(--border);
         vertical-align: middle;
         overflow-wrap: anywhere;
       }
 
-      .fleet-table thead {
+      .fleet-table thead th {
+        position: sticky;
+        top: 63px;
+        z-index: 8;
         background: var(--meta-bg);
         color: var(--text-muted);
-        font-size: 0.73rem;
+        font-size: 0.71rem;
+        font-weight: 700;
         text-transform: uppercase;
-        letter-spacing: 0.05em;
+        letter-spacing: 0.055em;
+        box-shadow: inset 0 -1px 0 var(--border);
       }
 
       .fleet-table tr:last-child td {
         border-bottom: 0;
       }
 
-      .fleet-table th:nth-child(1) { width: 23%; }
+      .fleet-table th:nth-child(1) { width: 24%; }
       .fleet-table th:nth-child(2) { width: 25%; }
       .fleet-table th:nth-child(3) { width: 17%; }
-      .fleet-table th:nth-child(4) { width: 35%; }
+      .fleet-table th:nth-child(4) { width: 34%; }
 
       .fleet-table .safety-badge {
         display: inline-block;
@@ -1145,8 +1913,28 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
       .fleet-table .list-sub {
         display: block;
         color: var(--text-muted);
-        font-size: 0.78rem;
-        margin-top: 3px;
+        font-size: 0.76rem;
+        margin-top: 2px;
+      }
+
+      .unit-row-link {
+        background: none;
+        border: none;
+        padding: 0;
+        color: var(--text);
+        font-weight: 800;
+        font-size: 0.95rem;
+        cursor: pointer;
+        text-align: left;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-variant-numeric: tabular-nums;
+      }
+
+      .unit-row-link:hover {
+        color: var(--accent);
+        text-decoration: underline;
       }
 
       .list-actions {
@@ -1156,11 +1944,92 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
       }
 
       .fleet-table tbody tr {
-        transition: background-color 0.14s ease;
+        transition: background-color 0.12s ease;
+        cursor: pointer;
       }
 
       .fleet-table tbody tr:hover {
+        background: var(--bg-hover);
+      }
+
+      .fleet-table tbody tr.is-selected {
+        background: rgba(56, 189, 248, 0.11);
+        box-shadow: inset 3px 0 0 var(--accent);
+      }
+
+      :root[data-theme="light"] .fleet-table tbody tr.is-selected {
+        background: rgba(2, 132, 199, 0.09);
+      }
+
+      /* VEHICLE-DETAIL WORKSPACE PANEL SECTIONS */
+      .detail-empty-box {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        padding: 56px 24px;
+        height: 100%;
+        min-height: 360px;
+        color: var(--text-muted);
+      }
+
+      .detail-empty-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
         background: var(--meta-bg);
+        border: 1px solid var(--border);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.35rem;
+        margin-bottom: 14px;
+        color: var(--accent);
+      }
+
+      .detail-empty-box h3 {
+        color: var(--text);
+        font-size: 1.02rem;
+        font-weight: 700;
+        margin-bottom: 6px;
+      }
+
+      .detail-empty-box p {
+        font-size: 0.84rem;
+        max-width: 280px;
+        line-height: 1.5;
+      }
+
+      .detail-section-label {
+        font-size: 0.7rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: var(--text-muted);
+        margin-bottom: 8px;
+      }
+
+      .detail-block {
+        margin-top: 16px;
+        padding-top: 14px;
+        border-top: 1px solid var(--border);
+      }
+
+      .detail-upload-bar {
+        background: var(--input-bg);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        padding: 10px 12px;
+        margin-bottom: 12px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .muted-note {
+        color: var(--text-muted);
+        font-size: 0.82rem;
       }
 
       /* TOOLS DROPDOWN */
@@ -1479,6 +2348,80 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
         gap: 10px;
       }
 
+      @media (max-width: 700px) {
+        /* Single-column readable unit cards on phone screens */
+        #fleet-container[data-mobile-layout="dense"] .fleet-grid,
+        #fleet-container[data-mobile-layout="full"] .fleet-grid {
+          grid-template-columns: 1fr;
+          gap: 10px;
+        }
+
+        #fleet-container[data-mobile-layout="dense"] .truck-card {
+          padding: 14px;
+          gap: 10px;
+          cursor: pointer;
+        }
+
+        #fleet-container[data-mobile-layout="dense"] .truck-top {
+          display: flex;
+          flex-wrap: wrap;
+          align-items: flex-start;
+          justify-content: space-between;
+          gap: 8px;
+        }
+
+        #fleet-container[data-mobile-layout="dense"] .truck-top > div:first-child {
+          margin-bottom: 0;
+          min-width: 0;
+          flex: 1 1 160px;
+        }
+
+        #fleet-container[data-mobile-layout="dense"] .unit-title {
+          font-size: 1.06rem;
+          gap: 6px;
+        }
+
+        #fleet-container[data-mobile-layout="dense"] .truck-sub {
+          display: block;
+          font-size: 0.78rem;
+          margin-top: 2px;
+        }
+
+        #fleet-container[data-mobile-layout="dense"] .truck-card .safety-badge {
+          width: 100%;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          padding: 8px 11px;
+          font-size: 0.84rem;
+        }
+
+        #fleet-container[data-mobile-layout="dense"] .truck-actions {
+          display: grid;
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+          gap: 6px;
+          padding-top: 8px;
+        }
+
+        #fleet-container[data-mobile-layout="dense"] .truck-actions .btn {
+          width: 100%;
+          min-height: 44px;
+          padding: 6px 8px;
+          font-size: 0.76rem;
+        }
+
+        /* Hide secondary Edit/Cert buttons on compact phone cards so primary Details / Log Safety / Files buttons are clean and tappable */
+        #fleet-container[data-mobile-layout="dense"] .truck-actions [data-edit],
+        #fleet-container[data-mobile-layout="dense"] .truck-actions [data-view-file] {
+          display: none;
+        }
+
+        .mobile-layout-switch {
+          width: auto;
+          flex: 1 1 auto;
+        }
+      }
+
       #fleet-container[data-mobile-layout="dense"] .truck-card {
         padding: 12px;
         gap: 8px;
@@ -1567,20 +2510,23 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
     }
 
     @media (max-width: 700px) {
-      .app-header { position: static; padding: 12px; }
-      .header-actions { width: 100%; gap: 8px; position: relative; }
+      .app-header { position: sticky; top: 0; z-index: 30; padding: 8px 12px; }
       .tools-menu { position: static; }
-      .tools-panel { right: 0; top: calc(100% + 8px); width: min(280px, 100%); }
-      .header-actions > .btn { flex: 1 1 auto; padding: 10px; }
-      .container { padding: 16px 12px 36px; }
-      .site-footer { flex-wrap: wrap; padding: 0 12px 24px; }
-      .toolbar { padding: 12px; }
+      .tools-panel { right: 8px; top: calc(100% + 4px); width: min(260px, calc(100vw - 16px)); }
+      #btn-add-truck {
+        padding: 8px 11px;
+        font-size: 0;
+        gap: 0;
+      }
+      #btn-add-truck::before {
+        content: "+ Add";
+        font-size: 0.8rem;
+        font-weight: 700;
+      }
+      .site-footer { flex-wrap: wrap; padding: 0 12px calc(84px + env(safe-area-inset-bottom, 0px)); }
       .toolbar-left { min-width: 0; width: 100%; }
-      .search-input { width: 100%; min-width: 0; flex-basis: 100%; }
+      .search-input { width: 100%; min-width: 0; flex-basis: 100%; min-height: 44px; font-size: 0.9rem; padding: 8px 12px; }
       .toolbar-left > .select-filter, .filter-field { width: 100%; }
-      .toolbar-right { width: 100%; }
-      .kpi-card { padding: 14px 12px; }
-      .kpi-label { font-size: 0.72rem; }
       .modal-panel { padding: 18px; max-height: 94dvh; }
       .modal-header { top: -18px; }
       .modal-footer { flex-wrap: wrap; }
@@ -1630,8 +2576,17 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
           <img src="${basePath}/icon.svg" alt="Icon" />
           <div>
             <div class="brand-title">Truck Safety Tracker</div>
-            <div class="brand-sub">Fleet safety · Inspection records & certificates</div>
+            <div class="brand-sub">Fleet operations workspace · Inspections & certificates</div>
           </div>
+        </div>
+        <div class="header-search-wrap">
+          <input
+            type="search"
+            id="search-input"
+            class="search-input"
+            aria-label="Search fleet units"
+            placeholder="Search Unit #, Plate, VIN, Make/Model, Sticker #..."
+          />
         </div>
         <div class="header-actions">
           <button type="button" id="btn-scan-unit" class="btn btn-secondary btn-sm">Scan / Paste UUID</button>
@@ -1642,15 +2597,19 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
           <details id="header-tools" class="tools-menu">
             <summary class="btn btn-secondary btn-sm">Tools ▾</summary>
             <div class="tools-panel">
-          <button type="button" id="btn-export-ics" class="btn btn-secondary btn-sm" title="Download Calendar (.ics) reminders">
-            📅 .ICS Calendar
-          </button>
-          <button type="button" id="btn-browser-notify" class="btn btn-secondary btn-sm" title="Enable Browser Alerts">
-            🔔 Alerts
-          </button>
-          <button type="button" id="btn-settings" class="btn btn-secondary btn-sm">
-            ⚙️ Settings
-          </button>
+              <div class="mobile-tools-extras">
+                <button type="button" class="btn btn-secondary btn-sm" data-theme-toggle aria-label="Switch to light mode">☀ Light mode</button>
+              </div>
+              <button type="button" id="btn-vin-decoder" class="btn btn-secondary btn-sm">VIN decoder</button>
+              <button type="button" id="btn-export-ics" class="btn btn-secondary btn-sm" title="Download Calendar (.ics) reminders">
+                📅 .ICS Calendar
+              </button>
+              <button type="button" id="btn-browser-notify" class="btn btn-secondary btn-sm" title="Enable Browser Alerts">
+                🔔 Alerts
+              </button>
+              <button type="button" id="btn-settings" class="btn btn-secondary btn-sm">
+                ⚙️ Settings
+              </button>
             </div>
           </details>
           <button type="button" id="btn-lock" class="btn btn-secondary btn-sm" title="Lock App">
@@ -1660,122 +2619,277 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
       </div>
     </header>
 
-    <main class="container">
-      <!-- KPI STATUS CARDS -->
-      <section class="kpi-grid">
-        <div role="button" tabindex="0" class="kpi-card kpi-overdue" data-kpi="overdue">
-          <div>
-            <div class="kpi-label">🔴 Overdue</div>
-            <div class="kpi-val" id="kpi-overdue-count">0</div>
-            <div class="kpi-sub">Safety expired</div>
-          </div>
+    <div class="workspace-shell">
+      <!-- LEFT REGION: GRAPHITE NAVIGATION & QUICK FLEET VIEWS -->
+      <nav class="workspace-nav" aria-label="Fleet views and navigation">
+        <div>
+          <div class="nav-section-title">Quick Fleet Views</div>
+          <ul class="nav-list">
+            <li>
+              <button type="button" class="nav-view-btn active-nav" data-nav-view="all" aria-current="true">
+                <span class="nav-view-label"><span class="status-dot all" aria-hidden="true"></span>All units</span>
+                <span class="nav-count" id="nav-count-all">0</span>
+              </button>
+            </li>
+            <li>
+              <button type="button" class="nav-view-btn" data-nav-view="overdue" aria-current="false">
+                <span class="nav-view-label"><span class="status-dot overdue" aria-hidden="true"></span>Overdue</span>
+                <span class="nav-count" id="nav-count-overdue">0</span>
+              </button>
+            </li>
+            <li>
+              <button type="button" class="nav-view-btn" data-nav-view="due_soon" aria-current="false">
+                <span class="nav-view-label"><span class="status-dot due_soon" aria-hidden="true"></span>Due soon</span>
+                <span class="nav-count" id="nav-count-duesoon">0</span>
+              </button>
+            </li>
+            <li>
+              <button type="button" class="nav-view-btn" data-nav-view="no_date" aria-current="false">
+                <span class="nav-view-label"><span class="status-dot no_date" aria-hidden="true"></span>No date set</span>
+                <span class="nav-count" id="nav-count-nodate">0</span>
+              </button>
+            </li>
+            <li>
+              <button type="button" class="nav-view-btn" data-nav-view="good" aria-current="false">
+                <span class="nav-view-label"><span class="status-dot good" aria-hidden="true"></span>Up to date</span>
+                <span class="nav-count" id="nav-count-good">0</span>
+              </button>
+            </li>
+          </ul>
         </div>
-        <div role="button" tabindex="0" class="kpi-card kpi-due-soon" data-kpi="due_soon">
-          <div>
-            <div class="kpi-label">🟡 Due Soon</div>
-            <div class="kpi-val" id="kpi-duesoon-count">0</div>
-            <div class="kpi-sub" id="kpi-duesoon-label">Within 30 days</div>
-          </div>
+        <div class="nav-tools-group">
+          <div class="nav-section-title">Operations & Tools</div>
+          <ul class="nav-list">
+            <li><button type="button" class="nav-tool-btn" data-nav-action="scan">⌗ Scan / Paste UUID</button></li>
+            <li><button type="button" class="nav-tool-btn" data-nav-action="add">+ Add Unit</button></li>
+            <li><button type="button" class="nav-tool-btn" data-nav-action="ics">📅 Export .ICS Schedule</button></li>
+            <li><button type="button" class="nav-tool-btn" data-nav-action="alerts">🔔 Browser Alerts</button></li>
+            <li><button type="button" class="nav-tool-btn" data-nav-action="settings">⚙️ Fleet Settings</button></li>
+          </ul>
         </div>
-        <div role="button" tabindex="0" class="kpi-card kpi-good" data-kpi="good">
-          <div>
-            <div class="kpi-label">🟢 Up to date</div>
-            <div class="kpi-val" id="kpi-good-count">0</div>
-            <div class="kpi-sub">Safety active</div>
-          </div>
-        </div>
-        <div role="button" tabindex="0" class="kpi-card kpi-all active-filter" data-kpi="all">
-          <div>
-            <div class="kpi-label">🚛 Total Fleet</div>
-            <div class="kpi-val" id="kpi-total-count">0</div>
-            <div class="kpi-sub">Click any card to filter</div>
-          </div>
-        </div>
-      </section>
+      </nav>
 
-      <!-- SEARCH & FILTER TOOLBAR -->
-      <section class="toolbar">
-        <div class="toolbar-left">
-          <input
-            type="search"
-            id="search-input"
-            class="search-input"
-            placeholder="Search Unit #, Plate, VIN, Make/Model, Sticker #..."
-          />
-          <select id="filter-vehicle-type" class="select-filter" aria-label="Vehicle type">
-            <option value="all">All Vehicle Types</option>
-            <option value="Tractor">Tractor</option>
-            <option value="Straight Truck">Straight Truck</option>
-            <option value="Trailer">Trailer</option>
-            <option value="Pickup / Service Truck">Pickup / Service Truck</option>
-            <option value="Other">Other</option>
-          </select>
-          <label class="filter-field" for="filter-status">Due date
-            <select id="filter-status" class="select-filter" aria-label="Due date">
-              <option value="all">All due dates</option>
-              <option value="overdue">🔴 Past due / overdue</option>
-              <option value="today">Due today</option>
-              <option value="due_soon">🟡 Close / due soon</option>
-              <option value="within_7">Due within 7 days</option>
-              <option value="within_14">Due within 14 days</option>
-              <option value="within_30">Due within 30 days</option>
-              <option value="within_60">Due within 60 days</option>
-              <option value="within_90">Due within 90 days</option>
-              <option value="good">🟢 Not close / up to date</option>
-              <option value="no_date">⚪ No date set</option>
-              <option value="range">Choose date range…</option>
-            </select>
-          </label>
-          <label class="filter-field hidden" id="filter-from-field" for="filter-from">Due on or after
-            <input type="date" id="filter-from" class="select-filter" />
-          </label>
-          <label class="filter-field hidden" id="filter-to-field" for="filter-to">Due on or before
-            <input type="date" id="filter-to" class="select-filter" />
-          </label>
-          <label class="filter-field" for="sort-due">Sort by
-            <select id="sort-due" class="select-filter" aria-label="Sort by">
-              <option value="earliest">Due date: earliest first</option>
-              <option value="latest">Due date: latest first</option>
-              <option value="unit">Unit number</option>
-            </select>
-          </label>
-          <p id="filter-help" class="filter-help">“Within” includes today, but not overdue units. “Close” uses the warning days in Settings.</p>
-        </div>
-        <div class="toolbar-right">
-          <div class="mobile-layout-switch" role="group" aria-label="Phone unit layout">
-            <button type="button" id="mobile-layout-rows" class="btn btn-secondary btn-sm" aria-pressed="false" title="Compact rows show the most units at once">Rows</button>
-            <button type="button" id="mobile-layout-dense" class="btn btn-secondary btn-sm" aria-pressed="true" title="Dense cards show more units with key status information">Dense</button>
-            <button type="button" id="mobile-layout-full" class="btn btn-secondary btn-sm" aria-pressed="false" title="Full cards show every unit detail">Full</button>
+      <!-- CENTER REGION: FLEET SUMMARY, TOOLBAR & PRIMARY FLEET LIST -->
+      <main class="container workspace-main">
+        <!-- COMPACT SUMMARY STRIP -->
+        <section class="kpi-grid" aria-label="Fleet status summary">
+          <div role="button" tabindex="0" class="kpi-card kpi-overdue" data-kpi="overdue">
+            <div>
+              <div class="kpi-label">🔴 Overdue</div>
+              <div class="kpi-val" id="kpi-overdue-count">0</div>
+              <div class="kpi-sub">Safety expired</div>
+            </div>
           </div>
-          <div class="view-switch" role="group" aria-label="Desktop fleet view">
-            <button type="button" id="view-cards" class="btn btn-secondary btn-sm" aria-pressed="true">Cards</button>
-            <button type="button" id="view-list" class="btn btn-secondary btn-sm" aria-pressed="false">Compact list</button>
+          <div role="button" tabindex="0" class="kpi-card kpi-due-soon" data-kpi="due_soon">
+            <div>
+              <div class="kpi-label">🟡 Due Soon</div>
+              <div class="kpi-val" id="kpi-duesoon-count">0</div>
+              <div class="kpi-sub" id="kpi-duesoon-label">Within 30 days</div>
+            </div>
           </div>
-          <button type="button" id="btn-clear-filters" class="btn btn-secondary btn-sm">Clear filters</button>
-          <button type="button" id="btn-refresh" class="btn btn-secondary btn-sm">
-            ↻ Refresh
-          </button>
-        </div>
-      </section>
+          <div role="button" tabindex="0" class="kpi-card kpi-good" data-kpi="good">
+            <div>
+              <div class="kpi-label">🟢 Up to date</div>
+              <div class="kpi-val" id="kpi-good-count">0</div>
+              <div class="kpi-sub">Safety active</div>
+            </div>
+          </div>
+          <div role="button" tabindex="0" class="kpi-card kpi-nodate" data-kpi="no_date">
+            <div>
+              <div class="kpi-label">⚪ No Date Set</div>
+              <div class="kpi-val" id="kpi-nodate-count">0</div>
+              <div class="kpi-sub">Pending date</div>
+            </div>
+          </div>
+          <div role="button" tabindex="0" class="kpi-card kpi-all active-filter" data-kpi="all">
+            <div>
+              <div class="kpi-label">🚛 Total Fleet</div>
+              <div class="kpi-val" id="kpi-total-count">0</div>
+              <div class="kpi-sub">All units</div>
+            </div>
+          </div>
+        </section>
 
-      <!-- FLEET LIST -->
-      <section id="fleet-container">
-        <p id="filter-results" class="filter-results" role="status" aria-live="polite"></p>
-        <div id="fleet-grid" class="fleet-grid"></div>
-        <div id="fleet-table-wrap" class="fleet-table-wrap hidden">
-          <table class="fleet-table">
-            <caption>Fleet safety list</caption>
-            <thead><tr><th scope="col">Unit / vehicle</th><th scope="col">Safety / due date</th><th scope="col">Last inspection</th><th scope="col">Actions</th></tr></thead>
-            <tbody id="fleet-table-body"></tbody>
-          </table>
+        <!-- FILTER & VIEW TOOLBAR (Collapses advanced filters into a Filter Sheet on mobile) -->
+        <section id="fleet-toolbar" class="toolbar" aria-label="Fleet filters and view controls">
+          <div class="mobile-sheet-header">
+            <h2 class="modal-title" style="font-size:1.08rem;">Filter & Sort Fleet</h2>
+            <button type="button" id="btn-close-filter-sheet" class="close-btn" aria-label="Close filter sheet">&times;</button>
+          </div>
+          <div class="toolbar-left">
+            <label class="filter-field" for="filter-vehicle-type">Vehicle type
+              <select id="filter-vehicle-type" class="select-filter" aria-label="Vehicle type">
+                <option value="all">All Vehicle Types</option>
+                <option value="Tractor">Tractor</option>
+                <option value="Straight Truck">Straight Truck</option>
+                <option value="Trailer">Trailer</option>
+                <option value="Pickup / Service Truck">Pickup / Service Truck</option>
+                <option value="Other">Other</option>
+              </select>
+            </label>
+            <label class="filter-field" for="filter-status">Due date
+              <select id="filter-status" class="select-filter" aria-label="Due date">
+                <option value="all">All due dates</option>
+                <option value="overdue">🔴 Past due / overdue</option>
+                <option value="today">Due today</option>
+                <option value="due_soon">🟡 Close / due soon</option>
+                <option value="within_7">Due within 7 days</option>
+                <option value="within_14">Due within 14 days</option>
+                <option value="within_30">Due within 30 days</option>
+                <option value="within_60">Due within 60 days</option>
+                <option value="within_90">Due within 90 days</option>
+                <option value="good">🟢 Not close / up to date</option>
+                <option value="no_date">⚪ No date set</option>
+                <option value="range">Choose date range…</option>
+              </select>
+            </label>
+            <label class="filter-field hidden" id="filter-from-field" for="filter-from">Due on or after
+              <input type="date" id="filter-from" class="select-filter" />
+            </label>
+            <label class="filter-field hidden" id="filter-to-field" for="filter-to">Due on or before
+              <input type="date" id="filter-to" class="select-filter" />
+            </label>
+            <label class="filter-field" for="sort-due">Sort by
+              <select id="sort-due" class="select-filter" aria-label="Sort by">
+                <option value="earliest">Due date: earliest first</option>
+                <option value="latest">Due date: latest first</option>
+                <option value="unit">Unit number</option>
+              </select>
+            </label>
+            <p id="filter-help" class="filter-help">“Within” includes today, but not overdue units. “Close” uses the warning days in Settings.</p>
+          </div>
+          <div class="toolbar-right">
+            <button type="button" id="btn-mobile-filter-sheet" class="btn btn-secondary btn-sm mobile-filter-sheet-btn" aria-expanded="false" aria-controls="fleet-toolbar">
+              <span>⚙ Filter & Sort</span>
+              <span id="mobile-filter-badge" class="filter-badge-count hidden">0</span>
+            </button>
+            <div class="mobile-layout-switch" role="group" aria-label="Phone unit layout">
+              <button type="button" id="mobile-layout-rows" class="btn btn-secondary btn-sm" aria-pressed="false" title="Compact rows show the most units at once">Rows</button>
+              <button type="button" id="mobile-layout-dense" class="btn btn-secondary btn-sm" aria-pressed="true" title="Dense cards show more units with key status information">Dense</button>
+              <button type="button" id="mobile-layout-full" class="btn btn-secondary btn-sm" aria-pressed="false" title="Full cards show every unit detail">Full</button>
+            </div>
+            <div class="view-switch" role="group" aria-label="Desktop fleet view">
+              <button type="button" id="view-list" class="btn btn-secondary btn-sm" aria-pressed="true">Compact list</button>
+              <button type="button" id="view-cards" class="btn btn-secondary btn-sm" aria-pressed="false">Cards</button>
+            </div>
+            <button type="button" id="btn-clear-filters" class="btn btn-secondary btn-sm">Clear filters</button>
+            <button type="button" id="btn-refresh" class="btn btn-secondary btn-sm">
+              ↻ Refresh
+            </button>
+          </div>
+          <div class="mobile-sheet-footer">
+            <button type="button" id="btn-filter-sheet-reset" class="btn btn-secondary">Reset</button>
+            <button type="button" id="btn-filter-sheet-apply" class="btn btn-primary">Apply Filters</button>
+          </div>
+        </section>
+
+        <!-- ACTIVE FILTERS BANNER -->
+        <div id="active-filter-bar" class="active-filter-bar hidden" role="region" aria-label="Active filters">
+          <div id="active-filter-chips" class="active-filter-chips"></div>
+          <button type="button" id="btn-reset-active-filters" class="btn btn-secondary btn-sm" style="min-height:34px; padding:4px 10px; font-size:0.78rem;">Reset filters</button>
         </div>
-        <div id="fleet-empty" class="empty-box hidden">
-          <h3 id="fleet-empty-title">No trucks or trailers found</h3>
-          <p id="fleet-empty-description" style="margin-bottom: 16px;">Add your first truck or trailer to start tracking safety expiration dates and R2 inspection certificates.</p>
-          <button type="button" id="btn-empty-add" class="btn btn-primary">+ Add First Unit</button>
+
+        <!-- FLEET LIST -->
+        <section id="fleet-container">
+          <p id="filter-results" class="filter-results" role="status" aria-live="polite"></p>
+          <div id="fleet-loading" class="empty-box hidden" role="status" aria-live="polite">
+            <h3>Loading fleet records…</h3>
+            <p>Fetching units, safety expiration dates, and certificate counts.</p>
+          </div>
+          <div id="fleet-error" class="empty-box hidden" role="alert">
+            <h3 id="fleet-error-title">Unable to load fleet data</h3>
+            <p id="fleet-error-description" style="margin-bottom: 16px;">Check your connection and try refreshing the workspace.</p>
+            <button type="button" id="btn-error-retry" class="btn btn-primary">↻ Retry loading</button>
+          </div>
+          <div id="fleet-table-wrap" class="fleet-table-wrap hidden">
+            <table class="fleet-table">
+              <caption>Fleet safety list</caption>
+              <thead><tr><th scope="col">Unit / vehicle</th><th scope="col">Safety / due date</th><th scope="col">Last inspection</th><th scope="col">Actions</th></tr></thead>
+              <tbody id="fleet-table-body"></tbody>
+            </table>
+          </div>
+          <div id="fleet-grid" class="fleet-grid"></div>
+          <div id="fleet-empty" class="empty-box hidden">
+            <h3 id="fleet-empty-title">No trucks or trailers found</h3>
+            <p id="fleet-empty-description" style="margin-bottom: 16px;">Add your first truck or trailer to start tracking safety expiration dates and R2 inspection certificates.</p>
+            <button type="button" id="btn-empty-add" class="btn btn-primary">+ Add First Unit</button>
+          </div>
+        </section>
+      </main>
+
+      <!-- RIGHT REGION: PERSISTENT VEHICLE-DETAIL WORKSPACE PANEL -->
+      <aside class="workspace-detail-col" aria-label="Selected vehicle details">
+        <div id="detail-empty-state" class="detail-empty-box">
+          <div class="detail-empty-icon" aria-hidden="true">🚛</div>
+          <h3>No unit selected</h3>
+          <p>Select any unit from the fleet list or scan a QR label to inspect its compliance status, log a safety inspection, or manage R2 certificates here.</p>
         </div>
-      </section>
-    </main>
+        <div id="modal-unit" class="modal-backdrop workspace-detail hidden">
+          <div class="modal-panel detail-panel-inner">
+            <div id="detail-selected-content">
+              <div class="modal-header" style="top: -18px;">
+                <div style="display:flex; align-items:center; gap:10px; min-width:0;">
+                  <button type="button" class="btn btn-secondary btn-sm mobile-back-btn" data-close="modal-unit" aria-label="Back to fleet">← Back</button>
+                  <div style="min-width:0;">
+                    <h2 id="unit-title" class="modal-title">Unit overview</h2>
+                    <p id="unit-subtitle-host" class="muted-note" style="margin-top:2px;"></p>
+                  </div>
+                </div>
+                <button type="button" class="close-btn" data-close="modal-unit" aria-label="Close unit overview">&times;</button>
+              </div>
+              <div id="unit-status-badge-host" style="margin-bottom: 12px;"></div>
+              <div class="detail-section-label">Primary Actions</div>
+              <div id="unit-actions" class="truck-actions" style="padding-top:0; border-top:none; margin-bottom:14px;"></div>
+              <div id="unit-details"></div>
+
+              <!-- INLINE CHRONOLOGICAL INSPECTION HISTORY & R2 CERTIFICATES -->
+              <details id="detail-history-section" class="detail-disclosure" open>
+                <summary>Inspection History & Certificates</summary>
+                <div class="detail-disclosure-body">
+                  <div id="detail-upload-section" class="detail-upload-bar hidden">
+                    <label for="detail-quick-upload-input" style="font-size:0.78rem; font-weight:650; color:var(--text);">Attach Certificate / Sheet to R2 (PDF, JPEG, PNG, WebP)</label>
+                    <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+                      <input type="file" id="detail-quick-upload-input" accept="application/pdf,image/jpeg,image/png,image/webp" style="font-size:0.78rem; flex:1 1 160px; min-width:0;" />
+                      <button type="button" id="btn-detail-quick-upload" class="btn btn-primary btn-sm">Upload to R2</button>
+                    </div>
+                    <p id="detail-upload-feedback" class="hidden" role="status" aria-live="polite" style="font-size:0.78rem; margin:0;"></p>
+                  </div>
+                  <div id="detail-history-list"></div>
+                </div>
+              </details>
+
+              <!-- QR LABEL & SECONDARY UNIT ACTIONS -->
+              <details class="detail-disclosure" open>
+                <summary>QR Label & Unit Actions</summary>
+                <div class="detail-disclosure-body">
+                  <div style="display:flex; flex-wrap:wrap; gap:8px; align-items:center;">
+                    <a id="unit-print-label" class="btn btn-secondary btn-sm hidden" target="_blank" rel="noopener">🖨 Print QR label</a>
+                  </div>
+                  <p style="margin-top:8px;color:var(--text-muted);font-size:0.78rem;">Optional QR label: UUID only · 1.5 × 1.5 inches. Manual unit access still works without a QR.</p>
+                  <div id="unit-secondary-actions"></div>
+                </div>
+              </details>
+            </div>
+          </div>
+        </div>
+      </aside>
+    </div>
+
+    <!-- MOBILE BOTTOM NAVIGATION BAR (Fleet / Scan / Tools) -->
+    <nav class="mobile-bottom-nav" aria-label="Mobile primary navigation">
+      <button type="button" id="mobile-nav-fleet" class="mobile-nav-item active" aria-current="page">
+        <span class="mobile-nav-icon" aria-hidden="true">🚛</span>
+        <span>Fleet</span>
+      </button>
+      <button type="button" id="mobile-nav-scan" class="mobile-nav-item">
+        <span class="mobile-nav-icon" aria-hidden="true">⌗</span>
+        <span>Scan</span>
+      </button>
+      <button type="button" id="mobile-nav-tools" class="mobile-nav-item" aria-expanded="false">
+        <span class="mobile-nav-icon" aria-hidden="true">⚙️</span>
+        <span>Tools</span>
+      </button>
+    </nav>
     <footer class="site-footer">
       <span>Open source under the MIT License</span>
       <span class="site-footer-separator" aria-hidden="true">·</span>
@@ -1792,6 +2906,7 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
         <button type="button" class="close-btn" data-close="modal-truck">&times;</button>
       </div>
       <form id="form-truck">
+        <div id="truck-form-error" class="form-error-banner hidden" role="alert" aria-live="assertive"></div>
         <input type="hidden" id="truck-id" />
         <div class="form-grid">
           <div class="input-group">
@@ -1819,10 +2934,12 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
           <div class="input-group col-span-2">
             <label for="truck-vin">VIN (Vehicle Identification Number)</label>
             <input id="truck-vin" class="input-control" placeholder="17-character VIN" />
+            <button type="button" id="btn-truck-decode-vin" class="btn btn-secondary">Decode VIN…</button>
+            <small>Preview NHTSA details before applying them. Nothing is saved automatically.</small>
           </div>
           <div class="input-group">
             <label for="truck-year">Year</label>
-            <input id="truck-year" type="number" min="1950" max="2035" class="input-control" placeholder="e.g. 2022" />
+            <input id="truck-year" type="number" min="1900" max="2100" class="input-control" placeholder="e.g. 2022" />
           </div>
           <div class="input-group">
             <label for="truck-make">Make</label>
@@ -1889,6 +3006,50 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
     </div>
   </div>
 
+  <!-- Shared standalone / unit-form VIN preview. Only explicit lookups contact NHTSA. -->
+  <div id="modal-vin" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="vin-title">
+    <div class="modal-panel">
+      <div class="modal-header">
+        <h2 class="modal-title" id="vin-title">VIN decoder</h2>
+        <button type="button" class="close-btn" data-close="modal-vin" aria-label="Close VIN decoder">&times;</button>
+      </div>
+      <p class="muted-note" style="margin-bottom:14px;">An explicit lookup sends only the VIN and optional model year to NHTSA vPIC. For 1981+ vehicles; not a title, history or inspection check. Verify results against the vehicle label, especially GVWR ranges.</p>
+      <div id="vin-connectivity" class="vin-connectivity" data-state="not-checked" role="status" aria-live="polite" aria-atomic="true">
+        <strong id="vin-connectivity-title">NHTSA connection not checked</strong>
+        <p id="vin-connectivity-detail">Connection is checked only when you decode a VIN. No background requests are sent.</p>
+      </div>
+      <form id="form-vin">
+        <div class="form-grid">
+          <div class="input-group col-span-2">
+            <label for="vin-input">VIN to decode</label>
+            <input id="vin-input" class="input-control" maxlength="17" autocomplete="off" autocapitalize="characters" spellcheck="false" required aria-describedby="vin-status" placeholder="Full 17-character VIN" />
+          </div>
+          <div class="input-group">
+            <label for="vin-year">Model year (optional)</label>
+            <input id="vin-year" class="input-control" type="number" min="1981" max="2100" step="1" placeholder="Helps resolve older VINs" />
+          </div>
+        </div>
+        <button type="submit" id="btn-vin-lookup" class="btn btn-primary">Decode VIN</button>
+      </form>
+      <p id="vin-status" role="status" aria-live="polite" style="margin-top:14px;overflow-wrap:anywhere;"></p>
+      <div id="vin-preview" class="hidden" style="margin-top:14px;">
+        <div id="vin-warnings" role="status" style="margin-bottom:12px;overflow-wrap:anywhere;"></div>
+        <p id="vin-duplicate-warning" class="truck-notes hidden" role="status" style="margin-bottom:12px;overflow-wrap:anywhere;"></p>
+        <p id="vin-comparison-note" class="muted-note hidden" style="margin-bottom:12px;">Current form values include unsaved edits. Compare them with the decoded values before applying.</p>
+        <p id="vin-selection-help" class="muted-note" style="margin-bottom:12px;">Check the fields you want to apply. Available fields start selected; uncheck any you want to keep unchanged. Other specifications are read-only.</p>
+        <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px;">
+          <button type="button" id="btn-vin-select-all" class="btn btn-secondary btn-sm">Select all</button>
+          <button type="button" id="btn-vin-clear-selection" class="btn btn-secondary btn-sm">Clear selection</button>
+        </div>
+        <div id="vin-details" class="meta-grid" role="group" aria-label="Decoded VIN details and fields to apply" aria-describedby="vin-selection-help"></div>
+        <p class="muted-note" style="margin-top:14px;">Only checked vehicle details will be applied. Inspection dates, plate, notes and operational status are never changed.</p>
+        <div class="modal-footer">
+          <button type="button" id="btn-vin-apply" class="btn btn-primary" disabled>Use for new unit</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- MODAL: LOG NEW SAFETY INSPECTION (+ R2 UPLOAD) -->
   <div id="modal-inspect" class="modal-backdrop hidden">
     <div class="modal-panel">
@@ -1897,6 +3058,7 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
         <button type="button" class="close-btn" data-close="modal-inspect">&times;</button>
       </div>
       <form id="form-inspect">
+        <div id="inspect-form-error" class="form-error-banner hidden" role="alert" aria-live="assertive"></div>
         <input type="hidden" id="inspect-truck-id" />
         <input type="hidden" id="inspect-interval" value="12" />
         <div class="form-grid">
@@ -1930,19 +3092,6 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
           <button type="submit" id="inspect-save-btn" class="btn btn-success">✓ Complete Inspection</button>
         </div>
       </form>
-    </div>
-  </div>
-
-  <div id="modal-unit" class="modal-backdrop hidden">
-    <div class="modal-panel">
-      <div class="modal-header">
-        <h2 id="unit-title" class="modal-title">Unit overview</h2>
-        <button type="button" class="close-btn" data-close="modal-unit" aria-label="Close unit overview">&times;</button>
-      </div>
-      <div id="unit-details"></div>
-      <div id="unit-actions" class="truck-actions" style="margin-top:16px;"></div>
-      <a id="unit-print-label" class="btn btn-secondary" style="margin-top:12px;" target="_blank" rel="noopener">Print QR label</a>
-      <p style="margin-top:10px;color:var(--text-muted);font-size:0.8rem;">Optional QR label: UUID only · 1.5 × 1.5 inches. Manual unit access still works without a QR.</p>
     </div>
   </div>
 
@@ -2061,6 +3210,8 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
     // The server owns the HttpOnly session cookie; never persist tokens in URLs or localStorage.
     localStorage.removeItem('truck_safety_token');
     let fleetData = [];
+    let fleetLoading = false;
+    let fleetLoadError = '';
     let appSettings = { warning_days: 30, webhook_url: '', webhook_type: 'auto' };
     let activeHistoryTruckId = null;
     let mobileLayout = readPreference('truck_safety_mobile_layout', 'dense');
@@ -2102,9 +3253,12 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
         apply();
       }
     }
-    setFleetView(readPreference('truck_safety_view', 'cards'));
+    setFleetView(readPreference('truck_safety_view', 'list'));
     document.getElementById('view-cards').addEventListener('click', () => { setFleetView('cards'); renderFleet(); });
     document.getElementById('view-list').addEventListener('click', () => { setFleetView('list'); renderFleet(); });
+    window.matchMedia('(min-width: 960px)').addEventListener('change', () => {
+      if (fleetData.length > 0) renderFleet();
+    });
 
     function setMobileLayout(layout, persist = true) {
       mobileLayout = ['rows', 'dense', 'full'].includes(layout) ? layout : 'dense';
@@ -2157,27 +3311,37 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
       }
       if (!res.ok) {
         const data = await res.json();
-        throw new Error(data.error || 'Request failed (HTTP ' + res.status + ')');
+        throw Object.assign(new Error(data.error || 'Request failed (HTTP ' + res.status + ')'), { status: res.status });
       }
       return res;
     }
 
     function lockApp(reason = '') {
       fleetData = [];
+      fleetLoading = false;
+      fleetLoadError = '';
       appSettings = { warning_days: 30, webhook_url: '', webhook_type: 'auto' };
       activeHistoryTruckId = null;
       overviewRequest++;
       stopUnitCamera();
-      document.getElementById('unit-details').innerHTML = '';
-      document.getElementById('unit-actions').innerHTML = '';
-      document.getElementById('unit-title').textContent = 'Unit overview';
-      document.getElementById('unit-print-label').removeAttribute('href');
+      resetVinDecoder();
+      document.getElementById('form-vin').reset();
+      if (typeof clearPendingUnit === 'function') {
+        clearPendingUnit();
+      } else {
+        document.getElementById('unit-details').innerHTML = '';
+        document.getElementById('unit-actions').innerHTML = '';
+        document.getElementById('unit-title').textContent = 'Unit overview';
+        document.getElementById('unit-print-label').removeAttribute('href');
+      }
       document.querySelectorAll('.modal-backdrop').forEach(el => el.classList.add('hidden'));
       document.getElementById('fleet-grid').innerHTML = '';
       document.getElementById('fleet-table-body').innerHTML = '';
       document.getElementById('fleet-table-wrap').classList.add('hidden');
       document.getElementById('header-tools').open = false;
       document.getElementById('history-list').innerHTML = '';
+      const detailHistory = document.getElementById('detail-history-list');
+      if (detailHistory) detailHistory.innerHTML = '';
       document.getElementById('viewer-container').innerHTML = '';
       document.getElementById('form-settings').reset();
       document.getElementById('app-view').classList.add('hidden');
@@ -2239,10 +3403,21 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
 
     // Load Dashboard
     async function loadDashboard() {
+      const loadingEl = document.getElementById('fleet-loading');
+      const errorEl = document.getElementById('fleet-error');
+      fleetLoadError = '';
+      if (errorEl) errorEl.classList.add('hidden');
+      if (fleetData.length === 0 && loadingEl) {
+        fleetLoading = true;
+        loadingEl.classList.remove('hidden');
+        document.getElementById('fleet-empty').classList.add('hidden');
+      }
       try {
         const res = await apiFetch('/trucks');
         const data = await res.json();
         fleetData = data.trucks || [];
+        fleetLoading = false;
+        if (loadingEl) loadingEl.classList.add('hidden');
         if (data.settings) {
           appSettings = data.settings;
           document.getElementById('kpi-duesoon-label').textContent = 'Within ' + appSettings.warning_days + ' days';
@@ -2250,11 +3425,23 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
         }
         updateKpis();
         renderFleet();
-        await openPendingUnit();
-
+        if (typeof pendingUnitId !== 'undefined' && pendingUnitId) {
+          await openPendingUnit();
+        } else if (typeof selectedUnitId !== 'undefined' && selectedUnitId) {
+          const stillExists = fleetData.some(t => t.id === selectedUnitId);
+          if (stillExists) {
+            await openUnitOverview(selectedUnitId);
+          } else {
+            clearPendingUnit();
+          }
+        }
       } catch (err) {
+        fleetLoading = false;
+        if (loadingEl) loadingEl.classList.add('hidden');
         if (err.message !== 'Unauthorized') {
+          fleetLoadError = err.message || 'Failed to load fleet data';
           showToast('Failed to load fleet data', true);
+          renderFleet();
         }
       }
     }
@@ -2263,10 +3450,24 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
       const overdue = fleetData.filter((t) => t.safety_status === 'overdue').length;
       const dueSoon = fleetData.filter((t) => t.safety_status === 'due_soon').length;
       const good = fleetData.filter((t) => t.safety_status === 'good').length;
+      const noDate = fleetData.filter((t) => t.safety_status === 'no_date').length;
+      const total = fleetData.length;
       document.getElementById('kpi-overdue-count').textContent = overdue;
       document.getElementById('kpi-duesoon-count').textContent = dueSoon;
       document.getElementById('kpi-good-count').textContent = good;
-      document.getElementById('kpi-total-count').textContent = fleetData.length;
+      const kpiNoDate = document.getElementById('kpi-nodate-count');
+      if (kpiNoDate) kpiNoDate.textContent = noDate;
+      document.getElementById('kpi-total-count').textContent = total;
+      const navAll = document.getElementById('nav-count-all');
+      const navOverdue = document.getElementById('nav-count-overdue');
+      const navDueSoon = document.getElementById('nav-count-duesoon');
+      const navNoDate = document.getElementById('nav-count-nodate');
+      const navGood = document.getElementById('nav-count-good');
+      if (navAll) navAll.textContent = total;
+      if (navOverdue) navOverdue.textContent = overdue;
+      if (navDueSoon) navDueSoon.textContent = dueSoon;
+      if (navNoDate) navNoDate.textContent = noDate;
+      if (navGood) navGood.textContent = good;
     }
 
     function formatDaysBadge(truck) {
@@ -2286,6 +3487,17 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
       return d + ' days left';
     }
 
+    function statusIcon(status) {
+      if (status === 'overdue') return '▲';
+      if (status === 'due_soon') return '◆';
+      if (status === 'good') return '●';
+      return '○';
+    }
+
+    function formatStatusWithIcon(truck) {
+      return statusIcon(truck.safety_status) + ' ' + formatDaysBadge(truck);
+    }
+
     function escapeHtml(str) {
       return String(str || '')
         .replace(/&/g, '&amp;')
@@ -2301,6 +3513,7 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
       const sFilter = document.getElementById('filter-status').value;
       const from = document.getElementById('filter-from').value;
       const to = document.getElementById('filter-to').value;
+      const sort = document.getElementById('sort-due').value;
       const rangeActive = sFilter === 'range';
       const invalidRange = rangeActive && from && to && from > to;
       document.getElementById('filter-from-field').classList.toggle('hidden', !rangeActive);
@@ -2310,6 +3523,83 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
       document.querySelectorAll('.kpi-card').forEach(c => {
         c.classList.toggle('active-filter', c.getAttribute('data-kpi') === sFilter);
       });
+      document.querySelectorAll('[data-nav-view]').forEach(btn => {
+        const active = btn.getAttribute('data-nav-view') === sFilter;
+        btn.classList.toggle('active-nav', active);
+        btn.setAttribute('aria-current', String(active));
+      });
+
+      // Update active filter bar & mobile filter badge
+      const activeBar = document.getElementById('active-filter-bar');
+      const activeChips = document.getElementById('active-filter-chips');
+      const mobileBadge = document.getElementById('mobile-filter-badge');
+      let advancedFilterCount = 0;
+      if (vType !== 'all') advancedFilterCount++;
+      if (sFilter !== 'all') advancedFilterCount++;
+      if (rangeActive && (from || to)) advancedFilterCount++;
+      if (sort !== 'earliest') advancedFilterCount++;
+      if (mobileBadge) {
+        mobileBadge.textContent = String(advancedFilterCount);
+        mobileBadge.classList.toggle('hidden', advancedFilterCount === 0);
+      }
+      if (activeBar && activeChips) {
+        const chips = [];
+        if (q) chips.push('Search: “' + escapeHtml(document.getElementById('search-input').value.trim()) + '”');
+        if (vType !== 'all') chips.push('Type: ' + escapeHtml(vType));
+        if (sFilter !== 'all') {
+          const statusLabel = document.getElementById('filter-status').selectedOptions[0]?.textContent || sFilter;
+          chips.push('Due: ' + escapeHtml(statusLabel));
+        }
+        if (rangeActive && (from || to)) {
+          chips.push('Range: ' + escapeHtml(from || '…') + ' → ' + escapeHtml(to || '…'));
+        }
+        if (sort !== 'earliest') {
+          const sortLabel = document.getElementById('sort-due').selectedOptions[0]?.textContent || sort;
+          chips.push(escapeHtml(sortLabel));
+        }
+        if (chips.length > 0) {
+          activeChips.innerHTML = '<span style="color:var(--text-muted); font-weight:600; font-size:0.75rem; text-transform:uppercase; letter-spacing:0.04em;">Active filters:</span>' +
+            chips.map(c => '<span class="active-filter-chip">' + c + '</span>').join('');
+          activeBar.classList.remove('hidden');
+        } else {
+          activeChips.innerHTML = '';
+          activeBar.classList.add('hidden');
+        }
+      }
+
+      const loadingEl = document.getElementById('fleet-loading');
+      const errorEl = document.getElementById('fleet-error');
+      const grid = document.getElementById('fleet-grid');
+      const empty = document.getElementById('fleet-empty');
+      const tableBody = document.getElementById('fleet-table-body');
+      const tableWrap = document.getElementById('fleet-table-wrap');
+
+      if (fleetLoading && fleetData.length === 0) {
+        if (loadingEl) loadingEl.classList.remove('hidden');
+        if (errorEl) errorEl.classList.add('hidden');
+        empty.classList.add('hidden');
+        tableWrap.classList.add('hidden');
+        grid.innerHTML = '';
+        tableBody.innerHTML = '';
+        document.getElementById('filter-results').textContent = 'Loading fleet data…';
+        return;
+      }
+      if (loadingEl) loadingEl.classList.add('hidden');
+
+      if (fleetLoadError) {
+        if (errorEl) {
+          document.getElementById('fleet-error-description').textContent = fleetLoadError + (fleetData.length ? ' Showing previously loaded records.' : '');
+          errorEl.classList.remove('hidden');
+        }
+        if (fleetData.length === 0) {
+          empty.classList.add('hidden');
+          tableWrap.classList.add('hidden');
+          grid.innerHTML = '';
+          tableBody.innerHTML = '';
+          document.getElementById('filter-results').textContent = 'Failed to load fleet data.';
+          return;
+        }
+      } else if (errorEl) errorEl.classList.add('hidden');
 
       const filtered = fleetData.filter((t) => {
         if (invalidRange) return false;
@@ -2340,7 +3630,6 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
         return true;
       });
 
-      const sort = document.getElementById('sort-due').value;
       filtered.sort((a, b) => {
         const unitOrder = String(a.unit_number).localeCompare(String(b.unit_number), undefined, { numeric: true });
         if (sort === 'unit') return unitOrder;
@@ -2354,22 +3643,24 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
       document.getElementById('filter-results').textContent = invalidRange
         ? 'End date must be on or after the start date.'
         : 'Showing ' + filtered.length + ' of ' + fleetData.length + ' units · ' + document.getElementById('filter-status').selectedOptions[0].textContent;
-      const grid = document.getElementById('fleet-grid');
-      const empty = document.getElementById('fleet-empty');
-      const tableBody = document.getElementById('fleet-table-body');
-      const tableWrap = document.getElementById('fleet-table-wrap');
+
       const desktopList = window.matchMedia('(min-width: 960px)').matches && document.getElementById('fleet-container').dataset.view === 'list';
       const phoneRows = window.matchMedia('(max-width: 959px)').matches && mobileLayout === 'rows';
       tableWrap.classList.toggle('hidden', filtered.length === 0 || !(desktopList || phoneRows));
+      const curSelected = typeof selectedUnitId !== 'undefined' ? selectedUnitId : null;
       tableBody.innerHTML = filtered.map(t => {
         const id = escapeHtml(t.id);
+        const isSel = curSelected && curSelected === t.id;
         const dueLabel = t.next_due_date ? 'Due ' + escapeHtml(t.next_due_date) : 'Inspection date pending';
         const vehicleLine = [t.year, t.make, t.model, t.equipment_type].filter(Boolean).join(' ');
-        return '<tr>' +
-          '<td><strong>Unit #' + escapeHtml(t.unit_number) + '</strong><span class="list-sub">' + escapeHtml(t.vehicle_type) + (t.status !== 'Active' ? ' · ' + escapeHtml(t.status) : '') + '</span><span class="list-sub">' + escapeHtml(vehicleLine) + '</span></td>' +
-          '<td><span class="safety-badge ' + escapeHtml(t.safety_status) + '">' + escapeHtml(formatDaysBadge(t)) + '<small>' + dueLabel + '</small></span></td>' +
+        const latestFileBtn = t.latest_attachment
+          ? '<button type="button" class="btn btn-secondary btn-sm" data-view-file="' + escapeHtml(t.latest_attachment.id) + '" data-file-name="' + escapeHtml(t.latest_attachment.file_name) + '" data-file-type="' + escapeHtml(t.latest_attachment.content_type) + '">📄 View Cert</button>'
+          : '';
+        return '<tr data-unit-row="' + id + '" class="' + (isSel ? 'is-selected' : '') + '" aria-selected="' + String(Boolean(isSel)) + '">' +
+          '<td><button type="button" class="unit-row-link" data-select-unit="' + id + '"><strong>Unit #' + escapeHtml(t.unit_number) + '</strong></button><span class="list-sub">' + escapeHtml(t.vehicle_type) + (t.status !== 'Active' ? ' · ' + escapeHtml(t.status) : '') + '</span><span class="list-sub">' + escapeHtml(vehicleLine) + '</span></td>' +
+          '<td><span class="safety-badge ' + escapeHtml(t.safety_status) + '">' + escapeHtml(formatStatusWithIcon(t)) + '<small>' + dueLabel + '</small></span></td>' +
           '<td>' + escapeHtml(t.last_inspection_date || '—') + '<span class="list-sub">' + escapeHtml(t.license_plate || '') + '</span></td>' +
-          '<td><div class="list-actions"><button type="button" class="btn btn-secondary btn-sm" data-details="' + id + '">Details</button><button type="button" class="btn btn-success btn-sm" data-inspect="' + id + '">Log Safety</button><button type="button" class="btn btn-secondary btn-sm" data-history="' + id + '">Files (' + (t.attachment_count || 0) + ')</button><button type="button" class="btn btn-secondary btn-sm" data-edit="' + id + '">Edit</button></div></td></tr>';
+          '<td><div class="list-actions"><button type="button" class="btn btn-secondary btn-sm" data-details="' + id + '">Details</button><button type="button" class="btn btn-success btn-sm" data-inspect="' + id + '">Log Safety</button>' + latestFileBtn + '<button type="button" class="btn btn-secondary btn-sm" data-history="' + id + '">Files (' + (t.attachment_count || 0) + ')</button><button type="button" class="btn btn-secondary btn-sm" data-edit="' + id + '">Edit</button></div></td></tr>';
       }).join('');
       const hasFleet = fleetData.length > 0;
       document.getElementById('fleet-empty-title').textContent = hasFleet ? 'No units match these filters' : 'No trucks or trailers found';
@@ -2387,6 +3678,7 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
       empty.classList.add('hidden');
       grid.innerHTML = filtered
         .map((t) => {
+          const isSel = curSelected && curSelected === t.id;
           const ymm = [t.year, t.make, t.model, t.equipment_type].filter(Boolean).join(' ') || 'Vehicle details not set';
           const latestFileBtn = t.latest_attachment
             ? \`<button type="button" class="btn btn-secondary btn-sm" data-view-file="\${escapeHtml(t.latest_attachment.id)}" data-file-name="\${escapeHtml(t.latest_attachment.file_name)}" data-file-type="\${escapeHtml(t.latest_attachment.content_type)}">📄 View Cert</button>\`
@@ -2395,7 +3687,7 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
           const dueValue = t.next_due_date ? \`\${escapeHtml(t.next_due_date)} (\${t.interval_months || 12}m)\` : \`No date set (\${t.interval_months || 12}m)\`;
 
           return \`
-            <article class="truck-card status-\${escapeHtml(t.safety_status)}">
+            <article class="truck-card status-\${escapeHtml(t.safety_status)}\${isSel ? ' is-selected' : ''}" data-unit-row="\${escapeHtml(t.id)}" aria-selected="\${String(Boolean(isSel))}">
               <div>
                 <div class="truck-top">
                   <div>
@@ -2408,7 +3700,7 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
                     <div class="truck-sub">\${escapeHtml(ymm)}</div>
                   </div>
                   <div class="safety-badge \${escapeHtml(t.safety_status)}">
-                    <span>\${escapeHtml(formatDaysBadge(t))}</span>
+                    <span>\${escapeHtml(formatStatusWithIcon(t))}</span>
                     <small>\${dueSmall}</small>
                   </div>
                 </div>
@@ -2470,13 +3762,27 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
       });
     });
 
-    document.getElementById('search-input').addEventListener('input', renderFleet);
-    document.getElementById('filter-vehicle-type').addEventListener('change', renderFleet);
-    document.getElementById('filter-status').addEventListener('change', renderFleet);
-    document.getElementById('sort-due').addEventListener('change', renderFleet);
-    document.getElementById('filter-from').addEventListener('input', renderFleet);
-    document.getElementById('filter-to').addEventListener('input', renderFleet);
-    document.getElementById('btn-clear-filters').addEventListener('click', () => {
+    // Left Navigation Quick Fleet Views & Tool shortcuts
+    document.querySelectorAll('[data-nav-view]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const view = btn.getAttribute('data-nav-view');
+        document.getElementById('filter-status').value = view;
+        renderFleet();
+      });
+    });
+
+    document.querySelectorAll('[data-nav-action]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const action = btn.getAttribute('data-nav-action');
+        if (action === 'scan') document.getElementById('btn-scan-unit').click();
+        else if (action === 'add') document.getElementById('btn-add-truck').click();
+        else if (action === 'ics') document.getElementById('btn-export-ics').click();
+        else if (action === 'alerts') document.getElementById('btn-browser-notify').click();
+        else if (action === 'settings') document.getElementById('btn-settings').click();
+      });
+    });
+
+    function clearAllFilters() {
       document.getElementById('search-input').value = '';
       document.getElementById('filter-vehicle-type').value = 'all';
       document.getElementById('filter-status').value = 'all';
@@ -2484,8 +3790,89 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
       document.getElementById('filter-to').value = '';
       document.getElementById('sort-due').value = 'earliest';
       renderFleet();
-    });
+    }
+
+    document.getElementById('search-input').addEventListener('input', renderFleet);
+    document.getElementById('filter-vehicle-type').addEventListener('change', renderFleet);
+    document.getElementById('filter-status').addEventListener('change', renderFleet);
+    document.getElementById('sort-due').addEventListener('change', renderFleet);
+    document.getElementById('filter-from').addEventListener('input', renderFleet);
+    document.getElementById('filter-to').addEventListener('input', renderFleet);
+    document.getElementById('btn-clear-filters').addEventListener('click', clearAllFilters);
+    const resetActiveBtn = document.getElementById('btn-reset-active-filters');
+    if (resetActiveBtn) resetActiveBtn.addEventListener('click', clearAllFilters);
     document.getElementById('btn-refresh').addEventListener('click', loadDashboard);
+    const retryBtn = document.getElementById('btn-error-retry');
+    if (retryBtn) retryBtn.addEventListener('click', loadDashboard);
+
+    // Mobile Filter Sheet controls
+    const fleetToolbar = document.getElementById('fleet-toolbar');
+    const mobileFilterSheetBtn = document.getElementById('btn-mobile-filter-sheet');
+    function setMobileFilterSheetOpen(open) {
+      if (!fleetToolbar || !mobileFilterSheetBtn) return;
+      fleetToolbar.classList.toggle('mobile-sheet-open', open);
+      mobileFilterSheetBtn.setAttribute('aria-expanded', String(open));
+    }
+    if (mobileFilterSheetBtn) {
+      mobileFilterSheetBtn.addEventListener('click', () => {
+        setMobileFilterSheetOpen(!fleetToolbar.classList.contains('mobile-sheet-open'));
+      });
+    }
+    const closeFilterSheetBtn = document.getElementById('btn-close-filter-sheet');
+    if (closeFilterSheetBtn) closeFilterSheetBtn.addEventListener('click', () => setMobileFilterSheetOpen(false));
+    const applyFilterSheetBtn = document.getElementById('btn-filter-sheet-apply');
+    if (applyFilterSheetBtn) applyFilterSheetBtn.addEventListener('click', () => {
+      renderFleet();
+      setMobileFilterSheetOpen(false);
+    });
+    const resetFilterSheetBtn = document.getElementById('btn-filter-sheet-reset');
+    if (resetFilterSheetBtn) resetFilterSheetBtn.addEventListener('click', () => {
+      clearAllFilters();
+    });
+
+    // Mobile Bottom Navigation bar (Fleet / Scan / Tools)
+    const navFleetBtn = document.getElementById('mobile-nav-fleet');
+    const navScanBtn = document.getElementById('mobile-nav-scan');
+    const navToolsBtn = document.getElementById('mobile-nav-tools');
+    if (navFleetBtn) {
+      navFleetBtn.addEventListener('click', () => {
+        setMobileFilterSheetOpen(false);
+        const tools = document.getElementById('header-tools');
+        if (tools) tools.open = false;
+        if (typeof selectedUnitId !== 'undefined' && selectedUnitId && typeof clearPendingUnit === 'function') {
+          clearPendingUnit();
+        }
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
+    }
+    if (navScanBtn) {
+      navScanBtn.addEventListener('click', () => {
+        setMobileFilterSheetOpen(false);
+        const tools = document.getElementById('header-tools');
+        if (tools) tools.open = false;
+        document.getElementById('btn-scan-unit').click();
+      });
+    }
+    if (navToolsBtn) {
+      navToolsBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        setMobileFilterSheetOpen(false);
+        const tools = document.getElementById('header-tools');
+        if (tools) {
+          tools.open = !tools.open;
+          navToolsBtn.setAttribute('aria-expanded', String(tools.open));
+          if (tools.open) {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          }
+        }
+      });
+    }
+
+    // Track dirty state for Add/Edit Truck and Log Inspection forms to avoid silently discarding unsaved edits
+    let truckFormDirty = false;
+    let inspectFormDirty = false;
+    document.getElementById('form-truck').addEventListener('input', () => { truckFormDirty = true; });
+    document.getElementById('form-inspect').addEventListener('input', () => { inspectFormDirty = true; });
 
     // Auto-calculate due date when last inspection date or interval changes in Add/Edit modal
     function addCalendarMonths(date, months) {
@@ -2531,6 +3918,9 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
     function openAddTruckModal() {
       document.getElementById('modal-truck-title').textContent = 'Add Truck / Trailer';
       document.getElementById('form-truck').reset();
+      truckFormDirty = false;
+      const errBanner = document.getElementById('truck-form-error');
+      if (errBanner) { errBanner.textContent = ''; errBanner.classList.add('hidden'); }
       document.getElementById('truck-id').value = '';
       setTruckNoDateMode(false, false);
       const today = new Date().toISOString().slice(0, 10);
@@ -2542,6 +3932,219 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
 
     document.getElementById('btn-add-truck').addEventListener('click', openAddTruckModal);
     document.getElementById('btn-empty-add').addEventListener('click', openAddTruckModal);
+
+    // Shared VIN lookup preview. Cancel / input changes invalidate any in-flight result.
+    let vinRequest = null;
+    let vinDecoded = null;
+    let vinFromTruck = false;
+    let vinTruckId = '';
+    let vinReturnFocus = null;
+    let vinConnectivity = 'not-checked';
+
+    function setVinConnectivity(state, detail) {
+      vinConnectivity = state;
+      const titles = {
+        'not-checked': 'NHTSA connection not checked',
+        checking: 'Checking NHTSA connection…',
+        connected: 'NHTSA connected — last lookup',
+        unavailable: 'NHTSA temporarily unavailable',
+        'app-unreachable': 'App connection failed — NHTSA status unknown',
+      };
+      document.getElementById('vin-connectivity').dataset.state = state;
+      document.getElementById('vin-connectivity-title').textContent = titles[state];
+      document.getElementById('vin-connectivity-detail').textContent = detail;
+    }
+
+    function vinLookupButtonLabel() {
+      return vinConnectivity === 'unavailable' || vinConnectivity === 'app-unreachable' ? 'Retry VIN lookup' : 'Decode VIN';
+    }
+
+    function vinApplyFields(d) {
+      return [
+        ['truck-vin', d.vin, 'VIN'], ['truck-year', d.year, 'Year'], ['truck-make', d.make, 'Make'],
+        ['truck-model', d.model, 'Model'], ['truck-type', d.vehicle_type, 'Fleet type suggestion'],
+        ['truck-equipment-type', d.equipment_type, 'Body / equipment type'], ['truck-gvwr', d.gvwr, 'GVWR / weight class (range)'],
+      ];
+    }
+
+    function selectedVinFields() {
+      if (!vinDecoded) return [];
+      const selected = new Set(Array.from(document.querySelectorAll('#vin-details [data-vin-field]:checked'), input => input.getAttribute('data-vin-field')));
+      return vinApplyFields(vinDecoded).filter(([id, value]) => value != null && value !== '' && selected.has(id));
+    }
+
+    function updateVinSelectionControls() {
+      const options = document.querySelectorAll('#vin-details [data-vin-field]');
+      const selected = selectedVinFields().length;
+      document.getElementById('btn-vin-apply').disabled = selected === 0;
+      document.getElementById('btn-vin-select-all').disabled = options.length === selected;
+      document.getElementById('btn-vin-clear-selection').disabled = selected === 0;
+    }
+
+    document.getElementById('vin-details').addEventListener('change', updateVinSelectionControls);
+    ['btn-vin-select-all', 'btn-vin-clear-selection'].forEach(id => {
+      document.getElementById(id).addEventListener('click', () => {
+        document.querySelectorAll('#vin-details [data-vin-field]').forEach(input => { input.checked = id === 'btn-vin-select-all'; });
+        updateVinSelectionControls();
+      });
+    });
+
+    function updateVinDuplicateWarning() {
+      const warning = document.getElementById('vin-duplicate-warning');
+      const normalizedVin = vinDecoded.vin.trim().toUpperCase();
+      const matches = fleetData.filter(unit =>
+        (!vinFromTruck || unit.id !== vinTruckId) && String(unit.vin || '').trim().toUpperCase() === normalizedVin
+      );
+      warning.textContent = matches.length
+        ? 'This VIN already belongs to ' + matches.map(unit => 'Unit #' + unit.unit_number).join(', ') + ' in the loaded fleet. Verify before applying or saving. This warning does not block saving.'
+        : '';
+      warning.classList.toggle('hidden', matches.length === 0);
+    }
+
+    function resetVinDecoder() {
+      if (vinRequest) vinRequest.abort();
+      vinRequest = null;
+      if (vinConnectivity === 'checking') setVinConnectivity('not-checked', 'Lookup cancelled. Decode a VIN to check the connection again.');
+      vinDecoded = null;
+      document.getElementById('btn-vin-apply').disabled = true;
+      document.getElementById('vin-preview').classList.add('hidden');
+      document.getElementById('vin-details').innerHTML = '';
+      document.getElementById('vin-warnings').textContent = '';
+      document.getElementById('vin-duplicate-warning').textContent = '';
+      document.getElementById('vin-duplicate-warning').classList.add('hidden');
+      updateVinSelectionControls();
+      document.getElementById('vin-status').textContent = '';
+      const button = document.getElementById('btn-vin-lookup');
+      button.disabled = false;
+      button.textContent = vinLookupButtonLabel();
+    }
+
+    function openVinDecoder(fromTruck) {
+      setVinConnectivity('not-checked', 'Connection is checked only when you decode a VIN. No background requests are sent.');
+      resetVinDecoder();
+      vinFromTruck = fromTruck;
+      vinTruckId = document.getElementById('truck-id').value;
+      vinReturnFocus = document.activeElement;
+      document.getElementById('form-vin').reset();
+      if (fromTruck) {
+        document.getElementById('vin-input').value = document.getElementById('truck-vin').value.trim();
+        document.getElementById('vin-year').value = document.getElementById('truck-year').value;
+      }
+      document.getElementById('vin-comparison-note').classList.toggle('hidden', !fromTruck);
+      document.getElementById('btn-vin-apply').textContent = fromTruck ? 'Apply to unit form' : 'Use for new unit';
+      document.getElementById('modal-vin').classList.remove('hidden');
+      document.getElementById('vin-input').focus();
+    }
+
+    function closeVinDecoder() {
+      resetVinDecoder();
+      document.getElementById('modal-vin').classList.add('hidden');
+      if (vinReturnFocus) vinReturnFocus.focus();
+    }
+
+    document.getElementById('btn-vin-decoder').addEventListener('click', () => openVinDecoder(false));
+    document.getElementById('btn-truck-decode-vin').addEventListener('click', () => openVinDecoder(true));
+    document.getElementById('form-vin').addEventListener('input', resetVinDecoder);
+    document.getElementById('form-vin').addEventListener('submit', async (event) => {
+      event.preventDefault();
+      resetVinDecoder();
+      const status = document.getElementById('vin-status');
+      const vin = document.getElementById('vin-input').value.trim().toUpperCase();
+      document.getElementById('vin-input').value = vin;
+      if (!/^[A-HJ-NPR-Z0-9]{17}$/.test(vin)) {
+        status.textContent = 'Enter a full 17-character VIN using letters and numbers (no I, O or Q).';
+        return;
+      }
+      const controller = new AbortController();
+      vinRequest = controller;
+      const button = document.getElementById('btn-vin-lookup');
+      button.disabled = true;
+      button.textContent = 'Decoding…';
+      setVinConnectivity('checking', 'Contacting the real NHTSA vPIC service. The provider lookup times out after 15 seconds.');
+      status.textContent = 'Looking up VIN with NHTSA…';
+      let timedOut = false;
+      const timeout = setTimeout(() => { timedOut = true; controller.abort(); }, 20000);
+      try {
+        const response = await apiFetch('/vin/decode', {
+          method: 'POST', signal: controller.signal,
+          body: JSON.stringify({ vin, year: document.getElementById('vin-year').value }),
+        });
+        const data = await response.json();
+        if (vinRequest !== controller || controller.signal.aborted) return;
+        setVinConnectivity('connected', 'The last lookup reached NHTSA. Review the returned details and any warnings.');
+        vinDecoded = data.decoded;
+        const d = vinDecoded;
+        const fields = [
+          ...vinApplyFields(d),
+          ['', d.decoded_vehicle_type, 'Vehicle type (NHTSA)'], ['', d.manufacturer, 'Manufacturer'],
+          ['', d.engine, 'Engine'], ['', d.fuel_type, 'Fuel'], ['', d.plant_country, 'Plant country'],
+        ];
+        document.getElementById('vin-details').innerHTML = fields.map(([id, value, label]) => {
+          const compare = vinFromTruck && id;
+          const decodedValue = escapeHtml(value || 'Not available');
+          const detail = '<div><span>' + escapeHtml(label) + '</span>' + (compare
+            ? '<div class="vin-field-values"><div><span>Current form</span><strong data-vin-current>' + escapeHtml(document.getElementById(id).value || 'Not set') + '</strong></div>' +
+              '<div><span>Decoded VIN</span><strong data-vin-decoded>' + decodedValue + '</strong></div></div>'
+            : '<strong>' + decodedValue + '</strong>') + '</div>';
+          const attributes = id ? ' data-vin-detail="' + id + '"' : '';
+          const comparisonClass = compare ? ' vin-comparison-row' : '';
+          return id && value != null && value !== ''
+            ? '<label class="meta-item vin-field-option' + comparisonClass + '"' + attributes + '><input type="checkbox" data-vin-field="' + id + '" aria-label="Apply ' + escapeHtml(label) + '" checked />' + detail + '</label>'
+            : '<div class="meta-item' + comparisonClass + '"' + attributes + '>' + detail + '</div>';
+        }).join('');
+        updateVinSelectionControls();
+        updateVinDuplicateWarning();
+        document.getElementById('vin-warnings').textContent = d.warnings.join(' ');
+        status.textContent = d.warnings.length ? 'Partial decode — review warnings before applying.' : 'Decoded by NHTSA. Review before applying.';
+        document.getElementById('vin-preview').classList.remove('hidden');
+      } catch (error) {
+        if (vinRequest === controller && (!controller.signal.aborted || timedOut)) {
+          status.textContent = timedOut ? 'The app did not respond within 20 seconds. Please retry.' : error.message;
+          if (error.status === 502 || error.status === 504) {
+            setVinConnectivity('unavailable', error.message + ' Retry the lookup later, or close this decoder and enter details manually. Your form entries have not changed.');
+          } else if (error.status === 422) {
+            setVinConnectivity('connected', 'NHTSA responded but found no vehicle details. Check the VIN or enter details manually.');
+          } else {
+            setVinConnectivity(error.status ? 'not-checked' : 'app-unreachable', error.status
+              ? 'The app could not complete the lookup. NHTSA connectivity was not confirmed. ' + error.message
+              : 'Unable to confirm NHTSA connectivity through the app. Check your connection and retry, or enter details manually. Your form entries have not changed.');
+          }
+        }
+      } finally {
+        clearTimeout(timeout);
+        if (vinRequest === controller) {
+          vinRequest = null;
+          button.disabled = false;
+          button.textContent = vinLookupButtonLabel();
+        }
+      }
+    });
+
+    document.getElementById('btn-vin-apply').addEventListener('click', () => {
+      if (!vinDecoded) return;
+      const fields = selectedVinFields();
+      if (fields.length === 0) return;
+      if (vinFromTruck && (document.getElementById('modal-truck').classList.contains('hidden') || document.getElementById('truck-id').value !== vinTruckId)) {
+        closeVinDecoder();
+        return;
+      }
+      if (vinFromTruck) {
+        const replacements = fields.filter(([id, value]) => {
+          const current = document.getElementById(id).value.trim();
+          return current && current !== String(value);
+        }).map(([, , label]) => label);
+        if (replacements.length && !confirm('Replace existing form values for: ' + replacements.join(', ') + '? Nothing is saved until Save Unit.')) return;
+      } else {
+        openAddTruckModal();
+        // A VIN lookup supplies no evidence that an inspection has occurred.
+        setTruckNoDateMode(true);
+      }
+      fields.forEach(([id, value]) => { document.getElementById(id).value = String(value); });
+      truckFormDirty = true;
+      closeVinDecoder();
+      document.getElementById('truck-unit').focus();
+      showToast('VIN details applied to form. Review, then Save Unit.');
+    });
 
     // Save Truck (Create or Update)
     document.getElementById('form-truck').addEventListener('submit', async (e) => {
@@ -2568,7 +4171,11 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
       };
 
       const btn = document.getElementById('truck-save-btn');
+      const errBanner = document.getElementById('truck-form-error');
+      if (errBanner) { errBanner.textContent = ''; errBanner.classList.add('hidden'); }
       btn.disabled = true;
+      const origText = btn.textContent;
+      btn.textContent = 'Saving...';
       try {
         const res = await apiFetch(id ? '/trucks/' + id : '/trucks', {
           method: id ? 'PUT' : 'POST',
@@ -2578,91 +4185,123 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
           const err = await res.json();
           throw new Error(err.error || 'Failed to save unit');
         }
+        truckFormDirty = false;
         document.getElementById('modal-truck').classList.add('hidden');
         showToast(id ? 'Unit updated' : 'Unit added to fleet');
         await loadDashboard();
       } catch (err) {
+        if (errBanner) {
+          errBanner.textContent = err.message;
+          errBanner.classList.remove('hidden');
+        }
         showToast(err.message, true);
       } finally {
         btn.disabled = false;
+        btn.textContent = origText;
       }
     });
 
-    // Delegate actions on truck cards
-    ['fleet-grid', 'fleet-table-body', 'unit-actions'].forEach(containerId => document.getElementById(containerId).addEventListener('click', async (e) => {
-      const btn = e.target.closest('button');
-      if (!btn) return;
-
-      const detailsId = btn.getAttribute('data-details');
-      if (detailsId) { await openUnitOverview(detailsId); return; }
-      if (containerId === 'unit-actions') document.getElementById('modal-unit').classList.add('hidden');
-      const editId = btn.getAttribute('data-edit');
-      const inspectId = btn.getAttribute('data-inspect');
-      const historyId = btn.getAttribute('data-history');
-      const deleteId = btn.getAttribute('data-delete');
-      const viewFileId = btn.getAttribute('data-view-file');
-
-      if (editId) {
-        const t = fleetData.find((x) => x.id === editId);
-        if (!t) return;
-        document.getElementById('modal-truck-title').textContent = 'Edit Unit #' + t.unit_number;
-        document.getElementById('truck-id').value = t.id;
-        document.getElementById('truck-unit').value = t.unit_number;
-        document.getElementById('truck-type').value = t.vehicle_type || 'Tractor';
-        document.getElementById('truck-plate').value = t.license_plate || '';
-        document.getElementById('truck-gvwr').value = t.gvwr || '';
-        document.getElementById('truck-vin').value = t.vin || '';
-        document.getElementById('truck-year').value = t.year || '';
-        document.getElementById('truck-make').value = t.make || '';
-        document.getElementById('truck-model').value = t.model || '';
-        document.getElementById('truck-equipment-type').value = t.equipment_type || '';
-        document.getElementById('truck-op-status').value = t.status || 'Active';
-        document.getElementById('truck-interval').value = String(t.interval_months || 12);
-        const hasNoDate = !t.next_due_date && !t.last_inspection_date;
-        setTruckNoDateMode(hasNoDate, false);
-        document.getElementById('truck-last-date').value = t.last_inspection_date || '';
-        document.getElementById('truck-due-date').value = t.next_due_date || '';
-        document.getElementById('truck-sticker').value = t.sticker_number || '';
-        document.getElementById('truck-shop').value = t.shop_name || '';
-        document.getElementById('truck-notes').value = t.notes || '';
-        document.getElementById('modal-truck').classList.remove('hidden');
-      } else if (inspectId) {
-        const t = fleetData.find((x) => x.id === inspectId);
-        if (!t) return;
-        document.getElementById('modal-inspect-title').textContent = 'Log Safety — Unit #' + t.unit_number;
-        document.getElementById('form-inspect').reset();
-        document.getElementById('inspect-truck-id').value = t.id;
-        const months = t.interval_months || 12;
-        document.getElementById('inspect-interval').value = String(months);
-        const today = new Date().toISOString().slice(0, 10);
-        document.getElementById('inspect-date').value = today;
-        const exp = addCalendarMonths(today, months);
-        document.getElementById('inspect-exp-date').value = exp;
-        document.getElementById('inspect-shop').value = t.shop_name || '';
-        document.getElementById('modal-inspect').classList.remove('hidden');
-      } else if (historyId) {
-        openHistoryModal(historyId);
-      } else if (viewFileId) {
-        openFileViewer(
-          viewFileId,
-          btn.getAttribute('data-file-name') || 'Certificate',
-          btn.getAttribute('data-file-type') || 'application/octet-stream'
-        );
-      } else if (deleteId) {
-        const t = fleetData.find((x) => x.id === deleteId);
-        if (!t) return;
-        if (!confirm('Delete Unit #' + t.unit_number + ' and all its inspection logs/files?')) return;
-        try {
-          const res = await apiFetch('/trucks/' + deleteId, { method: 'DELETE' });
-          if (res.ok) {
-            showToast('Deleted Unit #' + t.unit_number);
-            await loadDashboard();
+    // Delegate actions on truck cards, table rows, and detail panel
+    ['fleet-grid', 'fleet-table-body', 'unit-actions', 'unit-secondary-actions'].forEach(containerId => {
+      const container = document.getElementById(containerId);
+      if (!container) return;
+      container.addEventListener('click', async (e) => {
+        const btn = e.target.closest('button');
+        if (!btn) {
+          // Clicking a table row or unit card outside action buttons selects the unit in the workspace detail panel / full-screen mobile view
+          if (containerId === 'fleet-table-body' || containerId === 'fleet-grid') {
+            const row = e.target.closest('[data-unit-row]');
+            if (row) {
+              const rowUnitId = row.getAttribute('data-unit-row');
+              if (rowUnitId) await openUnitOverview(rowUnitId);
+            }
           }
-        } catch (err) {
-          showToast('Failed to delete unit', true);
+          return;
         }
-      }
-    }));
+
+        const detailsId = btn.getAttribute('data-details') || btn.getAttribute('data-select-unit');
+        if (detailsId) { await openUnitOverview(detailsId); return; }
+        // On tablet/mobile (< 1200px), #modal-unit is a fixed overlay drawer; hide it when launching a modal dialog so it doesn't cover the header
+        if (containerId === 'unit-actions' && !window.matchMedia('(min-width: 1200px)').matches) {
+          document.getElementById('modal-unit').classList.add('hidden');
+        }
+        const editId = btn.getAttribute('data-edit');
+        const inspectId = btn.getAttribute('data-inspect');
+        const historyId = btn.getAttribute('data-history');
+        const deleteId = btn.getAttribute('data-delete');
+        const viewFileId = btn.getAttribute('data-view-file');
+
+        if (editId) {
+          const t = fleetData.find((x) => x.id === editId);
+          if (!t) return;
+          truckFormDirty = false;
+          const errBanner = document.getElementById('truck-form-error');
+          if (errBanner) { errBanner.textContent = ''; errBanner.classList.add('hidden'); }
+          document.getElementById('modal-truck-title').textContent = 'Edit Unit #' + t.unit_number;
+          document.getElementById('truck-id').value = t.id;
+          document.getElementById('truck-unit').value = t.unit_number;
+          document.getElementById('truck-type').value = t.vehicle_type || 'Tractor';
+          document.getElementById('truck-plate').value = t.license_plate || '';
+          document.getElementById('truck-gvwr').value = t.gvwr || '';
+          document.getElementById('truck-vin').value = t.vin || '';
+          document.getElementById('truck-year').value = t.year || '';
+          document.getElementById('truck-make').value = t.make || '';
+          document.getElementById('truck-model').value = t.model || '';
+          document.getElementById('truck-equipment-type').value = t.equipment_type || '';
+          document.getElementById('truck-op-status').value = t.status || 'Active';
+          document.getElementById('truck-interval').value = String(t.interval_months || 12);
+          const hasNoDate = !t.next_due_date && !t.last_inspection_date;
+          setTruckNoDateMode(hasNoDate, false);
+          document.getElementById('truck-last-date').value = t.last_inspection_date || '';
+          document.getElementById('truck-due-date').value = t.next_due_date || '';
+          document.getElementById('truck-sticker').value = t.sticker_number || '';
+          document.getElementById('truck-shop').value = t.shop_name || '';
+          document.getElementById('truck-notes').value = t.notes || '';
+          document.getElementById('modal-truck').classList.remove('hidden');
+        } else if (inspectId) {
+          const t = fleetData.find((x) => x.id === inspectId);
+          if (!t) return;
+          inspectFormDirty = false;
+          const errBanner = document.getElementById('inspect-form-error');
+          if (errBanner) { errBanner.textContent = ''; errBanner.classList.add('hidden'); }
+          document.getElementById('modal-inspect-title').textContent = 'Log Safety — Unit #' + t.unit_number;
+          document.getElementById('form-inspect').reset();
+          document.getElementById('inspect-truck-id').value = t.id;
+          const months = t.interval_months || 12;
+          document.getElementById('inspect-interval').value = String(months);
+          const today = new Date().toISOString().slice(0, 10);
+          document.getElementById('inspect-date').value = today;
+          const exp = addCalendarMonths(today, months);
+          document.getElementById('inspect-exp-date').value = exp;
+          document.getElementById('inspect-shop').value = t.shop_name || '';
+          document.getElementById('modal-inspect').classList.remove('hidden');
+        } else if (historyId) {
+          openHistoryModal(historyId);
+        } else if (viewFileId) {
+          openFileViewer(
+            viewFileId,
+            btn.getAttribute('data-file-name') || 'Certificate',
+            btn.getAttribute('data-file-type') || 'application/octet-stream'
+          );
+        } else if (deleteId) {
+          const t = fleetData.find((x) => x.id === deleteId);
+          if (!t) return;
+          if (!confirm('Delete Unit #' + t.unit_number + ' and all its inspection logs/files?')) return;
+          try {
+            const res = await apiFetch('/trucks/' + deleteId, { method: 'DELETE' });
+            if (res.ok) {
+              if (typeof selectedUnitId !== 'undefined' && selectedUnitId === deleteId) {
+                clearPendingUnit();
+              }
+              showToast('Deleted Unit #' + t.unit_number);
+              await loadDashboard();
+            }
+          } catch (err) {
+            showToast('Failed to delete unit', true);
+          }
+        }
+      });
+    });
 
     // Update expiration when inspection date changes
     document.getElementById('inspect-date').addEventListener('change', (e) => {
@@ -2678,6 +4317,8 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
       e.preventDefault();
       const truckId = document.getElementById('inspect-truck-id').value;
       const btn = document.getElementById('inspect-save-btn');
+      const errBanner = document.getElementById('inspect-form-error');
+      if (errBanner) { errBanner.textContent = ''; errBanner.classList.add('hidden'); }
       btn.disabled = true;
       btn.textContent = 'Saving...';
 
@@ -2719,16 +4360,79 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
           }
         }
 
+        inspectFormDirty = false;
         document.getElementById('modal-inspect').classList.add('hidden');
         showToast('Safety inspection logged & due date updated!');
         await loadDashboard();
       } catch (err) {
+        if (errBanner) {
+          errBanner.textContent = err.message;
+          errBanner.classList.remove('hidden');
+        }
         showToast(err.message, true);
       } finally {
         btn.disabled = false;
         btn.textContent = '✓ Complete Inspection';
       }
     });
+
+    function renderHistoryMarkup(inspections, looseFiles) {
+      let html = '';
+
+      if (looseFiles.length > 0) {
+        html += \`
+          <div class="history-item">
+            <div class="history-top">
+              <strong>📎 General Unit Certificates & Sheets</strong>
+            </div>
+            <div class="file-chip-list">
+              \${looseFiles.map((f) => renderFileChip(f)).join('')}
+            </div>
+          </div>
+        \`;
+      }
+
+      if (inspections.length === 0 && looseFiles.length === 0) {
+        html = '<p style="color: var(--text-muted); text-align:center; padding: 20px;">No inspection logs or R2 certificates uploaded yet for this unit.</p>';
+      } else {
+        html += inspections
+          .map(
+            (ins) => \`
+            <div class="history-item">
+              <div class="history-top">
+                <div>
+                  <strong>Inspected: \${escapeHtml(ins.inspection_date)}</strong>
+                  <span style="color: var(--text-muted); margin-left: 8px;">→ Expires: \${escapeHtml(ins.expiration_date)}</span>
+                </div>
+                <span class="op-pill">\${escapeHtml([ins.sticker_number ? 'Cert #' + ins.sticker_number : '', ins.shop_name].filter(Boolean).join(' • ') || 'Logged')}</span>
+              </div>
+              \${ins.notes ? \`<div style="font-size: 0.84rem; color: var(--text); margin-top: 4px;">\${escapeHtml(ins.notes)}</div>\` : ''}
+              \${
+                ins.attachments && ins.attachments.length > 0
+                  ? \`<div class="file-chip-list">\${ins.attachments.map((f) => renderFileChip(f)).join('')}</div>\`
+                  : ''
+              }
+            </div>
+          \`
+          )
+          .join('');
+      }
+      return html;
+    }
+
+    async function loadDetailHistory(truckId, generation) {
+      const detailList = document.getElementById('detail-history-list');
+      if (!detailList) return;
+      try {
+        const res = await apiFetch('/trucks/' + encodeURIComponent(truckId) + '/inspections');
+        const data = await res.json();
+        if (typeof overviewRequest !== 'undefined' && generation !== undefined && generation !== overviewRequest) return;
+        detailList.innerHTML = renderHistoryMarkup(data.inspections || [], data.unlinked_attachments || []);
+      } catch (err) {
+        if (typeof overviewRequest !== 'undefined' && generation !== undefined && generation !== overviewRequest) return;
+        detailList.innerHTML = '<p style="color:var(--red-text); font-size:0.84rem;">Failed to load inspection history.</p>';
+      }
+    }
 
     // History & R2 Attachments Modal
     async function openHistoryModal(truckId) {
@@ -2745,51 +4449,12 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
       try {
         const res = await apiFetch('/trucks/' + truckId + '/inspections');
         const data = await res.json();
-        const inspections = data.inspections || [];
-        const looseFiles = data.unlinked_attachments || [];
-
-        let html = '';
-
-        if (looseFiles.length > 0) {
-          html += \`
-            <div class="history-item">
-              <div class="history-top">
-                <strong>📎 General Unit Certificates & Sheets</strong>
-              </div>
-              <div class="file-chip-list">
-                \${looseFiles.map((f) => renderFileChip(f)).join('')}
-              </div>
-            </div>
-          \`;
-        }
-
-        if (inspections.length === 0 && looseFiles.length === 0) {
-          html = '<p style="color: var(--text-muted); text-align:center; padding: 24px;">No inspection logs or R2 certificates uploaded yet for this unit.</p>';
-        } else {
-          html += inspections
-            .map(
-              (ins) => \`
-              <div class="history-item">
-                <div class="history-top">
-                  <div>
-                    <strong>Inspected: \${escapeHtml(ins.inspection_date)}</strong>
-                    <span style="color: var(--text-muted); margin-left: 8px;">→ Expires: \${escapeHtml(ins.expiration_date)}</span>
-                  </div>
-                  <span class="op-pill">\${escapeHtml([ins.sticker_number ? 'Cert #' + ins.sticker_number : '', ins.shop_name].filter(Boolean).join(' • ') || 'Logged')}</span>
-                </div>
-                \${ins.notes ? \`<div style="font-size: 0.84rem; color: var(--text); margin-top: 4px;">\${escapeHtml(ins.notes)}</div>\` : ''}
-                \${
-                  ins.attachments && ins.attachments.length > 0
-                    ? \`<div class="file-chip-list">\${ins.attachments.map((f) => renderFileChip(f)).join('')}</div>\`
-                    : ''
-                }
-              </div>
-            \`
-            )
-            .join('');
-        }
-
+        const html = renderHistoryMarkup(data.inspections || [], data.unlinked_attachments || []);
         document.getElementById('history-list').innerHTML = html;
+        if (typeof selectedUnitId !== 'undefined' && selectedUnitId === truckId) {
+          const detailList = document.getElementById('detail-history-list');
+          if (detailList) detailList.innerHTML = html;
+        }
       } catch (err) {
         document.getElementById('history-list').innerHTML = '<p style="color:var(--red-text);">Failed to load history.</p>';
       }
@@ -2801,26 +4466,35 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
         <div class="file-chip">
           <span>📄 \${escapeHtml(f.file_name)} <small style="color:var(--text-muted);">(\${kb} KB)</small></span>
           <button type="button" class="btn btn-secondary btn-sm" style="padding:3px 8px;" data-preview-id="\${escapeHtml(f.id)}" data-preview-name="\${escapeHtml(f.file_name)}" data-preview-type="\${escapeHtml(f.content_type)}">View</button>
-          <button type="button" class="btn btn-danger btn-sm" style="padding:3px 7px;" data-del-file="\${escapeHtml(f.id)}">&times;</button>
+          <button type="button" class="btn btn-danger btn-sm" style="padding:3px 7px;" data-del-file="\${escapeHtml(f.id)}" aria-label="Delete \${escapeHtml(f.file_name)}">&times;</button>
         </div>
       \`;
     }
 
-    // Quick upload inside History Modal
-    document.getElementById('btn-quick-upload').addEventListener('click', async () => {
-      if (!activeHistoryTruckId) return;
-      const input = document.getElementById('quick-upload-input');
-      if (!input.files || input.files.length === 0) {
+    async function handleQuickCertificateUpload(inputEl, btnEl) {
+      const targetTruckId = activeHistoryTruckId || (typeof selectedUnitId !== 'undefined' ? selectedUnitId : null);
+      const feedbackEl = document.getElementById('detail-upload-feedback');
+      if (!targetTruckId) return;
+      if (!inputEl.files || inputEl.files.length === 0) {
+        if (feedbackEl) {
+          feedbackEl.textContent = 'Select a PDF or image file first.';
+          feedbackEl.style.color = 'var(--red-text)';
+          feedbackEl.classList.remove('hidden');
+        }
         showToast('Select a PDF or image file first', true);
         return;
       }
-      const btn = document.getElementById('btn-quick-upload');
-      btn.disabled = true;
-      btn.textContent = 'Uploading...';
+      btnEl.disabled = true;
+      btnEl.textContent = 'Uploading...';
+      if (feedbackEl) {
+        feedbackEl.textContent = 'Uploading certificate to R2…';
+        feedbackEl.style.color = 'var(--text-muted)';
+        feedbackEl.classList.remove('hidden');
+      }
       try {
         const fd = new FormData();
-        fd.append('file', input.files[0]);
-        const res = await apiFetch('/trucks/' + activeHistoryTruckId + '/attachments', {
+        fd.append('file', inputEl.files[0]);
+        const res = await apiFetch('/trucks/' + targetTruckId + '/attachments', {
           method: 'POST',
           body: fd,
         });
@@ -2828,44 +4502,74 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
           const err = await res.json();
           throw new Error(err.error || 'Upload failed');
         }
-        input.value = '';
+        inputEl.value = '';
+        if (feedbackEl) {
+          feedbackEl.textContent = '✓ Certificate uploaded to Cloudflare R2.';
+          feedbackEl.style.color = 'var(--green-text)';
+          feedbackEl.classList.remove('hidden');
+        }
         showToast('Uploaded to Cloudflare R2!');
-        await openHistoryModal(activeHistoryTruckId);
+        if (!document.getElementById('modal-history').classList.contains('hidden')) {
+          await openHistoryModal(targetTruckId);
+        }
         await loadDashboard();
       } catch (err) {
+        if (feedbackEl) {
+          feedbackEl.textContent = 'Upload failed: ' + err.message;
+          feedbackEl.style.color = 'var(--red-text)';
+          feedbackEl.classList.remove('hidden');
+        }
         showToast(err.message, true);
       } finally {
-        btn.disabled = false;
-        btn.textContent = 'Upload to R2';
+        btnEl.disabled = false;
+        btnEl.textContent = 'Upload to R2';
       }
-    });
+    }
 
-    // Click handler inside History List for previewing or deleting files
-    document.getElementById('history-list').addEventListener('click', async (e) => {
-      const previewBtn = e.target.closest('[data-preview-id]');
-      if (previewBtn) {
-        openFileViewer(
-          previewBtn.getAttribute('data-preview-id'),
-          previewBtn.getAttribute('data-preview-name'),
-          previewBtn.getAttribute('data-preview-type')
-        );
-        return;
-      }
-      const delBtn = e.target.closest('[data-del-file]');
-      if (delBtn) {
-        const attId = delBtn.getAttribute('data-del-file');
-        if (!confirm('Delete this file from R2 storage?')) return;
-        try {
-          const res = await apiFetch('/attachments/' + attId, { method: 'DELETE' });
-          if (res.ok) {
-            showToast('File deleted from R2');
-            await openHistoryModal(activeHistoryTruckId);
-            await loadDashboard();
-          }
-        } catch (err) {
-          showToast('Failed to delete file', true);
+    // Quick upload inside History Modal and Detail Workspace Panel
+    document.getElementById('btn-quick-upload').addEventListener('click', () => {
+      handleQuickCertificateUpload(document.getElementById('quick-upload-input'), document.getElementById('btn-quick-upload'));
+    });
+    const detailUploadBtn = document.getElementById('btn-detail-quick-upload');
+    if (detailUploadBtn) {
+      detailUploadBtn.addEventListener('click', () => {
+        handleQuickCertificateUpload(document.getElementById('detail-quick-upload-input'), detailUploadBtn);
+      });
+    }
+
+    // Click handler inside History List & Detail Panel History List for previewing or deleting files
+    ['history-list', 'detail-history-list'].forEach(listId => {
+      const listEl = document.getElementById(listId);
+      if (!listEl) return;
+      listEl.addEventListener('click', async (e) => {
+        const previewBtn = e.target.closest('[data-preview-id]');
+        if (previewBtn) {
+          openFileViewer(
+            previewBtn.getAttribute('data-preview-id'),
+            previewBtn.getAttribute('data-preview-name'),
+            previewBtn.getAttribute('data-preview-type')
+          );
+          return;
         }
-      }
+        const delBtn = e.target.closest('[data-del-file]');
+        if (delBtn) {
+          const attId = delBtn.getAttribute('data-del-file');
+          if (!confirm('Delete this file from R2 storage?')) return;
+          try {
+            const res = await apiFetch('/attachments/' + attId, { method: 'DELETE' });
+            if (res.ok) {
+              showToast('File deleted from R2');
+              const targetTruckId = activeHistoryTruckId || (typeof selectedUnitId !== 'undefined' ? selectedUnitId : null);
+              if (targetTruckId && !document.getElementById('modal-history').classList.contains('hidden')) {
+                await openHistoryModal(targetTruckId);
+              }
+              await loadDashboard();
+            }
+          } catch (err) {
+            showToast('Failed to delete file', true);
+          }
+        }
+      });
     });
 
     // In-App Photo / PDF Viewer
@@ -2963,11 +4667,92 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
     document.querySelectorAll('[data-close]').forEach((btn) => {
       btn.addEventListener('click', () => {
         const target = btn.getAttribute('data-close');
+        if (target === 'modal-truck' && truckFormDirty) {
+          if (!confirm('Discard unsaved unit changes?')) return;
+          truckFormDirty = false;
+        }
+        if (target === 'modal-inspect' && inspectFormDirty) {
+          if (!confirm('Discard unsaved inspection changes?')) return;
+          inspectFormDirty = false;
+        }
         document.getElementById(target).classList.add('hidden');
         if (target === 'modal-scan') stopUnitCamera();
+        if (target === 'modal-vin') closeVinDecoder();
         if (target === 'modal-unit') clearPendingUnit();
         if (target === 'modal-viewer') document.getElementById('viewer-container').innerHTML = '';
+        // If closing a sub-modal while a unit is still selected on tablet/mobile, restore the unit detail view
+        if ((target === 'modal-truck' || target === 'modal-inspect') && typeof selectedUnitId !== 'undefined' && selectedUnitId && !window.matchMedia('(min-width: 1200px)').matches) {
+          document.getElementById('modal-unit').classList.remove('hidden');
+        }
       });
+    });
+
+    // Escape-to-close for dialogs and detail drawer without discarding unsaved form edits
+    document.addEventListener('keydown', (event) => {
+      if (event.key !== 'Escape' || event.defaultPrevented) return;
+      const toolsMenu = document.getElementById('header-tools');
+      if (toolsMenu && toolsMenu.open) return;
+      if (fleetToolbar && fleetToolbar.classList.contains('mobile-sheet-open')) {
+        setMobileFilterSheetOpen(false);
+        return;
+      }
+
+      const vinModal = document.getElementById('modal-vin');
+      if (!vinModal.classList.contains('hidden')) {
+        closeVinDecoder();
+        return;
+      }
+      // Check top-level overlays in priority order (excluding form modals if dirty)
+      const viewer = document.getElementById('modal-viewer');
+      if (viewer && !viewer.classList.contains('hidden')) {
+        viewer.classList.add('hidden');
+        document.getElementById('viewer-container').innerHTML = '';
+        return;
+      }
+      const historyModal = document.getElementById('modal-history');
+      if (historyModal && !historyModal.classList.contains('hidden')) {
+        historyModal.classList.add('hidden');
+        return;
+      }
+      const scanModal = document.getElementById('modal-scan');
+      if (scanModal && !scanModal.classList.contains('hidden')) {
+        scanModal.classList.add('hidden');
+        stopUnitCamera();
+        return;
+      }
+      const pushModal = document.getElementById('modal-push');
+      if (pushModal && !pushModal.classList.contains('hidden')) {
+        pushModal.classList.add('hidden');
+        return;
+      }
+      const inspectModal = document.getElementById('modal-inspect');
+      if (inspectModal && !inspectModal.classList.contains('hidden')) {
+        const hasEdits = document.getElementById('inspect-sticker').value.trim() ||
+          document.getElementById('inspect-notes').value.trim() ||
+          (document.getElementById('inspect-file').files && document.getElementById('inspect-file').files.length > 0);
+        if (!hasEdits) inspectModal.classList.add('hidden');
+        return;
+      }
+      const truckModal = document.getElementById('modal-truck');
+      if (truckModal && !truckModal.classList.contains('hidden')) {
+        const hasEdits = document.getElementById('truck-unit').value.trim() ||
+          document.getElementById('truck-plate').value.trim() ||
+          document.getElementById('truck-vin').value.trim() ||
+          document.getElementById('truck-notes').value.trim();
+        if (!hasEdits) truckModal.classList.add('hidden');
+        return;
+      }
+      const settingsModal = document.getElementById('modal-settings');
+      if (settingsModal && !settingsModal.classList.contains('hidden')) {
+        if (!document.getElementById('set-new-passcode').value) {
+          settingsModal.classList.add('hidden');
+        }
+        return;
+      }
+      const unitPanel = document.getElementById('modal-unit');
+      if (unitPanel && !unitPanel.classList.contains('hidden')) {
+        clearPendingUnit();
+      }
     });
 
     // Register PWA Service Worker
