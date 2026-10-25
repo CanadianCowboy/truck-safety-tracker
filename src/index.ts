@@ -31,6 +31,10 @@ import { renderUnitLabel } from './qr';
 import qrReaderSource from 'jsqr/dist/jsQR.js?raw';
 import { handlePushApi, localReminderTime, pushConfigured, sendFleetPush } from './push';
 import { decodeVin } from './vin';
+import { MAX_BACKUP_BYTES } from './backup';
+import { exportFleetBackup, restoreFleetBackup } from './backup-worker';
+import { normalizeReminderDayList, selectReminderTrucks } from './reminders';
+import { normalizeReminderDayList as validateReminderDays } from './validation';
 
 const corsHeaders: Record<string, string> = {
   'Cache-Control': 'no-store',
@@ -53,6 +57,7 @@ async function ensureTruckColumns(env: Env): Promise<void> {
   for (const [column, definition] of [
     ['equipment_type', "TEXT NOT NULL DEFAULT ''"],
     ['vin_data', "TEXT NOT NULL DEFAULT ''"],
+    ['reminder_days', "TEXT NOT NULL DEFAULT ''"],
   ]) {
     try {
       await env.DB.prepare(`ALTER TABLE trucks ADD COLUMN ${column} ${definition}`).run();
@@ -77,7 +82,7 @@ async function fetchEnrichedFleet(env: Env, warningDays: number): Promise<Enrich
 
   for (const att of attachments || []) {
     countByTruck[att.truck_id] = (countByTruck[att.truck_id] || 0) + 1;
-    if (!latestByTruck[att.truck_id]) {
+    if (!latestByTruck[att.truck_id] && !att.r2_key.startsWith('truck-safety-missing-backup/')) {
       latestByTruck[att.truck_id] = att;
     }
   }
@@ -172,7 +177,9 @@ export default {
         if ((origin && origin !== url.origin) || request.headers.get('Sec-Fetch-Site') === 'cross-site') return jsonResponse({ error: 'Cross-site request denied' }, 403);
       }
       if (request.body) {
-        const limit = (request.headers.get('Content-Type') || '').includes('multipart/form-data') ? 11 * 1024 * 1024 : 64 * 1024;
+        const limit = (request.headers.get('Content-Type') || '').includes('multipart/form-data') ? 11 * 1024 * 1024
+          : subPath === '/api/backup/restore' ? MAX_BACKUP_BYTES
+          : 64 * 1024;
         if (Number(request.headers.get('Content-Length') || 0) > limit) throw new InputError('Request body too large.', 413);
         let bytes = 0;
         const body = request.body.pipeThrough(new TransformStream<Uint8Array, Uint8Array>({
@@ -298,6 +305,7 @@ export default {
 
         // GET /api/trucks
         if (request.method === "GET" && subPath === "/api/trucks") {
+          await ensureTruckColumns(env);
           const settings = await getAppSettings(env);
           const trucks = await fetchEnrichedFleet(env, settings.warning_days);
           return jsonResponse({ trucks, settings });
@@ -312,6 +320,7 @@ export default {
           if (inspection) validateDates(inspection, inspection);
           const next_due_date = String(body.next_due_date || (inspection ? defaultExpiryDate(inspection, Number(body.interval_months || 12)) : '')).trim();
           const vin_data = String(body.vin_data || '').trim();
+          const reminder_days = normalizeReminderDayList(body.reminder_days === undefined ? '' : String(body.reminder_days));
           if (!unit_number) {
             return jsonResponse(
               { error: "unit_number is required" },
@@ -319,7 +328,7 @@ export default {
             );
           }
 
-          validateTruck({ ...body, vin_data, last_inspection_date: inspection, next_due_date });
+          validateTruck({ ...body, vin_data, reminder_days, last_inspection_date: inspection, next_due_date });
           const id = crypto.randomUUID();
           const vehicle_type = String(body.vehicle_type || "Tractor").trim();
           const gvwr = String(body.gvwr || "").trim();
@@ -338,9 +347,9 @@ export default {
 
           await env.DB.prepare(
             `INSERT INTO trucks (
-              id, unit_number, vehicle_type, gvwr, license_plate, vin, year, make, model, equipment_type, vin_data,
+              id, unit_number, vehicle_type, gvwr, license_plate, vin, year, make, model, equipment_type, vin_data, reminder_days,
               last_inspection_date, next_due_date, interval_months, shop_name, sticker_number, status, notes
-            ) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13, ?14, ?15, ?16, ?17, ?18)`
+            ) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13, ?14, ?15, ?16, ?17, ?18, ?19)`
           )
             .bind(
               id,
@@ -354,6 +363,7 @@ export default {
               model,
               equipment_type,
               vin_data,
+              reminder_days,
               last_inspection_date,
               next_due_date,
               interval_months,
@@ -411,12 +421,19 @@ export default {
           const truckId = decodeURIComponent(truckMatch[1]);
 
           if (request.method === "GET") {
+            await ensureTruckColumns(env);
             const row = await env.DB.prepare("SELECT * FROM trucks WHERE id = ?1")
               .bind(truckId)
               .first<TruckRow>();
             if (!row) return jsonResponse({ error: "Truck not found" }, 404);
             const settings = await getAppSettings(env);
-            return jsonResponse({ truck: enrichTruck(row, settings.warning_days) });
+            const { results: unitAttachments } = await env.DB.prepare(
+              "SELECT * FROM attachments WHERE truck_id = ?1 ORDER BY created_at DESC"
+            ).bind(truckId).all<AttachmentRow>();
+            const latestAvailable = (unitAttachments || []).find(att => !att.r2_key.startsWith('truck-safety-missing-backup/')) || null;
+            return jsonResponse({
+              truck: enrichTruck(row, settings.warning_days, (unitAttachments || []).length, latestAvailable),
+            });
           }
 
           if (request.method === "PUT") {
@@ -436,6 +453,7 @@ export default {
             const make = String(body.make ?? existing.make).trim();
             const model = String(body.model ?? existing.model).trim();
             const equipment_type = String(body.equipment_type ?? existing.equipment_type ?? "").trim();
+            const reminder_days = normalizeReminderDayList(body.reminder_days !== undefined ? String(body.reminder_days || '').trim() : String(existing.reminder_days || ''));
             const vin_data = body.vin_data !== undefined
               ? String(body.vin_data || '').trim()
               : vin.toUpperCase() === existing.vin.trim().toUpperCase() ? String(existing.vin_data || '') : '';
@@ -467,6 +485,7 @@ export default {
               model,
               equipment_type,
               vin_data,
+              reminder_days,
               last_inspection_date,
               next_due_date,
               interval_months,
@@ -488,15 +507,16 @@ export default {
                 model = ?8,
                 equipment_type = ?9,
                 vin_data = ?10,
-                last_inspection_date = ?11,
-                next_due_date = ?12,
-                interval_months = ?13,
-                shop_name = ?14,
-                sticker_number = ?15,
-                status = ?16,
-                notes = ?17,
+                reminder_days = ?11,
+                last_inspection_date = ?12,
+                next_due_date = ?13,
+                interval_months = ?14,
+                shop_name = ?15,
+                sticker_number = ?16,
+                status = ?17,
+                notes = ?18,
                 updated_at = datetime('now')
-              WHERE id = ?18`
+              WHERE id = ?19`
             )
               .bind(
                 unit_number,
@@ -509,6 +529,7 @@ export default {
                 model,
                 equipment_type,
                 vin_data,
+                reminder_days,
                 last_inspection_date,
                 next_due_date,
                 interval_months,
@@ -580,14 +601,18 @@ export default {
               }
             }
 
+            const withAvailability = (items: AttachmentRow[]) => items.map(item => ({
+              ...item,
+              file_available: !item.r2_key.startsWith('truck-safety-missing-backup/'),
+            }));
             const enrichedInspections = (inspections || []).map((ins) => ({
               ...ins,
-              attachments: byInspection[ins.id] || [],
+              attachments: withAvailability(byInspection[ins.id] || []),
             }));
 
             return jsonResponse({
               inspections: enrichedInspections,
-              unlinked_attachments: unlinked,
+              unlinked_attachments: withAvailability(unlinked),
             });
           }
 
@@ -708,6 +733,9 @@ export default {
           if (!att) return jsonResponse({ error: "Attachment not found" }, 404);
 
           if (request.method === "GET") {
+            if (att.r2_key.startsWith('truck-safety-missing-backup/')) {
+              return jsonResponse({ error: 'Certificate file was not included in the backup; only its metadata was restored.' }, 404);
+            }
             const obj = await env.FILES.get(att.r2_key);
             if (!obj) {
               return jsonResponse({ error: "File object not found in R2" }, 404);
@@ -738,6 +766,17 @@ export default {
           }
         }
 
+        // Read-only fleet exports omit private R2 content but include metadata and explicitly say so.
+        if (request.method === 'GET' && subPath === '/api/backup') {
+          await ensureTruckColumns(env);
+          return await exportFleetBackup(env, url.searchParams.get('include_files') === '1');
+        }
+
+        if (request.method === 'POST' && subPath === '/api/backup/restore') {
+          await ensureTruckColumns(env);
+          return await restoreFleetBackup(request, env);
+        }
+
         // GET /api/calendar.ics
         if (request.method === "GET" && subPath === "/api/calendar.ics") {
           const settings = await getAppSettings(env);
@@ -765,10 +804,13 @@ export default {
               warning_days?: number;
               webhook_url?: string;
               webhook_type?: string;
+              notify_days?: string | string[];
               new_passcode?: string;
             };
 
             if (body.webhook_url !== undefined) validateWebhookUrl(String(body.webhook_url).trim());
+            const notifyDays = body.notify_days === undefined ? undefined : validateReminderDays(Array.isArray(body.notify_days) ? body.notify_days.join(',') : String(body.notify_days));
+            if (body.notify_days !== undefined && notifyDays === '') throw new InputError('Select at least one fleet reminder day.');
             if (body.webhook_type !== undefined && !['auto','ntfy','discord','slack','generic'].includes(body.webhook_type)) throw new InputError('Invalid webhook type.');
             if (body.warning_days !== undefined && (!Number.isInteger(body.warning_days) || body.warning_days < 1 || body.warning_days > 180)) throw new InputError('Warning threshold must be 1–180 days.');
             if (body.new_passcode && (body.new_passcode.trim().length < 8 || body.new_passcode.length > 128)) throw new InputError('New passcode must be 8–128 characters.');
@@ -794,6 +836,14 @@ export default {
                 "INSERT INTO settings (key, value, updated_at) VALUES ('webhook_type', ?1, datetime('now')) ON CONFLICT(key) DO UPDATE SET value = excluded.value, updated_at = excluded.updated_at"
               )
                 .bind(String(body.webhook_type).trim())
+                .run();
+            }
+
+            if (notifyDays !== undefined) {
+              await env.DB.prepare(
+                "INSERT INTO settings (key, value, updated_at) VALUES ('notify_days', ?1, datetime('now')) ON CONFLICT(key) DO UPDATE SET value = excluded.value, updated_at = excluded.updated_at"
+              )
+                .bind(notifyDays)
                 .run();
             }
 
@@ -855,9 +905,8 @@ export default {
 
     const trucks = await fetchEnrichedFleet(env, settings.warning_days);
     const activeTrucks = trucks.filter((t) => t.status !== "Inactive");
-    const needsAlert = activeTrucks.some(
-      (t) => t.safety_status === "overdue" || t.safety_status === "due_soon"
-    );
+    const reminderTrucks = selectReminderTrucks(activeTrucks, settings.notify_days);
+    const needsAlert = reminderTrucks.length > 0;
 
     if (needsAlert && pushConfigured(env)) {
       const result = await sendFleetPush(env, (env.BASE_PATH || '/truck-safety').replace(/\/+$/, ''), local.date);
@@ -870,7 +919,7 @@ export default {
       const result = await dispatchWebhookNotification(
         settings.webhook_url,
         settings.webhook_type,
-        activeTrucks,
+        reminderTrucks,
         false
       );
       if (!result.ok) throw new Error(result.message);

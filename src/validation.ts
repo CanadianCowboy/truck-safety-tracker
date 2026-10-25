@@ -14,6 +14,17 @@ export function validateDates(inspection: string, expiry: string, allowEmpty = f
   if (inspection && expiry < inspection) throw new InputError('Expiry cannot be before the inspection date.');
 }
 
+export function normalizeReminderDayList(value: string): string {
+  const trimmed = value.trim();
+  if (!trimmed || trimmed === 'none') return trimmed;
+  const allowed = ['30', '14', '7', '1', '0', 'overdue'];
+  const parts = trimmed.split(',').map(day => day.trim());
+  if (new Set(parts).size !== parts.length || parts.some(day => !allowed.includes(day))) {
+    throw new InputError('Per-unit reminders must be selected from 30, 14, 7, 1, 0 days or overdue.');
+  }
+  return allowed.filter(day => parts.includes(day)).join(',');
+}
+
 export function validateTruck(t: Partial<TruckRow>): void {
   if (!String(t.unit_number || '').trim()) throw new InputError('Unit number is required.');
   validateDates(String(t.last_inspection_date || '').trim(), String(t.next_due_date || '').trim(), true);
@@ -21,6 +32,7 @@ export function validateTruck(t: Partial<TruckRow>): void {
   if (!['Active', 'In Shop', 'Inactive'].includes(String(t.status || 'Active'))) throw new InputError('Invalid operational status.');
   if (![3, 6, 12, 24].includes(Number(t.interval_months ?? 12))) throw new InputError('Inspection interval must be 3, 6, 12 or 24 months.');
   if (t.year != null && (!Number.isInteger(Number(t.year)) || Number(t.year) < 1900 || Number(t.year) > 2100)) throw new InputError('Invalid vehicle year.');
+  if (t.reminder_days !== undefined) normalizeReminderDayList(t.reminder_days);
   if (t.vin_data) {
     try {
       const decoded: unknown = JSON.parse(t.vin_data);

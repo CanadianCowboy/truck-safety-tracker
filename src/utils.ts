@@ -147,6 +147,7 @@ export function enrichTruck(
   return {
     ...truck,
     equipment_type: truck.equipment_type || "",
+    reminder_days: truck.reminder_days || "",
     days_remaining,
     safety_status,
     attachment_count: attachmentCount,

@@ -23,6 +23,7 @@ export interface TruckRow {
   model: string;
   equipment_type: string;
   vin_data: string;
+  reminder_days: string;
   last_inspection_date: string;
   next_due_date: string;
   interval_months: number;

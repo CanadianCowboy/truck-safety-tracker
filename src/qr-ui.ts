@@ -128,8 +128,7 @@ export function renderQrScript(): string {
         // Keep quick actions independent of the current dashboard filters.
         const existing = fleetData.findIndex(unit => unit.id === t.id);
         if (existing >= 0) {
-          const previous = fleetData[existing];
-          fleetData[existing] = { ...t, attachment_count: previous.attachment_count, latest_attachment: previous.latest_attachment };
+          fleetData[existing] = t;
         } else {
           fleetData.push(t);
         }
@@ -146,11 +145,20 @@ export function renderQrScript(): string {
           badgeHost.innerHTML = '<div class="safety-badge ' + escapeHtml(t.safety_status) + '"><span>' + escapeHtml(formatStatusWithIcon(t)) + '</span><small>' + dueNote + '</small></div>';
         }
 
+        const formatReminderSchedule = (days) => {
+          if (days === 'none') return 'No reminders (opted out)';
+          const raw = days || (typeof appSettings !== 'undefined' && appSettings.notify_days) || '30,14,7,1,0';
+          const prefix = days ? 'Custom: ' : 'Fleet default: ';
+          const labels = String(raw).split(',').filter(Boolean).map(d => d === '0' ? 'due date' : d === 'overdue' ? 'overdue' : d === '1' ? '1d' : d + 'd');
+          return prefix + (labels.join(', ') || 'None');
+        };
+
         const summaryFields = [
           ['Safety status', formatDaysBadge(t)],
           ['Next safety due', t.next_due_date || 'No date set'],
           ['Last inspection', t.last_inspection_date || 'No date set'],
           ['Inspection interval', (t.interval_months || 12) + ' months'],
+          ['Reminder schedule', formatReminderSchedule(t.reminder_days)],
         ];
         const vinDataFields = Object.entries(parseVinData(t.vin_data));
         const unitFields = [
@@ -176,10 +184,30 @@ export function renderQrScript(): string {
               '<div class="meta-grid">' + unitFields.map(([label, value]) => '<div class="meta-item"><span>' + escapeHtml(label) + '</span><strong>' + escapeHtml(value || '—') + '</strong></div>').join('') + '</div>' +
             '</div>' +
           '</details>' +
-          (vinDataFields.length ? '<details class="detail-disclosure" style="margin-top:12px;"><summary>NHTSA VIN decode data (' + vinDataFields.length + ' fields)</summary><div class="detail-disclosure-body"><div class="meta-grid">' + vinDataFields.map(([key, value]) => '<div class="meta-item"><span>NHTSA: ' + escapeHtml(key) + '</span><strong>' + escapeHtml(value || 'Not provided by NHTSA') + '</strong></div>').join('') + '</div></div></details>' : '');
+          (vinDataFields.length
+            ? '<details class="detail-disclosure" style="margin-top:12px;">' +
+                '<summary>NHTSA VIN decode data (' + vinDataFields.length + ' fields)</summary>' +
+                '<div class="detail-disclosure-body">' +
+                  '<input type="search" id="detail-vin-filter" class="input-control" placeholder="Filter NHTSA VIN fields (e.g. EngineHP, PlantCity, ABS)…" aria-label="Filter NHTSA VIN fields" style="margin-bottom:8px; min-height:38px; padding:6px 10px; font-size:0.8rem;" />' +
+                  '<div id="detail-vin-grid" class="meta-grid">' +
+                    vinDataFields.map(([key, value]) => '<div class="meta-item" data-vin-kv="' + escapeHtml((key + ' ' + (value || 'Not provided by NHTSA')).toLowerCase()) + '"><span>NHTSA: ' + escapeHtml(key) + '</span><strong>' + escapeHtml(value || 'Not provided by NHTSA') + '</strong></div>').join('') +
+                  '</div>' +
+                '</div>' +
+              '</details>'
+            : '');
+        const vinFilterInput = document.getElementById('detail-vin-filter');
+        if (vinFilterInput) {
+          vinFilterInput.addEventListener('input', (ev) => {
+            const q = ev.target.value.trim().toLowerCase();
+            document.querySelectorAll('#detail-vin-grid .meta-item').forEach(item => {
+              item.classList.toggle('hidden', Boolean(q && !String(item.getAttribute('data-vin-kv') || '').includes(q)));
+            });
+          });
+        }
 
-        const latestCertBtn = (fleetData[existing >= 0 ? existing : fleetData.length - 1]?.latest_attachment)
-          ? '<button type="button" class="btn btn-secondary btn-sm" data-view-file="' + escapeHtml(fleetData[existing >= 0 ? existing : fleetData.length - 1].latest_attachment.id) + '" data-file-name="' + escapeHtml(fleetData[existing >= 0 ? existing : fleetData.length - 1].latest_attachment.file_name) + '" data-file-type="' + escapeHtml(fleetData[existing >= 0 ? existing : fleetData.length - 1].latest_attachment.content_type) + '">📄 View Latest Cert</button>'
+        const latestAtt = fleetData[existing >= 0 ? existing : fleetData.length - 1]?.latest_attachment;
+        const latestCertBtn = (latestAtt && latestAtt.file_available !== false)
+          ? '<button type="button" class="btn btn-secondary btn-sm" data-view-file="' + escapeHtml(latestAtt.id) + '" data-file-name="' + escapeHtml(latestAtt.file_name) + '" data-file-type="' + escapeHtml(latestAtt.content_type) + '">📄 View Latest Cert</button>'
           : '';
 
         actions.innerHTML =

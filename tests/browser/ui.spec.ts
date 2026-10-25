@@ -83,7 +83,33 @@ test('real unit form defaults to month-end without saving anything', async ({ pa
   await expect(page.locator('#truck-last-date')).toBeDisabled();
   await expect(page.locator('#truck-due-date')).toBeDisabled();
   await expect(page.locator('#truck-due-date')).toHaveValue('');
+  await expect(page.locator('#truck-reminder-days')).toHaveValue('');
+  await page.locator('#truck-reminder-days').selectOption('none');
+  await expect(page.locator('#truck-reminder-days')).toHaveValue('none');
   page.once('dialog', dialog => dialog.accept());
   await page.locator('#modal-truck').getByRole('button', { name: 'Cancel', exact: true }).click();
   await expect(page.locator('#modal-truck')).toBeHidden();
+
+  // Verify left nav shortcuts and backup modal preview + Escape handling
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await page.locator('[data-nav-action="backup"]').click();
+  await expect(page.locator('#modal-backup')).toBeVisible();
+  await page.locator('#backup-restore-file').setInputFiles({
+    name: 'empty-backup.json',
+    mimeType: 'application/json',
+    buffer: Buffer.from(JSON.stringify({
+      format: 'truck-safety-tracker-backup',
+      version: 1,
+      exported_at: '2026-10-25T00:00:00Z',
+      includes_certificate_files: false,
+      certificate_note: 'Certificate files are not included.',
+      units: [],
+      inspections: [],
+      attachments: [],
+    })),
+  });
+  await expect(page.locator('#backup-preview-box')).toBeVisible();
+  await expect(page.locator('#backup-preview-box')).toContainText('0 unit(s)');
+  await page.keyboard.press('Escape');
+  await expect(page.locator('#modal-backup')).toBeHidden();
 });

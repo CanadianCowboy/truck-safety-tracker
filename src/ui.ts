@@ -1094,12 +1094,13 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
           flex: 1;
         }
 
-        /* Full-screen focused forms on mobile (#modal-truck, #modal-inspect, #modal-scan, #modal-history, #modal-settings) */
+        /* Full-screen focused forms on mobile (#modal-truck, #modal-inspect, #modal-scan, #modal-history, #modal-backup, #modal-settings) */
         #modal-truck.modal-backdrop,
         #modal-inspect.modal-backdrop,
         #modal-vin.modal-backdrop,
         #modal-scan.modal-backdrop,
         #modal-history.modal-backdrop,
+        #modal-backup.modal-backdrop,
         #modal-settings.modal-backdrop {
           padding: 0;
           align-items: stretch;
@@ -1110,6 +1111,7 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
         #modal-vin .modal-panel,
         #modal-scan .modal-panel,
         #modal-history .modal-panel,
+        #modal-backup .modal-panel,
         #modal-settings .modal-panel {
           max-width: 100vw;
           width: 100vw;
@@ -2596,6 +2598,7 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
               <button type="button" id="btn-browser-notify" class="btn btn-secondary btn-sm" title="Enable Browser Alerts">
                 🔔 Alerts
               </button>
+              <button type="button" id="btn-fleet-backup" class="btn btn-secondary btn-sm" title="Download or restore a fleet backup">Fleet backup</button>
               <button type="button" id="btn-settings" class="btn btn-secondary btn-sm">
                 ⚙️ Settings
               </button>
@@ -2651,6 +2654,8 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
           <ul class="nav-list">
             <li class="hidden"><button type="button" class="nav-tool-btn hidden" data-nav-action="scan">⌗ Scan / Paste UUID</button></li>
             <li><button type="button" class="nav-tool-btn" data-nav-action="add">+ Add Unit</button></li>
+            <li><button type="button" class="nav-tool-btn" data-nav-action="vin">🔍 VIN Decoder</button></li>
+            <li><button type="button" class="nav-tool-btn" data-nav-action="backup">📦 Fleet Backup</button></li>
             <li><button type="button" class="nav-tool-btn" data-nav-action="ics">📅 Export .ICS Schedule</button></li>
             <li><button type="button" class="nav-tool-btn" data-nav-action="alerts">🔔 Browser Alerts</button></li>
             <li><button type="button" class="nav-tool-btn" data-nav-action="settings">⚙️ Fleet Settings</button></li>
@@ -2948,6 +2953,19 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
             </select>
           </div>
           <div class="input-group">
+            <label for="truck-reminder-days">Reminder schedule</label>
+            <select id="truck-reminder-days" class="input-control">
+              <option value="">Use fleet default</option>
+              <option value="30,14,7,1,0,overdue">Every reminder (including overdue)</option>
+              <option value="14,7,1,0,overdue">14, 7, 1 days, due date and overdue</option>
+              <option value="7,1,0,overdue">7, 1 days, due date and overdue</option>
+              <option value="1,0,overdue">1 day, due date and overdue</option>
+              <option value="7,1,0">7, 1 days and due date only</option>
+              <option value="none">No reminders</option>
+            </select>
+            <small>Overrides fleet-wide reminder days for this unit.</small>
+          </div>
+          <div class="input-group">
             <label for="truck-interval">Inspection Interval</label>
             <select id="truck-interval" class="input-control">
               <option value="12">Annual (12 Months)</option>
@@ -3031,6 +3049,10 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
         <details id="vin-all-data-section" class="detail-disclosure" style="margin-top:12px;">
           <summary id="vin-all-data-summary">All NHTSA decode data</summary>
           <div class="detail-disclosure-body">
+            <div class="input-group" style="margin-bottom:8px;">
+              <label for="vin-all-data-filter">Filter NHTSA fields</label>
+              <input id="vin-all-data-filter" type="search" class="input-control" placeholder="Search NHTSA fields (e.g. EngineHP, PlantCity, ABS)…" style="min-height:38px; padding:6px 10px; font-size:0.8rem;" />
+            </div>
             <div id="vin-all-data" class="meta-grid" aria-label="All values returned by NHTSA"></div>
           </div>
         </details>
@@ -3148,6 +3170,25 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
     </div>
   </div>
 
+  <!-- MODAL: FLEET BACKUP & MERGE RESTORE -->
+  <div id="modal-backup" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="backup-title">
+    <div class="modal-panel">
+      <div class="modal-header">
+        <h2 class="modal-title" id="backup-title">Fleet backup & restore</h2>
+        <button type="button" class="close-btn" data-close="modal-backup" aria-label="Close fleet backup">&times;</button>
+      </div>
+      <p class="muted-note">Export a versioned copy of units, inspection history, and certificate metadata. Choose explicitly whether to include private certificate files. Restore merges by permanent unit ID, adds missing records, updates matching records after confirmation, and never deletes records.</p>
+      <div class="form-grid" style="margin-top:14px;">
+        <label class="input-group col-span-2" style="display:flex;align-items:center;gap:10px;text-transform:none;color:var(--text);"><input id="backup-include-files" type="checkbox" /> Include private certificate files (20 MB total limit)</label>
+        <button type="button" id="btn-backup-export" class="btn btn-secondary">Download backup</button>
+        <div class="input-group col-span-2"><label for="backup-restore-file">Restore a versioned JSON backup (max 30 MB)</label><input id="backup-restore-file" type="file" accept="application/json,.json" class="input-control" /><small>Conflicting unit numbers are rejected. Data-only backups preserve certificate metadata as unavailable.</small></div>
+        <div id="backup-preview-box" class="truck-notes col-span-2 hidden" role="status" aria-live="polite" style="margin:0;"></div>
+        <button type="button" id="btn-backup-restore" class="btn btn-primary col-span-2">Validate & merge restore</button>
+        <p id="backup-status" class="muted-note col-span-2" role="status" aria-live="polite"></p>
+      </div>
+    </div>
+  </div>
+
   <!-- MODAL: SETTINGS (PASSCODE, THRESHOLDS, WEBHOOK ALERTS) -->
   <div id="modal-settings" class="modal-backdrop hidden">
     <div class="modal-panel">
@@ -3161,7 +3202,19 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
             <label for="set-warning-days">Yellow "Due Soon" Threshold (Days)</label>
             <input id="set-warning-days" type="number" min="1" max="180" class="input-control" required />
           </div>
-          <div class="input-group">
+          <div class="input-group col-span-2">
+            <label>Default reminder days (Winnipeg local time, 7:00 AM)</label>
+            <div style="display:flex;gap:12px;flex-wrap:wrap;">
+              <label><input type="checkbox" class="fleet-reminder-day" value="30" /> 30 days</label>
+              <label><input type="checkbox" class="fleet-reminder-day" value="14" /> 14 days</label>
+              <label><input type="checkbox" class="fleet-reminder-day" value="7" /> 7 days</label>
+              <label><input type="checkbox" class="fleet-reminder-day" value="1" /> 1 day</label>
+              <label><input type="checkbox" class="fleet-reminder-day" value="0" /> Due date</label>
+              <label><input type="checkbox" class="fleet-reminder-day" value="overdue" /> Overdue</label>
+            </div>
+            <small>Per-unit schedules override this fleet default.</small>
+          </div>
+          <div class="input-group col-span-2">
             <label for="set-webhook-type">Webhook Provider</label>
             <select id="set-webhook-type" class="input-control">
               <option value="auto">Auto-detect (NTFY / Discord / Slack / JSON)</option>
@@ -3302,7 +3355,8 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
         throw new Error('Unauthorized');
       }
       if (!res.ok) {
-        const data = await res.json();
+        let data = {};
+        try { data = await res.json(); } catch { /* Keep a useful HTTP error for non-JSON responses. */ }
         throw Object.assign(new Error(data.error || 'Request failed (HTTP ' + res.status + ')'), { status: res.status });
       }
       return res;
@@ -3499,6 +3553,12 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
         .replace(/'/g, '&#39;');
     }
 
+    function formatReminderTag(reminderDays) {
+      if (reminderDays === 'none') return '🔕 No reminders';
+      if (!reminderDays) return '';
+      return '🔔 Custom alerts';
+    }
+
     function renderFleet() {
       const q = document.getElementById('search-input').value.trim().toLowerCase();
       const vType = document.getElementById('filter-vehicle-type').value;
@@ -3614,6 +3674,7 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
             t.shop_name,
             t.sticker_number,
             t.notes,
+            ...Object.values(parseVinData(t.vin_data)),
           ]
             .join(' ')
             .toLowerCase();
@@ -3645,11 +3706,12 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
         const isSel = curSelected && curSelected === t.id;
         const dueLabel = t.next_due_date ? 'Due ' + escapeHtml(t.next_due_date) : 'Inspection date pending';
         const vehicleLine = [t.year, t.make, t.model, t.equipment_type].filter(Boolean).join(' ');
-        const latestFileBtn = t.latest_attachment
+        const latestFileBtn = (t.latest_attachment && t.latest_attachment.file_available !== false)
           ? '<button type="button" class="btn btn-secondary btn-sm" data-view-file="' + escapeHtml(t.latest_attachment.id) + '" data-file-name="' + escapeHtml(t.latest_attachment.file_name) + '" data-file-type="' + escapeHtml(t.latest_attachment.content_type) + '">📄 View Cert</button>'
           : '';
+        const remTag = formatReminderTag(t.reminder_days);
         return '<tr data-unit-row="' + id + '" class="' + (isSel ? 'is-selected' : '') + '" aria-selected="' + String(Boolean(isSel)) + '">' +
-          '<td><button type="button" class="unit-row-link" data-select-unit="' + id + '"><strong>Unit #' + escapeHtml(t.unit_number) + '</strong></button><span class="list-sub">' + escapeHtml(t.vehicle_type) + (t.status !== 'Active' ? ' · ' + escapeHtml(t.status) : '') + '</span><span class="list-sub">' + escapeHtml(vehicleLine) + '</span></td>' +
+          '<td><button type="button" class="unit-row-link" data-select-unit="' + id + '"><strong>Unit #' + escapeHtml(t.unit_number) + '</strong></button><span class="list-sub">' + escapeHtml(t.vehicle_type) + (t.status !== 'Active' ? ' · ' + escapeHtml(t.status) : '') + (remTag ? ' · ' + escapeHtml(remTag) : '') + '</span><span class="list-sub">' + escapeHtml(vehicleLine) + '</span></td>' +
           '<td><span class="safety-badge ' + escapeHtml(t.safety_status) + '">' + escapeHtml(formatStatusWithIcon(t)) + '<small>' + dueLabel + '</small></span></td>' +
           '<td>' + escapeHtml(t.last_inspection_date || '—') + '<span class="list-sub">' + escapeHtml(t.license_plate || '') + '</span></td>' +
           '<td><div class="list-actions"><button type="button" class="btn btn-secondary btn-sm" data-details="' + id + '">Details</button><button type="button" class="btn btn-success btn-sm" data-inspect="' + id + '">Log Safety</button>' + latestFileBtn + '<button type="button" class="btn btn-secondary btn-sm" data-history="' + id + '">Files (' + (t.attachment_count || 0) + ')</button><button type="button" class="btn btn-secondary btn-sm" data-edit="' + id + '">Edit</button></div></td></tr>';
@@ -3672,9 +3734,10 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
         .map((t) => {
           const isSel = curSelected && curSelected === t.id;
           const ymm = [t.year, t.make, t.model, t.equipment_type].filter(Boolean).join(' ') || 'Vehicle details not set';
-          const latestFileBtn = t.latest_attachment
+          const latestFileBtn = (t.latest_attachment && t.latest_attachment.file_available !== false)
             ? \`<button type="button" class="btn btn-secondary btn-sm" data-view-file="\${escapeHtml(t.latest_attachment.id)}" data-file-name="\${escapeHtml(t.latest_attachment.file_name)}" data-file-type="\${escapeHtml(t.latest_attachment.content_type)}">📄 View Cert</button>\`
             : '';
+          const remTag = formatReminderTag(t.reminder_days);
           const dueSmall = t.next_due_date ? 'Due ' + escapeHtml(t.next_due_date) : 'Inspection date pending';
           const dueValue = t.next_due_date ? \`\${escapeHtml(t.next_due_date)} (\${t.interval_months || 12}m)\` : \`No date set (\${t.interval_months || 12}m)\`;
 
@@ -3688,6 +3751,7 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
                       <span class="type-pill">\${escapeHtml(t.vehicle_type || 'Tractor')}</span>
                       \${t.equipment_type ? \`<span class="op-pill">\${escapeHtml(t.equipment_type)}</span>\` : ''}
                       \${t.status && t.status !== 'Active' ? \`<span class="op-pill">\${escapeHtml(t.status)}</span>\` : ''}
+                      \${remTag ? \`<span class="op-pill">\${escapeHtml(remTag)}</span>\` : ''}
                     </div>
                     <div class="truck-sub">\${escapeHtml(ymm)}</div>
                   </div>
@@ -3768,6 +3832,8 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
         const action = btn.getAttribute('data-nav-action');
         if (action === 'scan') document.getElementById('btn-scan-unit').click();
         else if (action === 'add') document.getElementById('btn-add-truck').click();
+        else if (action === 'vin') document.getElementById('btn-vin-decoder').click();
+        else if (action === 'backup') document.getElementById('btn-fleet-backup').click();
         else if (action === 'ics') document.getElementById('btn-export-ics').click();
         else if (action === 'alerts') document.getElementById('btn-browser-notify').click();
         else if (action === 'settings') document.getElementById('btn-settings').click();
@@ -3995,6 +4061,23 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
       warning.classList.toggle('hidden', matches.length === 0);
     }
 
+    function renderVinRawData() {
+      const container = document.getElementById('vin-all-data');
+      const section = document.getElementById('vin-all-data-section');
+      if (!container || !section) return;
+      if (!section.open || !vinDecoded || !vinDecoded.raw_data) {
+        container.innerHTML = '';
+        return;
+      }
+      const q = (document.getElementById('vin-all-data-filter')?.value || '').trim().toLowerCase();
+      const rawEntries = Object.entries(vinDecoded.raw_data);
+      container.innerHTML = rawEntries
+        .filter(([key, value]) => !q || (key + ' ' + (value || 'Not provided by NHTSA')).toLowerCase().includes(q))
+        .map(([key, value]) =>
+          '<div class="meta-item"><span>' + escapeHtml(key) + '</span><strong>' + escapeHtml(value || 'Not provided by NHTSA') + '</strong></div>'
+        ).join('');
+    }
+
     function resetVinDecoder() {
       if (vinRequest) vinRequest.abort();
       vinRequest = null;
@@ -4004,7 +4087,10 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
       document.getElementById('vin-preview').classList.add('hidden');
       document.getElementById('vin-details').innerHTML = '';
       document.getElementById('vin-all-data').innerHTML = '';
+      const vinFilterEl = document.getElementById('vin-all-data-filter');
+      if (vinFilterEl) vinFilterEl.value = '';
       document.getElementById('vin-all-data-summary').textContent = 'All NHTSA decode data';
+      document.getElementById('vin-all-data-section').open = false;
       document.getElementById('vin-all-data-section').classList.add('hidden');
       document.getElementById('vin-warnings').textContent = '';
       document.getElementById('vin-duplicate-warning').textContent = '';
@@ -4042,6 +4128,8 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
     document.getElementById('btn-vin-decoder').addEventListener('click', () => openVinDecoder(false));
     document.getElementById('btn-truck-decode-vin').addEventListener('click', () => openVinDecoder(true));
     document.getElementById('form-vin').addEventListener('input', resetVinDecoder);
+    document.getElementById('vin-all-data-section').addEventListener('toggle', renderVinRawData);
+    document.getElementById('vin-all-data-filter').addEventListener('input', renderVinRawData);
     document.getElementById('form-vin').addEventListener('submit', async (event) => {
       event.preventDefault();
       resetVinDecoder();
@@ -4096,9 +4184,8 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
         updateVinDuplicateWarning();
         const rawEntries = Object.entries(d.raw_data);
         document.getElementById('vin-all-data-summary').textContent = 'All NHTSA decode data (' + rawEntries.length + ' fields)';
-        document.getElementById('vin-all-data').innerHTML = rawEntries.map(([key, value]) =>
-          '<div class="meta-item"><span>' + escapeHtml(key) + '</span><strong>' + escapeHtml(value || 'Not provided by NHTSA') + '</strong></div>'
-        ).join('');
+        document.getElementById('vin-all-data-section').open = false;
+        document.getElementById('vin-all-data').innerHTML = '';
         document.getElementById('vin-all-data-section').classList.toggle('hidden', rawEntries.length === 0);
         document.getElementById('vin-warnings').textContent = d.warnings.join(' ');
         status.textContent = d.warnings.length ? 'Partial decode — review warnings before applying.' : 'Decoded by NHTSA. Review before applying.';
@@ -4177,6 +4264,7 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
         equipment_type: document.getElementById('truck-equipment-type').value.trim(),
         status: document.getElementById('truck-op-status').value,
         interval_months: Number(document.getElementById('truck-interval').value || 12),
+        reminder_days: document.getElementById('truck-reminder-days').value,
         last_inspection_date: noDate ? '' : document.getElementById('truck-last-date').value,
         next_due_date: noDate ? '' : document.getElementById('truck-due-date').value,
         sticker_number: document.getElementById('truck-sticker').value.trim(),
@@ -4264,6 +4352,7 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
           document.getElementById('truck-model').value = t.model || '';
           document.getElementById('truck-equipment-type').value = t.equipment_type || '';
           document.getElementById('truck-op-status').value = t.status || 'Active';
+          document.getElementById('truck-reminder-days').value = t.reminder_days || '';
           document.getElementById('truck-interval').value = String(t.interval_months || 12);
           const hasNoDate = !t.next_due_date && !t.last_inspection_date;
           setTruckNoDateMode(hasNoDate, false);
@@ -4412,12 +4501,13 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
       } else {
         html += inspections
           .map(
-            (ins) => \`
+            (ins, idx) => \`
             <div class="history-item">
               <div class="history-top">
                 <div>
                   <strong>Inspected: \${escapeHtml(ins.inspection_date)}</strong>
                   <span style="color: var(--text-muted); margin-left: 8px;">→ Expires: \${escapeHtml(ins.expiration_date)}</span>
+                  \${idx === 0 ? '<span class="type-pill" style="margin-left:8px;">Latest</span>' : ''}
                 </div>
                 <span class="op-pill">\${escapeHtml([ins.sticker_number ? 'Cert #' + ins.sticker_number : '', ins.shop_name].filter(Boolean).join(' • ') || 'Logged')}</span>
               </div>
@@ -4477,6 +4567,7 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
 
     function renderFileChip(f) {
       const kb = Math.max(1, Math.round((f.size_bytes || 0) / 1024));
+      if (f.file_available === false) return '<div class="file-chip"><span>📄 ' + escapeHtml(f.file_name) + ' <small style="color:var(--text-muted);">(certificate file unavailable — metadata only)</small></span></div>';
       return \`
         <div class="file-chip">
           <span>📄 \${escapeHtml(f.file_name)} <small style="color:var(--text-muted);">(\${kb} KB)</small></span>
@@ -4617,6 +4708,73 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
       window.location.href = API_BASE + '/calendar.ics';
     });
 
+    document.getElementById('btn-fleet-backup').addEventListener('click', () => {
+      document.getElementById('backup-status').textContent = '';
+      document.getElementById('backup-restore-file').value = '';
+      const previewBox = document.getElementById('backup-preview-box');
+      if (previewBox) { previewBox.textContent = ''; previewBox.classList.add('hidden'); }
+      document.getElementById('modal-backup').classList.remove('hidden');
+    });
+    document.getElementById('backup-restore-file').addEventListener('change', async (e) => {
+      const previewBox = document.getElementById('backup-preview-box');
+      const status = document.getElementById('backup-status');
+      status.textContent = '';
+      if (!previewBox) return;
+      const files = e.target.files;
+      if (!files || !files.length) {
+        previewBox.textContent = '';
+        previewBox.classList.add('hidden');
+        return;
+      }
+      const file = files[0];
+      if (file.size > 30 * 1024 * 1024) {
+        previewBox.textContent = 'Selected file exceeds the 30 MB restore limit.';
+        previewBox.classList.remove('hidden');
+        return;
+      }
+      try {
+        const backup = JSON.parse(await file.text());
+        if (backup.format !== 'truck-safety-tracker-backup' || backup.version !== 1 || !Array.isArray(backup.units) || !Array.isArray(backup.inspections) || !Array.isArray(backup.attachments)) {
+          previewBox.textContent = 'Unsupported backup version or invalid structure.';
+          previewBox.classList.remove('hidden');
+          return;
+        }
+        const existingIds = new Set(fleetData.map(u => u.id));
+        const newUnits = backup.units.filter(u => u && !existingIds.has(u.id)).length;
+        const matchingUnits = backup.units.length - newUnits;
+        const certNote = backup.includes_certificate_files ? 'Includes private certificate bytes' : 'Metadata-only (certificate bytes excluded)';
+        previewBox.textContent = 'Backup summary: ' + backup.units.length + ' unit(s) (' + newUnits + ' new, ' + matchingUnits + ' matching existing IDs), ' + backup.inspections.length + ' inspection(s), ' + backup.attachments.length + ' certificate record(s) · ' + certNote + (backup.exported_at ? ' · Exported ' + backup.exported_at : '');
+        previewBox.classList.remove('hidden');
+      } catch {
+        previewBox.textContent = 'Selected file is not valid JSON.';
+        previewBox.classList.remove('hidden');
+      }
+    });
+    document.getElementById('btn-backup-export').addEventListener('click', () => {
+      const includeFiles = document.getElementById('backup-include-files').checked;
+      if (includeFiles && !confirm('This download contains private certificates. Store it securely. Continue?')) return;
+      window.location.href = API_BASE + '/backup' + (includeFiles ? '?include_files=1' : '');
+    });
+    document.getElementById('btn-backup-restore').addEventListener('click', async () => {
+      const input = document.getElementById('backup-restore-file');
+      const status = document.getElementById('backup-status');
+      if (!input.files || !input.files.length) { status.textContent = 'Choose a JSON backup file first.'; return; }
+      const file = input.files[0];
+      if (file.size > 30 * 1024 * 1024) { status.textContent = 'Backup must be 30 MB or smaller.'; return; }
+      let backup;
+      try { backup = JSON.parse(await file.text()); } catch { status.textContent = 'The selected file is not valid JSON.'; return; }
+      if (backup.format !== 'truck-safety-tracker-backup' || backup.version !== 1 || !Array.isArray(backup.units) || !Array.isArray(backup.inspections) || !Array.isArray(backup.attachments)) { status.textContent = 'Unsupported backup version or invalid structure.'; return; }
+      const message = 'Merge ' + backup.units.length + ' unit(s), ' + backup.inspections.length + ' inspection(s), and ' + backup.attachments.length + ' certificate record(s)? Matching units will be updated; records are never deleted.' + (backup.includes_certificate_files ? '\\n\\nPrivate certificate bytes are included.' : '\\n\\nCertificate bytes are not included.');
+      if (!confirm(message)) return;
+      status.textContent = 'Validating and merging…';
+      try {
+        const response = await apiFetch('/backup/restore', { method: 'POST', body: JSON.stringify(backup) });
+        const result = await response.json();
+        status.textContent = 'Restore complete: ' + result.units_added + ' added, ' + result.units_updated + ' updated, ' + result.inspections_added + ' inspections; ' + result.certificate_files_restored + ' certificate files restored, ' + result.certificate_files_missing + ' unavailable.';
+        await loadDashboard();
+      } catch (error) { status.textContent = 'Restore failed: ' + error.message; }
+    });
+
     ${renderPushScript()}
 
     // Settings Modal
@@ -4628,6 +4786,7 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
         document.getElementById('set-warning-days').value = appSettings.warning_days || 30;
         document.getElementById('set-webhook-type').value = appSettings.webhook_type || 'auto';
         document.getElementById('set-webhook-url').value = appSettings.webhook_url || '';
+        document.querySelectorAll('.fleet-reminder-day').forEach(input => { input.checked = String(appSettings.notify_days || '30,14,7,1,0').split(',').includes(input.value); });
         document.getElementById('set-new-passcode').value = '';
         document.getElementById('modal-settings').classList.remove('hidden');
       } catch (err) {
@@ -4642,6 +4801,7 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
         webhook_type: document.getElementById('set-webhook-type').value,
         webhook_url: document.getElementById('set-webhook-url').value.trim(),
         new_passcode: document.getElementById('set-new-passcode').value,
+        notify_days: Array.from(document.querySelectorAll('.fleet-reminder-day:checked'), input => input.value).join(','),
       };
       try {
         const res = await apiFetch('/settings', {
@@ -4727,6 +4887,11 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
       const historyModal = document.getElementById('modal-history');
       if (historyModal && !historyModal.classList.contains('hidden')) {
         historyModal.classList.add('hidden');
+        return;
+      }
+      const backupModal = document.getElementById('modal-backup');
+      if (backupModal && !backupModal.classList.contains('hidden')) {
+        backupModal.classList.add('hidden');
         return;
       }
       const scanModal = document.getElementById('modal-scan');
