@@ -1,4 +1,4 @@
-import { renderPage, renderRemoval, REPO_URL, SITE_CSS, SITE_JS, type Language } from './page';
+import { GITHUB_LOGO, renderPage, renderRemoval, REPO_URL, SITE_CSS, SITE_JS, type Language } from './page';
 
 type Env = Cloudflare.Env;
 const CONSENT_VERSION = 'interest-only-2026-10-25';
@@ -105,8 +105,9 @@ export default {
     }
     if (request.method !== 'GET' && request.method !== 'HEAD') return response('Method not allowed', 405, 'text/plain; charset=utf-8');
     let result: Response;
-    if (url.pathname === '/site.css') result = response(SITE_CSS, 200, 'text/css; charset=utf-8');
-    else if (url.pathname === '/site.js') result = response(SITE_JS, 200, 'text/javascript; charset=utf-8');
+    if (url.pathname === '/github-lockup-white.svg') result = response(GITHUB_LOGO, 200, 'image/svg+xml');
+    else if (url.pathname === '/site.css') result = response(SITE_CSS, 200, 'text/css; charset=utf-8');
+    else    if (url.pathname === '/site.js') result = response(SITE_JS, 200, 'text/javascript; charset=utf-8');
     else if (url.pathname === '/favicon.svg') result = response('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48"><rect width="48" height="48" rx="12" fill="#0b1425"/><path d="M13 34V14h23v5H19v5h13v5H19v5" fill="#ffc45b"/></svg>', 200, 'image/svg+xml');
     else if (url.pathname === '/robots.txt') result = response('User-agent: *\nDisallow: /api/\nDisallow: /remove\n', 200, 'text/plain; charset=utf-8');
     else if (url.pathname === '/remove') result = response(renderRemoval(url.searchParams.get('lang') === 'fr' ? 'fr' : 'en'));
