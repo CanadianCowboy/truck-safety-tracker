@@ -1,5 +1,8 @@
 node_modules/
 .cloudflare/
+marketing/.cloudflare/
+marketing/.wrangler/
+marketing/dist/
 .agents/
 skills-lock.json
 dist/
