@@ -1,4 +1,6 @@
 import { GITHUB_LOGO, renderPage, renderRemoval, REPO_URL, SITE_CSS, SITE_JS, type Language } from './page';
+import { renderAppHtml } from '../../src/ui';
+import { DEMO_STORE_JS } from './demo-store';
 
 type Env = Cloudflare.Env;
 const CONSENT_VERSION = 'interest-only-2026-10-25';
@@ -17,6 +19,12 @@ function response(body: BodyInit | null, status = 200, type = 'text/html; charse
       'Strict-Transport-Security': 'max-age=31536000',
     },
   });
+}
+
+function demoResponse(body: BodyInit | null, status = 200, type = 'text/html; charset=utf-8'): Response {
+  const result = response(body, status, type);
+  result.headers.set('Content-Security-Policy', "default-src 'none'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; img-src 'self' blob: data:; frame-src 'self' blob:; connect-src 'self'; form-action 'self'; base-uri 'none'; frame-ancestors 'none'");
+  return result;
 }
 
 function json(body: object, status = 200): Response {
@@ -111,6 +119,10 @@ export default {
     else if (url.pathname === '/favicon.svg') result = response('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48"><rect width="48" height="48" rx="12" fill="#0b1425"/><path d="M13 34V14h23v5H19v5h13v5H19v5" fill="#ffc45b"/></svg>', 200, 'image/svg+xml');
     else if (url.pathname === '/robots.txt') result = response('User-agent: *\nDisallow: /api/\nDisallow: /remove\n', 200, 'text/plain; charset=utf-8');
     else if (url.pathname === '/remove') result = response(renderRemoval(url.searchParams.get('lang') === 'fr' ? 'fr' : 'en'));
+    else if (url.pathname === '/en/demo' || url.pathname === '/fr/demo') result = demoResponse(renderAppHtml('/' + url.pathname.slice(1, 3) + '/demo', false, true));
+    else if (url.pathname.endsWith('/demo/demo-store.js')) result = demoResponse(DEMO_STORE_JS, 200, 'text/javascript; charset=utf-8');
+    else if (url.pathname.endsWith('/demo/icon.svg')) result = response('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="14" fill="#111827"/><path d="M16 46V18h34v7H24v6h19v7H24v8" fill="#fbbf24"/></svg>', 200, 'image/svg+xml');
+    else if (/\/demo\/(?:fonts\/[^/]+|icon-192\.png|manifest\.json)$/.test(url.pathname)) result = response('Not available in demo', 404, 'text/plain; charset=utf-8');
     else if (['/', '/en', '/en/', '/fr', '/fr/'].includes(url.pathname)) {
       const language: Language = url.pathname.startsWith('/fr') ? 'fr' : 'en';
       result = response(renderPage(language, env.CONTACT_EMAIL));

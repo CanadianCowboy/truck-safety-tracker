@@ -71,7 +71,7 @@ ${renderPushWorkerScript(basePath)}
 `;
 }
 
-export function renderAppHtml(basePath: string, pushTestPage = false): string {
+export function renderAppHtml(basePath: string, pushTestPage = false, demoMode = false): string {
   return `<!DOCTYPE html>
 <html lang="en" class="dark">
 <head>
@@ -81,7 +81,7 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
   <meta name="theme-color" content="#0b0f19" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <link rel="manifest" href="${basePath}/manifest.json" />
+  ${demoMode ? '<meta name="robots" content="noindex,nofollow" />' : `<link rel="manifest" href="${basePath}/manifest.json" />`}
   <link rel="icon" type="image/svg+xml" href="${basePath}/icon.svg" />
   <link rel="apple-touch-icon" href="${basePath}/icon-192.png" />
   <style>
@@ -2531,7 +2531,7 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
 </head>
 <body>
   <!-- PASSCODE GATE VIEW -->
-  <div id="gate-view" class="gate-wrap">
+  <div id="gate-view" class="gate-wrap"${demoMode ? ' hidden' : ''}>
     <button type="button" class="btn btn-secondary gate-theme" data-theme-toggle aria-label="Switch to light mode">☀ Light mode</button>
     <div class="gate-card">
       <img src="${basePath}/icon.svg" alt="Truck Safety Logo" class="gate-logo" />
@@ -2560,7 +2560,7 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
   </div>
 
   <!-- MAIN APPLICATION VIEW -->
-  <div id="app-view" class="hidden">
+  <div id="app-view" class="${demoMode ? '' : 'hidden'}">
     <header class="app-header">
       <div class="header-inner">
         <div class="brand">
@@ -2604,13 +2604,14 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
               </button>
             </div>
           </details>
-          <button type="button" id="btn-lock" class="btn btn-secondary btn-sm" title="Lock App">
+          <button type="button" id="btn-lock" class="btn btn-secondary btn-sm${demoMode ? ' hidden' : ''}" title="Lock App">
             🔒 Lock
           </button>
         </div>
       </div>
     </header>
 
+    ${demoMode ? '<div role="note" style="margin:12px auto;max-width:1200px;padding:12px 18px;border:1px solid var(--border);border-radius:10px;color:var(--text-muted)"><strong>Demo:</strong> Unit records, inspection dates and inspection history are stored only in this browser tab. VIN decoding, certificates, QR labels, alerts, settings, backups and calendar exports are not available in the demo. <button type="button" id="demo-reset" class="btn btn-secondary btn-sm" style="margin-left:12px">Reset demo</button></div>' : ''}
     <div class="workspace-shell">
       <!-- LEFT REGION: GRAPHITE NAVIGATION & QUICK FLEET VIEWS -->
       <nav class="workspace-nav" aria-label="Fleet views and navigation">
@@ -2914,33 +2915,33 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
               <option value="Other">Other</option>
             </select>
           </div>
-          <div class="input-group">
+          <div class="input-group${demoMode ? ' hidden' : ''}">
             <label for="truck-plate">License Plate</label>
             <input id="truck-plate" class="input-control" placeholder="e.g. AB-12345" />
           </div>
-          <div class="input-group">
+          <div class="input-group${demoMode ? ' hidden' : ''}">
             <label for="truck-gvwr">GVWR / Weight Class</label>
             <input id="truck-gvwr" class="input-control" placeholder="e.g. 80,000 lbs / 36,287 kg" />
           </div>
-          <div class="input-group col-span-2">
+          <div class="input-group col-span-2${demoMode ? ' hidden' : ''}">
             <label for="truck-vin">VIN (Vehicle Identification Number)</label>
             <input id="truck-vin" class="input-control" placeholder="17-character VIN" />
             <button type="button" id="btn-truck-decode-vin" class="btn btn-secondary">Decode VIN…</button>
             <small>Preview NHTSA details before applying them. Nothing is saved automatically.</small>
           </div>
-          <div class="input-group">
+          <div class="input-group${demoMode ? ' hidden' : ''}">
             <label for="truck-year">Year</label>
             <input id="truck-year" type="number" min="1900" max="2100" class="input-control" placeholder="e.g. 2022" />
           </div>
-          <div class="input-group">
+          <div class="input-group${demoMode ? ' hidden' : ''}">
             <label for="truck-make">Make</label>
             <input id="truck-make" class="input-control" placeholder="e.g. Kenworth, Peterbilt, Wabash" />
           </div>
-          <div class="input-group">
+          <div class="input-group${demoMode ? ' hidden' : ''}">
             <label for="truck-model">Model</label>
             <input id="truck-model" class="input-control" placeholder="e.g. T680, 389, Dry Van 53'" />
           </div>
-          <div class="input-group">
+          <div class="input-group${demoMode ? ' hidden' : ''}">
             <label for="truck-equipment-type">Equipment / Body Type</label>
             <input id="truck-equipment-type" class="input-control" placeholder="e.g. Flatbed, Skid Steer, Reefer, Generator" />
           </div>
@@ -2952,7 +2953,7 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
               <option value="Inactive">Inactive</option>
             </select>
           </div>
-          <div class="input-group">
+          <div class="input-group${demoMode ? ' hidden' : ''}">
             <label for="truck-reminder-days">Reminder schedule</label>
             <select id="truck-reminder-days" class="input-control">
               <option value="">Use fleet default</option>
@@ -2965,7 +2966,7 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
             </select>
             <small>Overrides fleet-wide reminder days for this unit.</small>
           </div>
-          <div class="input-group">
+          <div class="input-group${demoMode ? ' hidden' : ''}">
             <label for="truck-interval">Inspection Interval</label>
             <select id="truck-interval" class="input-control">
               <option value="12">Annual (12 Months)</option>
@@ -2974,7 +2975,7 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
               <option value="24">Biennial (24 Months)</option>
             </select>
           </div>
-          <div class="input-group col-span-2" style="margin-bottom: 4px;">
+          <div class="input-group col-span-2${demoMode ? ' hidden' : ''}" style="margin-bottom: 4px;">
             <label for="truck-no-date" style="display: inline-flex; align-items: center; gap: 10px; cursor: pointer; text-transform: none; color: var(--text); font-size: 0.9rem;">
               <input id="truck-no-date" type="checkbox" style="width: 18px; height: 18px;" />
               <span>No inspection / due date yet (save unit info without dates)</span>
@@ -2989,15 +2990,15 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
             <input id="truck-due-date" type="date" class="input-control" />
             <small>Defaults to month-end, or leave blank if no date yet.</small>
           </div>
-          <div class="input-group">
+          <div class="input-group${demoMode ? ' hidden' : ''}">
             <label for="truck-sticker">Safety Sticker / Cert #</label>
             <input id="truck-sticker" class="input-control" placeholder="e.g. S-908412" />
           </div>
-          <div class="input-group col-span-2">
+          <div class="input-group col-span-2${demoMode ? ' hidden' : ''}">
             <label for="truck-shop">Inspection Shop / Mechanic</label>
             <input id="truck-shop" class="input-control" placeholder="e.g. Highway Heavy Duty Service" />
           </div>
-          <div class="input-group col-span-2">
+          <div class="input-group col-span-2${demoMode ? ' hidden' : ''}">
             <label for="truck-notes">Notes / Defects / Reminders</label>
             <textarea id="truck-notes" rows="2" class="input-control" placeholder="Any notes on tires, brakes, upcoming work..."></textarea>
           </div>
@@ -3011,7 +3012,7 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
   </div>
 
   <!-- Shared standalone / unit-form VIN preview. Only explicit lookups contact NHTSA. -->
-  <div id="modal-vin" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="vin-title">
+  <div id="modal-vin" class="modal-backdrop hidden${demoMode ? ' demo-disabled' : ''}" role="dialog" aria-modal="true" aria-labelledby="vin-title">
     <div class="modal-panel">
       <div class="modal-header">
         <h2 class="modal-title" id="vin-title">VIN decoder</h2>
@@ -3065,7 +3066,7 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
   </div>
 
   <!-- MODAL: LOG NEW SAFETY INSPECTION (+ R2 UPLOAD) -->
-  <div id="modal-inspect" class="modal-backdrop hidden">
+  <div id="modal-inspect" class="modal-backdrop hidden${demoMode ? ' demo-inspection' : ''}">
     <div class="modal-panel">
       <div class="modal-header">
         <h2 class="modal-title" id="modal-inspect-title">Log Safety Inspection</h2>
@@ -3092,7 +3093,7 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
             <label for="inspect-shop">Shop / Certified Mechanic</label>
             <input id="inspect-shop" class="input-control" placeholder="Shop name or inspector" />
           </div>
-          <div class="input-group col-span-2">
+          <div class="input-group col-span-2${demoMode ? ' hidden' : ''}">
             <label for="inspect-file">Upload Safety Certificate / Sheet (PDF, JPEG, PNG, WebP · max 10 MB)</label>
             <input id="inspect-file" type="file" accept="application/pdf,image/jpeg,image/png,image/webp" class="input-control" />
           </div>
@@ -3109,7 +3110,7 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
     </div>
   </div>
 
-  <div id="modal-scan" class="modal-backdrop hidden">
+  <div id="modal-scan" class="modal-backdrop hidden${demoMode ? ' demo-disabled' : ''}">
     <div class="modal-panel">
       <div class="modal-header">
         <h2 class="modal-title">Scan / Paste UUID</h2>
@@ -3252,8 +3253,10 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
   <script>
     const BASE_PATH = ${JSON.stringify(basePath)};
     const API_BASE = BASE_PATH + '/api';
-    // The server owns the HttpOnly session cookie; never persist tokens in URLs or localStorage.
-    localStorage.removeItem('truck_safety_token');
+    const DEMO_MODE = ${JSON.stringify(demoMode)};
+    const DEMO_STORE_URL = BASE_PATH + '/demo-store.js';
+    // Demo data is scoped to this browser tab; no fleet token or server session is used.
+    if (!DEMO_MODE) localStorage.removeItem('truck_safety_token');
     let fleetData = [];
     let fleetLoading = false;
     let fleetLoadError = '';
@@ -3410,6 +3413,7 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
 
     // Gate Login
     document.getElementById('gate-form').addEventListener('submit', async (e) => {
+      if (DEMO_MODE) { e.preventDefault(); return; }
       e.preventDefault();
       const passcode = document.getElementById('gate-passcode').value;
       const errEl = document.getElementById('gate-error');
@@ -3441,6 +3445,7 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
     });
 
     document.getElementById('btn-lock').addEventListener('click', async () => {
+      if (DEMO_MODE) { showToast('Locking is not available in demo.'); return; }
       try {
         await apiFetch('/auth/logout', { method: 'POST' });
         lockApp();
@@ -4125,7 +4130,8 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
       if (vinReturnFocus) vinReturnFocus.focus();
     }
 
-    document.getElementById('btn-vin-decoder').addEventListener('click', () => openVinDecoder(false));
+    document.getElementById('btn-vin-decoder').addEventListener('click', () => { if (DEMO_MODE) showToast('VIN decoding is not available in the demo.'); else openVinDecoder(false); });
+    if (DEMO_MODE) document.getElementById('btn-truck-decode-vin').classList.add('hidden');
     document.getElementById('btn-truck-decode-vin').addEventListener('click', () => openVinDecoder(true));
     document.getElementById('form-vin').addEventListener('input', resetVinDecoder);
     document.getElementById('vin-all-data-section').addEventListener('toggle', renderVinRawData);
@@ -4429,6 +4435,7 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
       try {
         const fileInput = document.getElementById('inspect-file');
         const hasFile = fileInput.files && fileInput.files.length > 0;
+        if (DEMO_MODE && hasFile) throw new Error('Certificates are not available in the demo.');
 
         if (hasFile) {
           const fd = new FormData();
@@ -4578,6 +4585,7 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
     }
 
     async function handleQuickCertificateUpload(inputEl, btnEl) {
+      if (DEMO_MODE) { showToast('Certificates are not available in the demo.'); return; }
       const targetTruckId = activeHistoryTruckId || (typeof selectedUnitId !== 'undefined' ? selectedUnitId : null);
       const feedbackEl = document.getElementById('detail-upload-feedback');
       if (!targetTruckId) return;
@@ -4633,6 +4641,9 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
     }
 
     // Quick upload inside History Modal and Detail Workspace Panel
+    if (DEMO_MODE) {
+      document.querySelectorAll('#btn-quick-upload, #btn-detail-quick-upload').forEach(button => button.addEventListener('click', () => showToast('Certificates are not available in the demo.')));
+    }
     document.getElementById('btn-quick-upload').addEventListener('click', () => {
       handleQuickCertificateUpload(document.getElementById('quick-upload-input'), document.getElementById('btn-quick-upload'));
     });
@@ -4680,6 +4691,7 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
 
     // In-App Photo / PDF Viewer
     function openFileViewer(attachmentId, fileName, contentType) {
+      if (DEMO_MODE) { showToast('Certificates are not available in the demo.'); return; }
       const fileUrl = API_BASE + '/attachments/' + encodeURIComponent(attachmentId);
       const downloadUrl = fileUrl + '?download=1';
       document.getElementById('viewer-title').textContent = fileName;
@@ -4705,10 +4717,20 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
 
     // Calendar (.ics) export
     document.getElementById('btn-export-ics').addEventListener('click', () => {
+      if (DEMO_MODE) { showToast('Calendar export is not available in the demo.'); return; }
       window.location.href = API_BASE + '/calendar.ics';
     });
+    if (DEMO_MODE) {
+      document.getElementById('btn-export-ics').classList.add('hidden');
+      document.getElementById('btn-fleet-backup').classList.add('hidden');
+      document.getElementById('btn-browser-notify').classList.add('hidden');
+      document.getElementById('btn-vin-decoder').classList.add('hidden');
+      document.getElementById('btn-scan-unit').classList.add('hidden');
+      document.querySelectorAll('[data-nav-action="scan"], [data-nav-action="vin"], [data-nav-action="backup"], [data-nav-action="ics"], [data-nav-action="alerts"], [data-nav-action="settings"]').forEach(el => el.classList.add('hidden'));
+    }
 
     document.getElementById('btn-fleet-backup').addEventListener('click', () => {
+      if (DEMO_MODE) { showToast('Backups are not available in the demo.'); return; }
       document.getElementById('backup-status').textContent = '';
       document.getElementById('backup-restore-file').value = '';
       const previewBox = document.getElementById('backup-preview-box');
@@ -4775,10 +4797,11 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
       } catch (error) { status.textContent = 'Restore failed: ' + error.message; }
     });
 
-    ${renderPushScript()}
+    ${demoMode ? `document.getElementById('btn-browser-notify').addEventListener('click', () => showToast('Alerts are not available in the demo.'));` : renderPushScript()}
 
     // Settings Modal
     document.getElementById('btn-settings').addEventListener('click', async () => {
+      if (DEMO_MODE) { showToast('Settings are not available in the demo.'); return; }
       try {
         const res = await apiFetch('/settings');
         const data = await res.json();
@@ -4935,17 +4958,26 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
       }
     });
 
+    if (DEMO_MODE) document.getElementById('demo-reset').addEventListener('click', () => {
+      sessionStorage.removeItem('truck_safety_demo_store');
+      location.reload();
+    });
+
     // Register PWA Service Worker
-    if ('serviceWorker' in navigator && 'PushManager' in window) {
+    if (!DEMO_MODE && 'serviceWorker' in navigator && 'PushManager' in window) {
       navigator.serviceWorker.register(BASE_PATH + '/sw.js').catch(err => console.error('Service worker registration failed:', err));
     }
 
-    ${renderQrScript()}
+    ${demoMode ? '' : renderQrScript()}
 
     // Initial session check
-    fetch(API_BASE + '/auth/verify').then(res => {
+    ${demoMode ? `const demoScript = document.createElement('script');
+    demoScript.src = DEMO_STORE_URL;
+    demoScript.onload = unlockApp;
+    demoScript.onerror = () => showToast('Demo storage could not start. Reload to try again.', true);
+    document.head.appendChild(demoScript);` : `fetch(API_BASE + '/auth/verify').then(res => {
       if (res.ok) unlockApp();
-    }).catch(() => showToast('Offline. Reconnect to unlock your fleet.', true));
+    }).catch(() => showToast('Offline. Reconnect to unlock your fleet.', true));`}
     setInterval(() => {
       if (!document.getElementById('app-view').classList.contains('hidden') && document.visibilityState === 'visible') loadDashboard();
     }, 5 * 60 * 1000);
