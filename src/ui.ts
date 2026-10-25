@@ -895,20 +895,9 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
           flex-shrink: 0;
         }
 
-        /* Keep phone header compact: Scan QR + Tools overflow menu. Add Unit is placed in the fleet workspace bar below. */
+        /* Keep phone header compact: Tools overflow menu. Add Unit is placed in the fleet workspace bar below. */
         .header-actions > [data-theme-toggle] {
           display: none;
-        }
-
-        #btn-scan-unit {
-          font-size: 0;
-          padding: 8px 10px;
-          gap: 0;
-        }
-        #btn-scan-unit::before {
-          content: "⌗ Scan QR";
-          font-size: 0.78rem;
-          font-weight: 650;
         }
 
         #header-tools > summary {
@@ -1146,7 +1135,7 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
         /* Safe-area Bottom Navigation Bar */
         .mobile-bottom-nav {
           display: grid;
-          grid-template-columns: repeat(3, 1fr);
+          grid-template-columns: repeat(2, 1fr);
           position: fixed;
           bottom: 0;
           left: 0;
@@ -2563,7 +2552,7 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
           🔒 Unlock Fleet Dashboard
         </button>
         <p id="pending-unit-message" class="hidden" style="margin-top:12px;">Unit selected. Enter the passcode to open its record.</p>
-        <button type="button" id="gate-scan-unit" class="btn btn-secondary btn-full" style="margin-top:12px;">Scan / Paste UUID (optional)</button>
+        <button type="button" id="gate-scan-unit" class="btn btn-secondary btn-full hidden" style="margin-top:12px;">Scan / Paste UUID (optional)</button>
       </form>
     </div>
   </div>
@@ -2589,7 +2578,7 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
           />
         </div>
         <div class="header-actions">
-          <button type="button" id="btn-scan-unit" class="btn btn-secondary btn-sm">Scan / Paste UUID</button>
+          <button type="button" id="btn-scan-unit" class="btn btn-secondary btn-sm hidden">Scan / Paste UUID</button>
           <button type="button" id="btn-add-truck" class="btn btn-primary">
             + Add Truck / Trailer
           </button>
@@ -2660,7 +2649,7 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
         <div class="nav-tools-group">
           <div class="nav-section-title">Operations & Tools</div>
           <ul class="nav-list">
-            <li><button type="button" class="nav-tool-btn" data-nav-action="scan">⌗ Scan / Paste UUID</button></li>
+            <li class="hidden"><button type="button" class="nav-tool-btn hidden" data-nav-action="scan">⌗ Scan / Paste UUID</button></li>
             <li><button type="button" class="nav-tool-btn" data-nav-action="add">+ Add Unit</button></li>
             <li><button type="button" class="nav-tool-btn" data-nav-action="ics">📅 Export .ICS Schedule</button></li>
             <li><button type="button" class="nav-tool-btn" data-nav-action="alerts">🔔 Browser Alerts</button></li>
@@ -2822,7 +2811,7 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
         <div id="detail-empty-state" class="detail-empty-box">
           <div class="detail-empty-icon" aria-hidden="true">🚛</div>
           <h3>No unit selected</h3>
-          <p>Select any unit from the fleet list or scan a QR label to inspect its compliance status, log a safety inspection, or manage R2 certificates here.</p>
+          <p>Select any unit from the fleet list to inspect its compliance status, log a safety inspection, or manage R2 certificates here.</p>
         </div>
         <div id="modal-unit" class="modal-backdrop workspace-detail hidden">
           <div class="modal-panel detail-panel-inner">
@@ -2858,8 +2847,8 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
                 </div>
               </details>
 
-              <!-- QR LABEL & SECONDARY UNIT ACTIONS -->
-              <details class="detail-disclosure" open>
+              <!-- QR LABEL & SECONDARY UNIT ACTIONS (retained but not exposed until ready) -->
+              <details id="unit-qr-controls" class="detail-disclosure hidden" aria-hidden="true" inert>
                 <summary>QR Label & Unit Actions</summary>
                 <div class="detail-disclosure-body">
                   <div style="display:flex; flex-wrap:wrap; gap:8px; align-items:center;">
@@ -2875,15 +2864,11 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
       </aside>
     </div>
 
-    <!-- MOBILE BOTTOM NAVIGATION BAR (Fleet / Scan / Tools) -->
+    <!-- MOBILE BOTTOM NAVIGATION BAR (Fleet / Tools) -->
     <nav class="mobile-bottom-nav" aria-label="Mobile primary navigation">
       <button type="button" id="mobile-nav-fleet" class="mobile-nav-item active" aria-current="page">
         <span class="mobile-nav-icon" aria-hidden="true">🚛</span>
         <span>Fleet</span>
-      </button>
-      <button type="button" id="mobile-nav-scan" class="mobile-nav-item">
-        <span class="mobile-nav-icon" aria-hidden="true">⌗</span>
-        <span>Scan</span>
       </button>
       <button type="button" id="mobile-nav-tools" class="mobile-nav-item" aria-expanded="false">
         <span class="mobile-nav-icon" aria-hidden="true">⚙️</span>
@@ -2908,6 +2893,7 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
       <form id="form-truck">
         <div id="truck-form-error" class="form-error-banner hidden" role="alert" aria-live="assertive"></div>
         <input type="hidden" id="truck-id" />
+        <input type="hidden" id="truck-vin-data" value="" />
         <div class="form-grid">
           <div class="input-group">
             <label for="truck-unit">Unit / Truck # *</label>
@@ -3036,13 +3022,19 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
         <div id="vin-warnings" role="status" style="margin-bottom:12px;overflow-wrap:anywhere;"></div>
         <p id="vin-duplicate-warning" class="truck-notes hidden" role="status" style="margin-bottom:12px;overflow-wrap:anywhere;"></p>
         <p id="vin-comparison-note" class="muted-note hidden" style="margin-bottom:12px;">Current form values include unsaved edits. Compare them with the decoded values before applying.</p>
-        <p id="vin-selection-help" class="muted-note" style="margin-bottom:12px;">Check the fields you want to apply. Available fields start selected; uncheck any you want to keep unchanged. Other specifications are read-only.</p>
+        <p id="vin-selection-help" class="muted-note" style="margin-bottom:12px;">Check the vehicle fields you want to change. The complete set of values returned by NHTSA is saved with the unit for future reference.</p>
         <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px;">
           <button type="button" id="btn-vin-select-all" class="btn btn-secondary btn-sm">Select all</button>
           <button type="button" id="btn-vin-clear-selection" class="btn btn-secondary btn-sm">Clear selection</button>
         </div>
         <div id="vin-details" class="meta-grid" role="group" aria-label="Decoded VIN details and fields to apply" aria-describedby="vin-selection-help"></div>
-        <p class="muted-note" style="margin-top:14px;">Only checked vehicle details will be applied. Inspection dates, plate, notes and operational status are never changed.</p>
+        <details id="vin-all-data-section" class="detail-disclosure" style="margin-top:12px;">
+          <summary id="vin-all-data-summary">All NHTSA decode data</summary>
+          <div class="detail-disclosure-body">
+            <div id="vin-all-data" class="meta-grid" aria-label="All values returned by NHTSA"></div>
+          </div>
+        </details>
+        <p class="muted-note" style="margin-top:14px;">Selected vehicle details will be applied. Every returned NHTSA field is retained on the unit. Inspection dates, plate, notes and operational status are never changed.</p>
         <div class="modal-footer">
           <button type="button" id="btn-vin-apply" class="btn btn-primary" disabled>Use for new unit</button>
         </div>
@@ -3832,7 +3824,6 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
 
     // Mobile Bottom Navigation bar (Fleet / Scan / Tools)
     const navFleetBtn = document.getElementById('mobile-nav-fleet');
-    const navScanBtn = document.getElementById('mobile-nav-scan');
     const navToolsBtn = document.getElementById('mobile-nav-tools');
     if (navFleetBtn) {
       navFleetBtn.addEventListener('click', () => {
@@ -3843,14 +3834,6 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
           clearPendingUnit();
         }
         window.scrollTo({ top: 0, behavior: 'smooth' });
-      });
-    }
-    if (navScanBtn) {
-      navScanBtn.addEventListener('click', () => {
-        setMobileFilterSheetOpen(false);
-        const tools = document.getElementById('header-tools');
-        if (tools) tools.open = false;
-        document.getElementById('btn-scan-unit').click();
       });
     }
     if (navToolsBtn) {
@@ -3871,7 +3854,17 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
     // Track dirty state for Add/Edit Truck and Log Inspection forms to avoid silently discarding unsaved edits
     let truckFormDirty = false;
     let inspectFormDirty = false;
-    document.getElementById('form-truck').addEventListener('input', () => { truckFormDirty = true; });
+    document.getElementById('form-truck').addEventListener('input', (event) => {
+      truckFormDirty = true;
+      if (event.target.id === 'truck-vin') {
+        try {
+          const sourceVin = JSON.parse(document.getElementById('truck-vin-data').value).VIN;
+          if (typeof sourceVin !== 'string' || sourceVin.trim().toUpperCase() !== event.target.value.trim().toUpperCase()) {
+            document.getElementById('truck-vin-data').value = '';
+          }
+        } catch { document.getElementById('truck-vin-data').value = ''; }
+      }
+    });
     document.getElementById('form-inspect').addEventListener('input', () => { inspectFormDirty = true; });
 
     // Auto-calculate due date when last inspection date or interval changes in Add/Edit modal
@@ -3922,6 +3915,7 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
       const errBanner = document.getElementById('truck-form-error');
       if (errBanner) { errBanner.textContent = ''; errBanner.classList.add('hidden'); }
       document.getElementById('truck-id').value = '';
+      document.getElementById('truck-vin-data').value = '';
       setTruckNoDateMode(false, false);
       const today = new Date().toISOString().slice(0, 10);
       const nextYear = addCalendarMonths(today, 12);
@@ -4009,6 +4003,9 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
       document.getElementById('btn-vin-apply').disabled = true;
       document.getElementById('vin-preview').classList.add('hidden');
       document.getElementById('vin-details').innerHTML = '';
+      document.getElementById('vin-all-data').innerHTML = '';
+      document.getElementById('vin-all-data-summary').textContent = 'All NHTSA decode data';
+      document.getElementById('vin-all-data-section').classList.add('hidden');
       document.getElementById('vin-warnings').textContent = '';
       document.getElementById('vin-duplicate-warning').textContent = '';
       document.getElementById('vin-duplicate-warning').classList.add('hidden');
@@ -4080,20 +4077,29 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
           ['', d.engine, 'Engine'], ['', d.fuel_type, 'Fuel'], ['', d.plant_country, 'Plant country'],
         ];
         document.getElementById('vin-details').innerHTML = fields.map(([id, value, label]) => {
+          if (id === 'truck-vin-data') return '';
           const compare = vinFromTruck && id;
-          const decodedValue = escapeHtml(value || 'Not available');
+          const decodedText = value || 'Not available';
+          const currentText = id ? (document.getElementById(id).value || 'Not set') : '';
+          const decodedValue = escapeHtml(decodedText);
           const detail = '<div><span>' + escapeHtml(label) + '</span>' + (compare
-            ? '<div class="vin-field-values"><div><span>Current form</span><strong data-vin-current>' + escapeHtml(document.getElementById(id).value || 'Not set') + '</strong></div>' +
+            ? '<div class="vin-field-values"><div><span>Current form</span><strong data-vin-current>' + escapeHtml(currentText) + '</strong></div>' +
               '<div><span>Decoded VIN</span><strong data-vin-decoded>' + decodedValue + '</strong></div></div>'
             : '<strong>' + decodedValue + '</strong>') + '</div>';
           const attributes = id ? ' data-vin-detail="' + id + '"' : '';
           const comparisonClass = compare ? ' vin-comparison-row' : '';
           return id && value != null && value !== ''
             ? '<label class="meta-item vin-field-option' + comparisonClass + '"' + attributes + '><input type="checkbox" data-vin-field="' + id + '" aria-label="Apply ' + escapeHtml(label) + '" checked />' + detail + '</label>'
-            : '<div class="meta-item' + comparisonClass + '"' + attributes + '>' + detail + '</div>';
+            : '<div class="meta-item' + (id === 'truck-vin-data' ? ' hidden' : '') + comparisonClass + '"' + attributes + '>' + detail + '</div>';
         }).join('');
         updateVinSelectionControls();
         updateVinDuplicateWarning();
+        const rawEntries = Object.entries(d.raw_data);
+        document.getElementById('vin-all-data-summary').textContent = 'All NHTSA decode data (' + rawEntries.length + ' fields)';
+        document.getElementById('vin-all-data').innerHTML = rawEntries.map(([key, value]) =>
+          '<div class="meta-item"><span>' + escapeHtml(key) + '</span><strong>' + escapeHtml(value || 'Not provided by NHTSA') + '</strong></div>'
+        ).join('');
+        document.getElementById('vin-all-data-section').classList.toggle('hidden', rawEntries.length === 0);
         document.getElementById('vin-warnings').textContent = d.warnings.join(' ');
         status.textContent = d.warnings.length ? 'Partial decode — review warnings before applying.' : 'Decoded by NHTSA. Review before applying.';
         document.getElementById('vin-preview').classList.remove('hidden');
@@ -4140,6 +4146,7 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
         setTruckNoDateMode(true);
       }
       fields.forEach(([id, value]) => { document.getElementById(id).value = String(value); });
+      document.getElementById('truck-vin-data').value = JSON.stringify(vinDecoded.raw_data);
       truckFormDirty = true;
       closeVinDecoder();
       document.getElementById('truck-unit').focus();
@@ -4157,6 +4164,13 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
         license_plate: document.getElementById('truck-plate').value.trim(),
         gvwr: document.getElementById('truck-gvwr').value.trim(),
         vin: document.getElementById('truck-vin').value.trim(),
+        vin_data: (() => {
+          const value = document.getElementById('truck-vin-data').value;
+          try {
+            const sourceVin = JSON.parse(value).VIN;
+            return typeof sourceVin === 'string' && sourceVin.trim().toUpperCase() === document.getElementById('truck-vin').value.trim().toUpperCase() ? value : '';
+          } catch { return ''; }
+        })(),
         year: document.getElementById('truck-year').value ? Number(document.getElementById('truck-year').value) : null,
         make: document.getElementById('truck-make').value.trim(),
         model: document.getElementById('truck-model').value.trim(),
@@ -4244,6 +4258,7 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
           document.getElementById('truck-plate').value = t.license_plate || '';
           document.getElementById('truck-gvwr').value = t.gvwr || '';
           document.getElementById('truck-vin').value = t.vin || '';
+          document.getElementById('truck-vin-data').value = t.vin_data || '';
           document.getElementById('truck-year').value = t.year || '';
           document.getElementById('truck-make').value = t.make || '';
           document.getElementById('truck-model').value = t.model || '';

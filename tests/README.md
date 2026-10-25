@@ -15,11 +15,11 @@ npm run build
 
 `npm test` includes deterministic pure date/validation/HMAC logic and one real NHTSA request. Browser VIN tests also contact NHTSA through the actual Worker. They use the publicly documented VIN `1M8GDM9AXKP042788`, never save it, and apply real decoded values only to an unsaved form. Provider failures fail the check; no cached/fabricated fallback is supplied.
 
-VIN browser checks verify the initial **not checked** state, **checking** during an actual request, and **connected (last lookup)** only after a real successful response. Invalid client input must not issue a lookup or claim a provider outage. Provider-unavailable/retry and browser-deadline branches are not verified unless a real failure occurs; they are never exercised with intercepted or fabricated responses.
+VIN browser checks verify the initial **not checked** state, **checking** during an actual request, **connected (last lookup)** only after a real successful response, and the full NHTSA result persisted only to an explicitly saved unit. The expandable decoder lists every one of the 154 returned fields, including empty values. Unit details show the saved decode; editing the VIN clears stale decode data unless the new matching decode is saved. Invalid client input must not issue a lookup or claim a provider outage. Provider-unavailable/retry and browser-deadline branches are not verified unless a real failure occurs; they are never exercised with intercepted or fabricated responses.
 
 Browser tests require an explicit `APP_PASSCODE`. Credentials are never written to tracked files. A shared worker session minimizes login attempts; on a real 429, the suite respects Retry-After and retries once. Browser tests do not change fleet records, settings, credentials, files or subscriptions. The security check ends only its own browser session.
 
-The suite reads actual fleet records for filters, enrichment, calendars, duplicate warnings and QR labels. With no units, it validates the actual empty state. QR coverage needing a real unit is annotated in test output rather than reported as exercised. No temporary units are created. Do not run against a changing fleet if exact snapshot comparisons would be unreliable.
+The suite reads actual fleet records for filters, enrichment, calendars, duplicate warnings and unit details. With no units, it validates the actual empty state. QR implementation tests remain available but the feature is hidden from the shipped UI. No temporary units are created. Do not run against a changing fleet if exact snapshot comparisons would be unreliable.
 
 ## Coverage boundaries after removing mocked tests
 

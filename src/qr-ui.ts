@@ -57,6 +57,14 @@ export function renderQrScript(): string {
       updateSelectedUnitHighlight();
     }
 
+    function parseVinData(value) {
+      if (!value) return {};
+      try {
+        const data = JSON.parse(value);
+        return data && typeof data === 'object' && !Array.isArray(data) ? data : {};
+      } catch { return {}; }
+    }
+
     function updateSelectedUnitHighlight() {
       document.querySelectorAll('[data-unit-row]').forEach(el => {
         const isSel = selectedUnitId && el.getAttribute('data-unit-row') === selectedUnitId;
@@ -144,6 +152,7 @@ export function renderQrScript(): string {
           ['Last inspection', t.last_inspection_date || 'No date set'],
           ['Inspection interval', (t.interval_months || 12) + ' months'],
         ];
+        const vinDataFields = Object.entries(parseVinData(t.vin_data));
         const unitFields = [
           ['Vehicle type', t.vehicle_type],
           ['Equipment / body type', t.equipment_type],
@@ -166,7 +175,8 @@ export function renderQrScript(): string {
             '<div class="detail-disclosure-body">' +
               '<div class="meta-grid">' + unitFields.map(([label, value]) => '<div class="meta-item"><span>' + escapeHtml(label) + '</span><strong>' + escapeHtml(value || '—') + '</strong></div>').join('') + '</div>' +
             '</div>' +
-          '</details>';
+          '</details>' +
+          (vinDataFields.length ? '<details class="detail-disclosure" style="margin-top:12px;"><summary>NHTSA VIN decode data (' + vinDataFields.length + ' fields)</summary><div class="detail-disclosure-body"><div class="meta-grid">' + vinDataFields.map(([key, value]) => '<div class="meta-item"><span>NHTSA: ' + escapeHtml(key) + '</span><strong>' + escapeHtml(value || 'Not provided by NHTSA') + '</strong></div>').join('') + '</div></div></details>' : '');
 
         const latestCertBtn = (fleetData[existing >= 0 ? existing : fleetData.length - 1]?.latest_attachment)
           ? '<button type="button" class="btn btn-secondary btn-sm" data-view-file="' + escapeHtml(fleetData[existing >= 0 ? existing : fleetData.length - 1].latest_attachment.id) + '" data-file-name="' + escapeHtml(fleetData[existing >= 0 ? existing : fleetData.length - 1].latest_attachment.file_name) + '" data-file-type="' + escapeHtml(fleetData[existing >= 0 ? existing : fleetData.length - 1].latest_attachment.content_type) + '">📄 View Latest Cert</button>'

@@ -44,6 +44,10 @@ describe('pure date, validation and cryptographic logic (no service substitution
     expect(() => validateDates('', '2026-02-30')).toThrow();
     expect(() => validateDates('2027-01-01', '2026-12-31')).toThrow();
     expect(() => validateTruck({})).toThrow('Unit number is required');
+    expect(() => validateTruck({ unit_number: 'unit', vin: '1M8GDM9AXKP042788', vin_data: '{"VIN":"1M8GDM9AXKP042788","EngineHP":"400"}' })).not.toThrow();
+    for (const vin_data of ['not-json', '[]', '{"EngineHP":400}', '{"EngineHP":"' + 'x'.repeat(1001) + '"}']) {
+      expect(() => validateTruck({ unit_number: 'unit', vin_data })).toThrow('Decoded VIN data');
+    }
   });
 
   it('rejects unsafe webhook destinations without sending a notification', () => {

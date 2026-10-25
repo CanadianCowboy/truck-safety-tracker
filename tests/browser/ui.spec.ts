@@ -6,6 +6,11 @@ test('real UI persists theme and view preferences and remains responsive', async
   const { trucks } = await readFleet(request);
   await page.goto(basePath + '/');
   await expect(page.locator('#app-view')).toBeVisible();
+  await expect(page.locator('#btn-scan-unit')).toBeHidden();
+  await expect(page.locator('#mobile-nav-scan')).toHaveCount(0);
+  await expect(page.locator('#gate-scan-unit')).toBeHidden();
+  await expect(page.locator('[data-nav-action="scan"]')).toBeHidden();
+  await expect(page.locator('details').filter({ hasText: 'QR Label & Unit Actions' })).toBeHidden();
   await page.locator('.header-actions > [data-theme-toggle]').click();
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
   await expect(page.locator('body')).toHaveCSS('background-color', 'rgb(241, 245, 249)');
@@ -37,7 +42,7 @@ test('real UI persists theme and view preferences and remains responsive', async
     for (const theme of ['light', 'dark']) {
       if (await page.locator('html').getAttribute('data-theme') !== theme) await page.locator('.header-actions > [data-theme-toggle]').click();
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), `${theme} at ${width}px`).toBe(true);
-      for (const id of ['btn-add-truck', 'btn-scan-unit', 'btn-lock', 'filter-status', 'search-input']) {
+      for (const id of ['btn-add-truck', 'btn-lock', 'filter-status', 'search-input']) {
         const box = await page.locator('#' + id).boundingBox();
         expect(box!.width, id).toBeGreaterThanOrEqual(44);
         expect(box!.height, id).toBeGreaterThanOrEqual(44);

@@ -20,6 +20,13 @@ describe('NHTSA VIN decoder without substituted services', () => {
     expect(decoded.decoded_vehicle_type).toBe('BUS');
     expect(decoded.vehicle_type).toBe('');
     expect(decoded.gvwr).toContain('Class 8');
+    expect(decoded.manufacturer).toBe('MOTOR COACH INDUSTRIES, INC.');
+    expect(decoded.engine).toContain('Detroit Diesel');
+    expect(decoded.fuel_type).toBe('Diesel');
+    expect(decoded.plant_country).toBe('UNITED STATES (USA)');
+    expect(decoded.raw_data.EngineHP).toBe('400');
+    expect(decoded.raw_data.PlantCity).toBe('PEMBINA');
+    expect(Object.keys(decoded.raw_data).length).toBeGreaterThan(30);
     expect(Array.isArray(decoded.warnings)).toBe(true);
   }, 20000);
 });

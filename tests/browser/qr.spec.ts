@@ -3,6 +3,12 @@ import { test, expect, basePath, readFleet } from './support';
 test('real scanner validates pasted input without opening the camera or creating records', async ({ page, request }) => {
   const before = (await readFleet(request)).trucks;
   await page.goto(basePath + '/');
+  await expect(page.locator('#btn-scan-unit')).toBeHidden();
+  await expect(page.locator('#mobile-nav-scan')).toHaveCount(0);
+  await expect(page.locator('#gate-scan-unit')).toBeHidden();
+  await expect(page.locator('details').filter({ hasText: 'QR Label & Unit Actions' })).toBeHidden();
+  // Exercise the retained scanner behavior through the hidden internal entry point.
+  await page.locator('#btn-scan-unit').evaluate(button => (button as HTMLButtonElement).classList.remove('hidden'));
   await page.locator('#btn-scan-unit').click();
   await page.locator('#scan-uuid').fill('invalid');
   await page.getByRole('button', { name: 'Open unit', exact: true }).click();

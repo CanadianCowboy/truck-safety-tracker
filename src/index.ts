@@ -50,10 +50,15 @@ function jsonResponse(data: unknown, status = 200, extraHeaders: Record<string, 
 }
 
 async function ensureTruckColumns(env: Env): Promise<void> {
-  try {
-    await env.DB.prepare("ALTER TABLE trucks ADD COLUMN equipment_type TEXT NOT NULL DEFAULT ''").run();
-  } catch {
-    // Column already exists.
+  for (const [column, definition] of [
+    ['equipment_type', "TEXT NOT NULL DEFAULT ''"],
+    ['vin_data', "TEXT NOT NULL DEFAULT ''"],
+  ]) {
+    try {
+      await env.DB.prepare(`ALTER TABLE trucks ADD COLUMN ${column} ${definition}`).run();
+    } catch {
+      // Column already exists.
+    }
   }
 }
 
@@ -306,6 +311,7 @@ export default {
           const inspection = String(body.last_inspection_date || '').trim();
           if (inspection) validateDates(inspection, inspection);
           const next_due_date = String(body.next_due_date || (inspection ? defaultExpiryDate(inspection, Number(body.interval_months || 12)) : '')).trim();
+          const vin_data = String(body.vin_data || '').trim();
           if (!unit_number) {
             return jsonResponse(
               { error: "unit_number is required" },
@@ -313,7 +319,7 @@ export default {
             );
           }
 
-          validateTruck({ ...body, last_inspection_date: inspection, next_due_date });
+          validateTruck({ ...body, vin_data, last_inspection_date: inspection, next_due_date });
           const id = crypto.randomUUID();
           const vehicle_type = String(body.vehicle_type || "Tractor").trim();
           const gvwr = String(body.gvwr || "").trim();
@@ -332,9 +338,9 @@ export default {
 
           await env.DB.prepare(
             `INSERT INTO trucks (
-              id, unit_number, vehicle_type, gvwr, license_plate, vin, year, make, model, equipment_type,
+              id, unit_number, vehicle_type, gvwr, license_plate, vin, year, make, model, equipment_type, vin_data,
               last_inspection_date, next_due_date, interval_months, shop_name, sticker_number, status, notes
-            ) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13, ?14, ?15, ?16, ?17)`
+            ) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13, ?14, ?15, ?16, ?17, ?18)`
           )
             .bind(
               id,
@@ -347,6 +353,7 @@ export default {
               make,
               model,
               equipment_type,
+              vin_data,
               last_inspection_date,
               next_due_date,
               interval_months,
@@ -429,6 +436,9 @@ export default {
             const make = String(body.make ?? existing.make).trim();
             const model = String(body.model ?? existing.model).trim();
             const equipment_type = String(body.equipment_type ?? existing.equipment_type ?? "").trim();
+            const vin_data = body.vin_data !== undefined
+              ? String(body.vin_data || '').trim()
+              : vin.toUpperCase() === existing.vin.trim().toUpperCase() ? String(existing.vin_data || '') : '';
             const interval_months = Number(body.interval_months ?? existing.interval_months);
             const last_inspection_date = String(
               body.last_inspection_date ?? existing.last_inspection_date
@@ -456,6 +466,7 @@ export default {
               make,
               model,
               equipment_type,
+              vin_data,
               last_inspection_date,
               next_due_date,
               interval_months,
@@ -476,15 +487,16 @@ export default {
                 make = ?7,
                 model = ?8,
                 equipment_type = ?9,
-                last_inspection_date = ?10,
-                next_due_date = ?11,
-                interval_months = ?12,
-                shop_name = ?13,
-                sticker_number = ?14,
-                status = ?15,
-                notes = ?16,
+                vin_data = ?10,
+                last_inspection_date = ?11,
+                next_due_date = ?12,
+                interval_months = ?13,
+                shop_name = ?14,
+                sticker_number = ?15,
+                status = ?16,
+                notes = ?17,
                 updated_at = datetime('now')
-              WHERE id = ?17`
+              WHERE id = ?18`
             )
               .bind(
                 unit_number,
@@ -496,6 +508,7 @@ export default {
                 make,
                 model,
                 equipment_type,
+                vin_data,
                 last_inspection_date,
                 next_due_date,
                 interval_months,

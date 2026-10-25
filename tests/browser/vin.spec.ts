@@ -42,10 +42,22 @@ for (const mobile of [false, true]) {
     expect(response.status(), 'The actual Worker and NHTSA must succeed; no fallback data').toBe(200);
     expect(response.headers()['cache-control']).toBe('no-store');
     const { decoded }: { decoded: VinDecodeResult } = await response.json();
+    expect(Object.keys(decoded.raw_data).length).toBeGreaterThan(30);
+    expect(decoded.raw_data.EngineHP).toBe('400');
+    expect(decoded.raw_data.PlantCity).toBe('PEMBINA');
     expect(decoded.vin).toBe(publicVin);
     expect(decoded.year).toBe(1989);
     expect(decoded.make).toBe('MOTOR COACH INDUSTRIES');
     await expect(page.locator('#vin-preview')).toBeVisible();
+    const availableRawFields = Object.keys(decoded.raw_data).length;
+    await expect(page.locator('#vin-all-data-summary')).toContainText(availableRawFields + ' fields');
+    await expect(page.locator('#vin-all-data .meta-item')).toHaveCount(0);
+    await expect(page.locator('#vin-all-data-section')).toBeHidden();
+    await page.locator('#vin-all-data-section > summary').click();
+    await expect(page.locator('#vin-all-data .meta-item')).toHaveCount(availableRawFields);
+    await expect(page.locator('#vin-all-data .meta-item').filter({ hasText: 'EngineHP' })).toContainText('400');
+    await expect(page.locator('#vin-all-data .meta-item').filter({ hasText: 'PlantCity' })).toContainText('PEMBINA');
+    await expect(page.locator('#vin-all-data .meta-item').filter({ hasText: 'ABS' })).toContainText('Not provided by NHTSA');
     await expect(page.locator('#vin-connectivity')).toHaveAttribute('data-state', 'connected');
     await expect(page.locator('#vin-connectivity-title')).toHaveText('NHTSA connected — last lookup');
     await expect(page.locator('#btn-vin-lookup')).toBeEnabled();
@@ -59,9 +71,11 @@ for (const mobile of [false, true]) {
       for (const match of matches) await expect(page.locator('#vin-duplicate-warning')).toContainText('Unit #' + match.unit_number);
     } else await expect(page.locator('#vin-duplicate-warning')).toBeHidden();
     await expect(page.locator('#btn-vin-select-all')).toBeDisabled();
+    await expect(page.locator('#vin-details [data-vin-field]')).toHaveCount(available.length);
     await page.locator('#btn-vin-clear-selection').click();
     await expect(page.locator('#btn-vin-apply')).toBeDisabled();
     await expect(page.locator('#vin-details [data-vin-field]:checked')).toHaveCount(0);
+    await expect(page.locator('#btn-vin-apply')).toBeDisabled();
     await page.locator('#btn-vin-select-all').click();
     await expect(page.locator('#vin-details [data-vin-field]:checked')).toHaveCount(available.length);
     for (const id of ['btn-vin-lookup', 'btn-vin-apply', 'btn-vin-select-all', 'btn-vin-clear-selection']) {
@@ -79,6 +93,7 @@ for (const mobile of [false, true]) {
     await expect(page.locator('#truck-vin')).toHaveValue('');
     await expect(page.locator('#truck-year')).toHaveValue('');
     await expect(page.locator('#truck-model')).toHaveValue('');
+    await expect(page.locator('#truck-vin-data')).toHaveValue(JSON.stringify(decoded.raw_data));
     await expect(page.locator('#truck-no-date')).toBeChecked();
     await expect(page.locator('#truck-last-date')).toHaveValue('');
     await expect(page.locator('#truck-due-date')).toHaveValue('');
@@ -89,6 +104,7 @@ for (const mobile of [false, true]) {
     const comparison = page.waitForResponse('**/api/vin/decode');
     await page.locator('#btn-vin-lookup').click();
     expect((await comparison).status()).toBe(200);
+    await expect(page.locator('#vin-details [data-vin-field]')).toHaveCount(available.length);
     const makeRow = page.locator('[data-vin-detail="truck-make"]');
     await expect(makeRow.locator('[data-vin-current]')).toHaveText(decoded.make);
     await expect(makeRow.locator('[data-vin-decoded]')).toHaveText(decoded.make);
@@ -98,6 +114,7 @@ for (const mobile of [false, true]) {
     expect(current!.x + current!.width).toBeLessThanOrEqual(incoming!.x);
     expect(Math.abs(current!.y - incoming!.y)).toBeLessThan(2);
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+    await expect(page.locator('#truck-vin-data')).toHaveValue(JSON.stringify(decoded.raw_data));
     await page.locator('#vin-year').fill('');
     await expect(page.locator('#vin-preview')).toBeHidden();
     await expect(page.locator('#vin-duplicate-warning')).toBeHidden();
@@ -106,6 +123,13 @@ for (const mobile of [false, true]) {
     await expect(page.locator('#vin-connectivity')).toHaveAttribute('data-state', 'connected');
     await page.keyboard.press('Escape');
     await expect(page.locator('#modal-vin')).toBeHidden();
+    const matchingUnit = trucks.find(truck => truck.vin.trim().toUpperCase() === publicVin);
+    if (matchingUnit) await page.locator('[data-select-unit="' + matchingUnit.id + '"]').evaluate(button => (button as HTMLButtonElement).click());
+    if (matchingUnit) {
+      await expect(page.locator('#unit-details')).toContainText('NHTSA: EngineHP');
+      await expect(page.locator('#unit-details')).toContainText(decoded.raw_data.EngineHP);
+      await expect(page.locator('#unit-details')).toContainText('NHTSA: PlantCity');
+    }
     page.once('dialog', dialog => dialog.accept());
     await page.locator('#modal-truck').getByRole('button', { name: 'Cancel', exact: true }).click();
     expect([...(await readFleet(request)).trucks].sort((a, b) => a.id.localeCompare(b.id))).toEqual(before);

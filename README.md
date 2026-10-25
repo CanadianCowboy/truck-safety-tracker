@@ -4,7 +4,7 @@
 [![Node.js >= 22.18](https://img.shields.io/badge/node-%3E%3D22.18.0-339933.svg)](./package.json)
 [![TypeScript](https://img.shields.io/badge/TypeScript-7.0-3178C6.svg)](./tsconfig.json)
 
-A sleek, mobile-first, passcode-protected fleet safety inspection and certificate tracker. Built for heavy-duty shops and fleet operators to track commercial vehicle inspection due dates, archive PDF/photo certificates privately, print 1.5" × 1.5" permanent UUID QR labels, export `.ics` schedules, and deliver automated daily reminders.
+A sleek, mobile-first, passcode-protected fleet safety inspection and certificate tracker. Built for heavy-duty shops and fleet operators to track commercial vehicle inspection due dates, archive PDF/photo certificates privately, decode full NHTSA VIN specifications, export `.ics` schedules, and deliver automated daily reminders.
 
 > **Disclaimer:** Truck Safety Tracker is an operational date and document organizer, **not** a legal certification that a vehicle is roadworthy or compliant with DOT / CVIP / provincial / federal regulations. Always verify inspection dates and status against physical certificates and local transport laws.
 
@@ -21,12 +21,9 @@ A sleek, mobile-first, passcode-protected fleet safety inspection and certificat
   - Log inspections with date, expiration, sticker/certificate number, shop name, and notes.
   - Upload **PDF, JPEG, PNG, and WebP** certificates (up to **10 MB** per file) validated by magic-byte file signatures.
   - All files are served exclusively behind authenticated session cookies (`Cache-Control: no-store`, strict CSP).
-- **Permanent UUID QR Labels & In-Browser Scanner:**
-  - Generate and print **1.5" × 1.5"** QR labels (including a 4-module quiet zone) containing only the unit's immutable UUID—no URLs, passcodes, or sensitive data embedded on the sticker.
-  - Scan labels in-app using the device camera (decoded locally in the browser via `jsQR`) or paste a UUID directly.
 - **VIN Decoder (NHTSA vPIC):**
   - Open **Tools → VIN decoder** for a standalone lookup, or **Decode VIN…** beside the VIN field in Add/Edit Unit.
-  - Preview year, make, model, body type, GVWR class/range, manufacturer, engine and fuel details, including partial-decode warnings. Compare current form values (including unsaved edits) beside decoded values in Add/Edit Unit. Choose individual fields using the preview checkboxes (available fields start selected), or use **Select all** / **Clear selection**, confirm replacements for checked fields only, then use **Save Unit**. Unchecked or missing values never erase your entries; Apply is disabled when no fields are selected.
+  - Show every field returned by NHTSA in an expandable **All NHTSA decode data** list (including engine, fuel, plant, brake and other specifications; unavailable values are labeled). The complete response is saved as per-unit VIN data when the reviewed unit form is saved, and shown in unit details. Selected editable fields can be applied without replacing unchecked entries; the full source decode is retained as reference.
   - Warns when the decoded VIN matches another unit in the currently loaded fleet (case-insensitive, ignoring surrounding whitespace), excluding the unit being edited. The warning is advisory, not a database uniqueness check, and does not block applying or saving.
   - A live-region connection panel shows **not checked**, **checking**, **connected (last lookup)** or **NHTSA temporarily unavailable**. Provider timeouts, rate limits and failed responses include an explicit **Retry VIN lookup** action and manual-entry guidance, without changing form values. App/network failures are labelled separately because they cannot confirm NHTSA's status. No polling, automatic retries or fallback data; the provider request is limited to 15 seconds and the browser stops waiting after 20 seconds.
   - Supports full 17-character VINs for 1981+ vehicles, with an optional model year hint. This is not a title/history report or proof of inspection; verify GVWR against the vehicle label.
@@ -225,13 +222,7 @@ Vite serves the local UI at `http://127.0.0.1:5173/truck-safety/` and proxies `/
 
 ---
 
-## Optional Unit QR Labels
-
-Open any unit's **Details / QR** modal and click **Print QR label**:
-- Prints a **1.5 × 1.5 inch** QR-only label (including a 4-module white quiet zone).
-- Print at **100% / Actual size** with browser headers and footers disabled.
-- The QR code encodes **only the unit's permanent UUID** (never a URL, passcode, session token, or unit number), so renaming a unit or changing domains never invalidates physical stickers on your trucks/trailers.
-- Use **Scan** in the header to scan with a phone camera (decoded locally in-browser) or paste a UUID.
+QR labels and in-app scanning are temporarily hidden from the fleet UI while the feature is being readied. The implementation is retained but is not exposed on the live site.
 
 ---
 

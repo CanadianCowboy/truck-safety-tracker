@@ -36,8 +36,8 @@ Planning notes. Features remain suggestions unless marked implemented below.
 - Show which units have no certificate attached to their latest inspection.
 - An older certificate should not count as proof for a newer inspection.
 
-### Unit QR labels — implemented
-- Optional Scan / Paste UUID, plus Details / QR and a manual Print QR label link per unit.
+### Unit QR labels — implemented, hidden until ready
+- QR scan and print controls remain implemented but are hidden from the live fleet UI until the feature is ready.
 - QR contains only the permanent unit UUID, for reuse by future apps. Each app decides what to do with it; it is not a website link.
 - Print QR-only labels at 1.5 × 1.5 inches including the white quiet zone, on paper for cutting/laminating. Print at 100% / Actual size with browser headers/footers disabled.
 - Camera scanning is in-app with UUID paste fallback. Scanning while locked selects the unit but requires the passcode before any unit data loads.

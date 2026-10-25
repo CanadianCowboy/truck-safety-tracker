@@ -21,7 +21,18 @@ export function validateTruck(t: Partial<TruckRow>): void {
   if (!['Active', 'In Shop', 'Inactive'].includes(String(t.status || 'Active'))) throw new InputError('Invalid operational status.');
   if (![3, 6, 12, 24].includes(Number(t.interval_months ?? 12))) throw new InputError('Inspection interval must be 3, 6, 12 or 24 months.');
   if (t.year != null && (!Number.isInteger(Number(t.year)) || Number(t.year) < 1900 || Number(t.year) > 2100)) throw new InputError('Invalid vehicle year.');
-  for (const value of Object.values(t)) if (typeof value === 'string' && value.length > 5000) throw new InputError('A field is too long (maximum 5000 characters).');
+  if (t.vin_data) {
+    try {
+      const decoded: unknown = JSON.parse(t.vin_data);
+      if (!decoded || typeof decoded !== 'object' || Array.isArray(decoded) || Object.values(decoded).some(value => typeof value !== 'string' || value.length > 1000)) throw new Error();
+      const sourceVin = (decoded as Record<string, unknown>).VIN;
+      if (typeof t.vin !== 'string' || typeof sourceVin !== 'string' || sourceVin.trim().toUpperCase() !== t.vin.trim().toUpperCase()) throw new Error();
+      if (t.vin_data.length > 64 * 1024) throw new Error();
+    } catch {
+      throw new InputError('Decoded VIN data must be a JSON object containing text values of at most 1000 characters, and match the unit VIN.');
+    }
+  }
+  for (const [key, value] of Object.entries(t)) if (typeof value === 'string' && key !== 'vin_data' && value.length > 5000) throw new InputError('A field is too long (maximum 5000 characters).');
 }
 
 export function validateWebhookUrl(value: string): void {

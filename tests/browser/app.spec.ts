@@ -24,6 +24,11 @@ test('real application serves scoped PWA assets, actual fleet records and calend
     const enriched = enrichTruck(truck, settings.warning_days, truck.attachment_count, truck.latest_attachment || null);
     expect(truck.days_remaining).toBe(enriched.days_remaining);
     expect(truck.safety_status).toBe(enriched.safety_status);
+    if (truck.vin_data) {
+      const vinData = JSON.parse(truck.vin_data);
+      expect(vinData).not.toBeNull();
+      expect(Array.isArray(vinData)).toBe(false);
+    }
   }
   if (!trucks.length) await expect(page.locator('#fleet-empty-title')).toHaveText('No trucks or trailers found');
   const calendarResponse = await request.get(basePath + '/api/calendar.ics');

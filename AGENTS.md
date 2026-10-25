@@ -42,7 +42,7 @@ This file provides comprehensive architectural, security, UI, testing, and opera
 | `src/qr.ts` & `src/qr-ui.ts` | Server-side SVG QR code generation (`qrcode-generator`) for 1.5" × 1.5" printable unit labels (encoding **only** the unit's permanent UUID) and client-side camera/paste UUID scanner (`jsQR`). |
 | `src/push.ts` & `src/push-ui.ts` | RFC 8030 / RFC 8291 (`aes128gcm`) / RFC 8292 (VAPID) native Web Push implementation using `@block65/webcrypto-web-push`, push host allowlist (SSRF protection), atomic D1 rate-limiting/daily deduplication, and the Alerts UI / `/truck-safety/push-test` diagnostic page. |
 | `src/types.ts` | TypeScript interfaces for `Env`, `TruckRow`, `EnrichedTruck`, `InspectionRow`, `AttachmentRow`, and `AppSettings`. |
-| `migrations/` | Additive SQL migrations for D1 (`0001_init.sql`, `0002_web_push.sql`). |
+| `migrations/` | Additive SQL migrations for D1, including `0004_vin_data.sql` for the complete structured NHTSA decode saved with a unit. |
 | `tests/utils.test.ts` | Pure date calculations, month-end expiry, input validation and real HMAC token signing/expiry tests. Live fleet/calendar coverage is in `tests/browser/app.spec.ts`. |
 | `tests/push.test.ts` | Pure timezone, payload privacy and push endpoint validation tests; no simulated delivery or subscriptions. |
 | `tests/browser/*.spec.ts` | Playwright end-to-end browser tests (`app.spec.ts`, `ui.spec.ts`, `filters.spec.ts`, `qr.spec.ts`, `push.spec.ts`, `security.spec.ts`). |
@@ -71,7 +71,7 @@ When modifying features or fixing bugs, preserve these tested invariants:
 5. **UI, Accessibility & Responsive Design (`src/ui.ts`):**
    - Maintain both `dark` (default) and `light` themes via `html[data-theme="dark" | "light"]`, persisted in `localStorage` under `truck_safety_theme`.
    - Light mode body background (`rgb(241, 245, 249)`) and input background (`rgb(248, 250, 252)`) and safety status badge contrast ratios (`>= 4.5:1` WCAG AA) are asserted by `tests/browser/ui.spec.ts`.
-   - Interactive primary controls (`#btn-add-truck`, `#btn-scan-unit`, `#btn-lock`, `#filter-status`, `#search-input`) must maintain at least `44px × 44px` touch target dimensions across all viewport widths (`320px` to `1280px`) with zero horizontal page overflow (`document.documentElement.scrollWidth <= innerWidth`).
+   - Visible interactive primary controls (`#btn-add-truck`, `#btn-lock`, `#filter-status`, `#search-input`) must maintain at least `44px × 44px` touch target dimensions across all viewport widths (`320px` to `1280px`) with zero horizontal page overflow (`document.documentElement.scrollWidth <= innerWidth`). The unfinished QR controls are hidden until ready.
    - Desktop view switcher (`Cards` vs `Compact list`) is visible at `>= 960px` and automatically falls back to cards below `960px` without overwriting the saved desktop preference (`truck_safety_view`).
 
 ---

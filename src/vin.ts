@@ -13,6 +13,7 @@ export interface VinDecodeResult {
   engine: string;
   fuel_type: string;
   plant_country: string;
+  raw_data: Record<string, string>;
   warnings: string[];
 }
 
@@ -75,6 +76,9 @@ export async function decodeVin(input: unknown): Promise<VinDecodeResult> {
     const modelYear = text('ModelYear');
     const equipmentType = text('BodyClass');
     const vehicleType = text('VehicleType');
+    const rawData = Object.fromEntries(Object.entries(fields)
+      .filter(([, value]) => typeof value === 'string')
+      .map(([key, value]) => [key, (value as string).trim().slice(0, 1000)]));
     const warnings: string[] = [];
     const codes = text('ErrorCode').split(',').map(code => code.trim()).filter(Boolean);
     if (codes.some(code => code !== '0')) warnings.push(text('ErrorText') || 'NHTSA reported a partial or uncertain decode. Verify the VIN and vehicle details.');
@@ -90,7 +94,7 @@ export async function decodeVin(input: unknown): Promise<VinDecodeResult> {
       equipment_type: equipmentType, gvwr: text('GVWR'), decoded_vehicle_type: vehicleType,
       manufacturer: text('Manufacturer'),
       engine: [text('EngineManufacturer'), text('EngineModel'), text('DisplacementL') ? text('DisplacementL') + ' L' : ''].filter(Boolean).join(' · '),
-      fuel_type: text('FuelTypePrimary'), plant_country: text('PlantCountry'), warnings,
+      fuel_type: text('FuelTypePrimary'), plant_country: text('PlantCountry'), raw_data: rawData, warnings,
     };
   } catch (error) {
     if (error instanceof InputError) throw error;
