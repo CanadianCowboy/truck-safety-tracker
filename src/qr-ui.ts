@@ -44,6 +44,12 @@ export function renderQrScript(): string {
       if (contentBox) contentBox.classList.add('hidden');
       document.getElementById('unit-title').textContent = 'Select a unit';
       document.getElementById('unit-details').innerHTML = '';
+      const documentsList = document.getElementById('shop-document-list');
+      if (documentsList) documentsList.innerHTML = '';
+      const documentsForm = document.getElementById('form-shop-document');
+      if (documentsForm) documentsForm.reset();
+      const documentsTruckId = document.getElementById('shop-document-truck-id');
+      if (documentsTruckId) documentsTruckId.value = '';
       document.getElementById('unit-actions').innerHTML = '';
       const secActions = document.getElementById('unit-secondary-actions');
       if (secActions) secActions.innerHTML = '';
@@ -98,6 +104,9 @@ export function renderQrScript(): string {
       const print = document.getElementById('unit-print-label');
       const historyList = document.getElementById('detail-history-list');
       const uploadSection = document.getElementById('detail-upload-section');
+      const documentsSection = document.getElementById('detail-documents-section');
+      const documentsTruckId = document.getElementById('shop-document-truck-id');
+      const documentsList = document.getElementById('shop-document-list');
 
       if (emptyBox) emptyBox.classList.add('hidden');
       if (contentBox) contentBox.classList.remove('hidden');
@@ -119,6 +128,9 @@ export function renderQrScript(): string {
       print.classList.add('hidden');
       print.removeAttribute('href');
       if (uploadSection) uploadSection.classList.add('hidden');
+      if (documentsSection) documentsSection.classList.add('hidden');
+      if (documentsTruckId) documentsTruckId.value = '';
+      if (documentsList) documentsList.innerHTML = '';
       if (historyList) historyList.innerHTML = '<p class="muted-note">Loading inspection history…</p>';
 
       try {
@@ -156,6 +168,7 @@ export function renderQrScript(): string {
         const summaryFields = [
           ['Safety status', formatDaysBadge(t)],
           ['Next safety due', t.next_due_date || 'No date set'],
+          ...((t.document_expiries || []).length ? [['Expiring documents', (t.document_expiries || []).map(document => (document.label || document.document_type) + ': ' + document.expiry_date + ' (' + (document.days_remaining < 0 ? Math.abs(document.days_remaining) + 'd overdue' : document.days_remaining + 'd')).join(' · ')]] : []),
           ['Last inspection', t.last_inspection_date || 'No date set'],
           ['Inspection interval', (t.interval_months || 12) + ' months'],
           ['Reminder schedule', formatReminderSchedule(t.reminder_days)],
@@ -223,6 +236,9 @@ export function renderQrScript(): string {
         print.href = API_BASE + '/trucks/' + encodeURIComponent(t.id) + '/label';
         print.classList.remove('hidden');
         if (uploadSection) uploadSection.classList.remove('hidden');
+        if (documentsSection) documentsSection.classList.remove('hidden');
+        if (documentsTruckId) documentsTruckId.value = t.id;
+        if (typeof loadShopDocuments === 'function') await loadShopDocuments(t.id);
 
         if (typeof loadDetailHistory === 'function') {
           await loadDetailHistory(t.id, generation);
@@ -237,6 +253,7 @@ export function renderQrScript(): string {
         if (subHost) subHost.textContent = 'Lookup error';
         if (badgeHost) badgeHost.innerHTML = '';
         if (uploadSection) uploadSection.classList.add('hidden');
+        if (documentsSection) documentsSection.classList.add('hidden');
         if (historyList) historyList.innerHTML = '';
         details.textContent = err.message === 'Truck not found'
           ? 'Unit not found or deleted. This UUID is not linked to a unit in Safety Tracker. No record was created.'

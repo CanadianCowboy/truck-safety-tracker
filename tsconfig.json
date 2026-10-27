@@ -4,7 +4,7 @@
     "module": "ES2022",
     "moduleResolution": "bundler",
     "lib": ["ES2022"],
-    "types": ["./.cloudflare/types/index.d.ts"],
+    "types": ["./.cloudflare/types/index.d.ts", "node"],
     "strict": true,
     "noEmit": true,
     "skipLibCheck": true,
