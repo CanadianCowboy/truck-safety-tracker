@@ -58,11 +58,20 @@ export interface InspectionRow {
   attachments?: AttachmentRow[];
 }
 
+export interface EnrichedDocumentExpiry {
+  id: string;
+  document_type: string;
+  label: string;
+  expiry_date: string;
+  days_remaining: number;
+}
+
 export interface EnrichedTruck extends TruckRow {
   days_remaining: number | null;
   safety_status: SafetyStatus;
   attachment_count: number;
   latest_attachment?: AttachmentRow | null;
+  document_expiries?: EnrichedDocumentExpiry[];
 }
 
 export interface AppSettings {

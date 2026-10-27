@@ -68,10 +68,19 @@ describe('per-unit reminder schedules', () => {
     expect([...effectiveReminderDays('none', '14,7,1,0')]).toEqual([]);
   });
 
-  it('selects matching dates, overdue units and excludes inactive or undated units', () => {
-    const fleet = [truck(7), truck(-1), truck(1, '1'), truck(0, 'none'), truck(null), truck(7, '', 'Inactive')];
-    expect(selectReminderTrucks(fleet, '7,1,0,overdue')).toEqual([fleet[0], fleet[1], fleet[2]]);
+  it('selects matching inspection or document expiries, overdue units and excludes inactive units', () => {
+    const inspectionDue = truck(7);
+    const inspectionOverdue = truck(-1);
+    const unitOverride = truck(1, '1');
+    const optedOut = truck(0, 'none');
+    const undated = truck(null);
+    const inactive = truck(7, '', 'Inactive');
+    const documentDue = { ...truck(null), document_expiries: [{ id: 'document-1', document_type: 'insurance', label: 'Policy', expiry_date: '2026-11-01', days_remaining: 7 }] };
+    const documentOverdue = { ...truck(null), document_expiries: [{ id: 'document-2', document_type: 'permit', label: '', expiry_date: '2026-10-01', days_remaining: -1 }] };
+    const fleet = [inspectionDue, inspectionOverdue, unitOverride, optedOut, undated, inactive, documentDue, documentOverdue];
+    expect(selectReminderTrucks(fleet, '7,1,0,overdue')).toEqual([inspectionDue, inspectionOverdue, unitOverride, documentDue, documentOverdue]);
     expect(isUnitReminderDue(truck(-1), '7,1,0')).toBe(false);
+    expect(isUnitReminderDue({ ...truck(100), document_expiries: [{ id: 'document-3', document_type: 'registration', label: '', expiry_date: '2026-11-08', days_remaining: 14 }] }, '7,1,0')).toBe(false);
     expect(normalizeReminderDayList('0,7,14,overdue')).toBe('14,7,0,overdue');
     expect(() => normalizeReminderDayList('7,7')).toThrow(InputError);
     expect(() => normalizeReminderDayList('15')).toThrow(InputError);

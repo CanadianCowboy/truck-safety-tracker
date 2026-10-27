@@ -15,11 +15,17 @@ export function effectiveReminderDays(unitDays: string, fleetDays: string): Set<
   return parseReminderDayList(unitDays === '' ? fleetDays : unitDays);
 }
 
-export function isUnitReminderDue(truck: Pick<EnrichedTruck, 'status' | 'days_remaining' | 'reminder_days'>, fleetDays: string): boolean {
-  if (truck.status === 'Inactive' || truck.days_remaining === null) return false;
+export function isUnitReminderDue(truck: Pick<EnrichedTruck, 'status' | 'days_remaining' | 'reminder_days' | 'document_expiries'>, fleetDays: string): boolean {
+  if (truck.status === 'Inactive') return false;
   const selected = effectiveReminderDays(truck.reminder_days || '', fleetDays);
-  if (truck.days_remaining < 0) return selected.has('overdue');
-  return selected.has(String(truck.days_remaining) as ReminderDay);
+  const inspectionDue = truck.days_remaining !== null && (truck.days_remaining < 0
+    ? selected.has('overdue')
+    : selected.has(String(truck.days_remaining) as ReminderDay));
+  const documentDue = (truck.document_expiries || []).some(document => {
+    if (document.days_remaining < 0) return selected.has('overdue');
+    return selected.has(String(document.days_remaining) as ReminderDay);
+  });
+  return inspectionDue || documentDue;
 }
 
 export function selectReminderTrucks<T extends EnrichedTruck>(trucks: T[], fleetDays: string): T[] {

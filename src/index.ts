@@ -35,6 +35,19 @@ import { MAX_BACKUP_BYTES } from './backup';
 import { exportFleetBackup, restoreFleetBackup } from './backup-worker';
 import { normalizeReminderDayList, selectReminderTrucks } from './reminders';
 import { normalizeReminderDayList as validateReminderDays } from './validation';
+import {
+  authenticateShopAccount,
+  canDeleteUnits,
+  canManageSettingsAndBackups,
+  canWriteFleetRecords,
+  fetchTargetAttributions,
+  handleShopAccountsApi,
+  PASSCODE_ACTOR,
+  recordShopActivity,
+  verifyAccountSessionToken,
+  type ShopActor,
+} from './shop-accounts';
+import { handleShopDocumentsApi } from './shop-documents';
 
 const corsHeaders: Record<string, string> = {
   'Cache-Control': 'no-store',
@@ -87,14 +100,20 @@ async function fetchEnrichedFleet(env: Env, warningDays: number): Promise<Enrich
     }
   }
 
-  return (trucks || []).map((t) =>
-    enrichTruck(
-      t,
-      warningDays,
-      countByTruck[t.id] || 0,
-      latestByTruck[t.id] || null
-    )
-  );
+  const today = new Date().toISOString().slice(0, 10);
+  const { results: documentRows } = await env.DB.prepare(`SELECT id, truck_id, document_type, label, expiry_date
+    FROM shop_unit_documents WHERE expiry_date <> '' AND expiry_date <= date(?1, '+180 days')
+    ORDER BY expiry_date, id`).bind(today).all<{ id: string; truck_id: string; document_type: string; label: string; expiry_date: string }>();
+  const documentsByTruck: Record<string, Array<{ id: string; document_type: string; label: string; expiry_date: string; days_remaining: number }>> = {};
+  for (const document of documentRows || []) {
+    const days_remaining = Math.round((Date.parse(`${document.expiry_date}T00:00:00Z`) - Date.parse(`${today}T00:00:00Z`)) / 86400000);
+    (documentsByTruck[document.truck_id] ||= []).push({ id: document.id, document_type: document.document_type, label: document.label, expiry_date: document.expiry_date, days_remaining });
+  }
+
+  return (trucks || []).map((t) => ({
+    ...enrichTruck(t, warningDays, countByTruck[t.id] || 0, latestByTruck[t.id] || null),
+    document_expiries: documentsByTruck[t.id] || [],
+  }));
 }
 
 async function saveUploadedFileToR2(
@@ -189,7 +208,7 @@ export default {
             controller.enqueue(chunk);
           },
         }));
-        request = new Request(request, { body });
+        request = new Request(request, { body, duplex: 'half' } as RequestInit);
       }
       // Static / PWA routes
       if (request.method === "GET" && (subPath === "/" || subPath === "/index.html" || subPath === '/push-test')) {
@@ -247,11 +266,17 @@ export default {
         });
       }
 
-      // Public API Login Gate
+      // Public API Login Gate (Supports shared fleet passcode OR individual staff account login)
       if (request.method === "POST" && subPath === "/api/auth/login") {
         const allowed = await env.LOGIN_LIMITER.limit({ key: `login:${request.headers.get('CF-Connecting-IP') || 'local'}` });
         if (!allowed.success) return jsonResponse({ error: 'Too many login attempts. Try again in a minute.' }, 429, { 'Retry-After': '60' });
-        const body = (await request.json()) as { passcode?: string };
+        const body = (await request.json()) as { passcode?: string; username?: string; password?: string };
+        const username = String(body.username || "").trim();
+        const password = String(body.password || "");
+        if (username || password) {
+          const { token, actor } = await authenticateShopAccount(env.DB, username, password, env.SESSION_SECRET);
+          return jsonResponse({ ok: true, actor }, 200, { 'Set-Cookie': sessionCookie(token, request, basePath) });
+        }
         const candidate = String(body.passcode || "");
         if (!candidate) {
           return jsonResponse({ error: "Passcode is required" }, 400);
@@ -263,7 +288,7 @@ export default {
           return jsonResponse({ error: "Invalid passcode" }, 401);
         }
         const token = await createSessionToken(activeHash);
-        return jsonResponse({ ok: true }, 200, { 'Set-Cookie': sessionCookie(token, request, basePath) });
+        return jsonResponse({ ok: true, actor: PASSCODE_ACTOR }, 200, { 'Set-Cookie': sessionCookie(token, request, basePath) });
       }
 
       if (request.method === 'POST' && subPath === '/api/auth/logout') {
@@ -274,19 +299,41 @@ export default {
       if (subPath.startsWith("/api/")) {
         const token = extractToken(request);
         // A server-to-server token is send-only; it cannot read fleet data or manage devices.
-        const sendOnly = subPath === '/api/push/send' && request.method === 'POST' &&
+        const sendOnly = Boolean(
+          subPath === '/api/push/send' && request.method === 'POST' &&
           request.headers.get('Authorization')?.startsWith('Bearer ') && env.PUSH_SEND_TOKEN &&
-          await timingSafeEqualStr(token || '', env.PUSH_SEND_TOKEN);
-        const isAuthenticated = sendOnly || await verifySessionToken(token, env);
-        if (!isAuthenticated) {
-          return jsonResponse({ error: "Unauthorized — valid passcode required" }, 401);
+          await timingSafeEqualStr(token || '', env.PUSH_SEND_TOKEN)
+        );
+        let currentActor: ShopActor | null = null;
+        if (sendOnly) {
+          currentActor = { ...PASSCODE_ACTOR, mode: 'send_only' };
+        } else if (await verifySessionToken(token, env)) {
+          currentActor = PASSCODE_ACTOR;
+        } else {
+          currentActor = await verifyAccountSessionToken(token, env.DB, env.SESSION_SECRET);
+        }
+        if (!currentActor) {
+          return jsonResponse({ error: "Unauthorized — sign in with a valid passcode or staff account" }, 401);
         }
 
         if (!['GET', 'HEAD'].includes(request.method)) {
           const allowed = await env.WRITE_LIMITER.limit({ key: 'fleet-writes' });
           if (!allowed.success) return jsonResponse({ error: 'Too many changes. Try again in a minute.' }, 429);
         }
+        if (subPath === '/api/shop-accounts' || subPath.startsWith('/api/shop-accounts/')) {
+          return await handleShopAccountsApi(request, env.DB, currentActor);
+        }
+        if (/^\/api\/trucks\/[^/]+\/documents(?:\/[^/]+)?$/.test(subPath)) {
+          return await handleShopDocumentsApi(request, env.DB, env.FILES, currentActor);
+        }
         if (subPath.startsWith('/api/push/')) {
+          if (request.method === 'POST' && subPath === '/api/push/send' && currentActor.mode !== 'send_only' && !canManageSettingsAndBackups(currentActor)) {
+            return jsonResponse({ error: 'Only shop owners or managers can send fleet-wide alerts.' }, 403);
+          }
+          if (request.method === 'POST' && subPath === '/api/push/unsubscribe' && !canManageSettingsAndBackups(currentActor)) {
+            const input = await request.clone().json() as { all?: boolean };
+            if (input.all === true) return jsonResponse({ error: 'Only shop owners or managers can remove all notification devices.' }, 403);
+          }
           if (request.method === 'POST' && ['/api/push/send', '/api/push/test'].includes(subPath)) {
             const allowed = await env.PUSH_LIMITER.limit({ key: subPath + ':' + (request.headers.get('CF-Connecting-IP') || 'local') });
             if (!allowed.success) return jsonResponse({ error: 'Too many notification requests. Try again in a minute.' }, 429, { 'Retry-After': '60' });
@@ -295,7 +342,7 @@ export default {
         }
         // GET /api/auth/verify
         if (request.method === "GET" && subPath === "/api/auth/verify") {
-          return jsonResponse({ ok: true });
+          return jsonResponse({ ok: true, actor: currentActor });
         }
 
         // Explicit POST avoids putting VINs in app URLs, history or query logs; shared write limiter applies.
@@ -308,7 +355,11 @@ export default {
           await ensureTruckColumns(env);
           const settings = await getAppSettings(env);
           const trucks = await fetchEnrichedFleet(env, settings.warning_days);
-          return jsonResponse({ trucks, settings });
+          return jsonResponse({ trucks, settings: canManageSettingsAndBackups(currentActor) ? settings : { ...settings, webhook_url: '' }, actor: currentActor });
+        }
+
+        if (!['GET', 'HEAD'].includes(request.method) && !canWriteFleetRecords(currentActor)) {
+          return jsonResponse({ error: "Read-only Viewer accounts cannot modify fleet records, inspections, or settings." }, 403);
         }
 
         // POST /api/trucks
@@ -391,7 +442,24 @@ export default {
                 notes ? `Initial entry: ${notes}` : "Initial safety record"
               )
               .run();
+            await recordShopActivity(
+              env.DB,
+              currentActor,
+              'inspection_logged',
+              `Logged initial safety inspection for Unit #${unit_number} (due ${next_due_date})`,
+              'inspection',
+              insId
+            );
           }
+
+          await recordShopActivity(
+            env.DB,
+            currentActor,
+            'unit_created',
+            `Added Unit #${unit_number} (${vehicle_type})`,
+            'unit',
+            id
+          );
 
           const created = await env.DB.prepare("SELECT * FROM trucks WHERE id = ?1")
             .bind(id)
@@ -431,8 +499,15 @@ export default {
               "SELECT * FROM attachments WHERE truck_id = ?1 ORDER BY created_at DESC"
             ).bind(truckId).all<AttachmentRow>();
             const latestAvailable = (unitAttachments || []).find(att => !att.r2_key.startsWith('truck-safety-missing-backup/')) || null;
+            const { results: documentExpiries } = await env.DB.prepare(`SELECT id, document_type, label, expiry_date
+              FROM shop_unit_documents WHERE truck_id = ?1 AND expiry_date <> '' AND expiry_date <= date('now', '+180 days')
+              ORDER BY expiry_date, id`).bind(truckId).all<{ id: string; document_type: string; label: string; expiry_date: string }>();
+            const today = new Date().toISOString().slice(0, 10);
+            const enrichedExpiries = (documentExpiries || []).map(document => ({ ...document,
+              days_remaining: Math.round((Date.parse(`${document.expiry_date}T00:00:00Z`) - Date.parse(`${today}T00:00:00Z`)) / 86400000),
+            }));
             return jsonResponse({
-              truck: enrichTruck(row, settings.warning_days, (unitAttachments || []).length, latestAvailable),
+              truck: { ...enrichTruck(row, settings.warning_days, (unitAttachments || []).length, latestAvailable), document_expiries: enrichedExpiries },
             });
           }
 
@@ -544,6 +619,14 @@ export default {
             const updated = await env.DB.prepare("SELECT * FROM trucks WHERE id = ?1")
               .bind(truckId)
               .first<TruckRow>();
+            await recordShopActivity(
+              env.DB,
+              currentActor,
+              'unit_updated',
+              `Updated Unit #${unit_number} (${vehicle_type})`,
+              'unit',
+              truckId
+            );
             const settings = await getAppSettings(env);
             return jsonResponse({
               truck: updated ? enrichTruck(updated, settings.warning_days) : null,
@@ -551,6 +634,12 @@ export default {
           }
 
           if (request.method === "DELETE") {
+            if (!canDeleteUnits(currentActor)) {
+              return jsonResponse({ error: "Only shop owners, managers, or the shared shop passcode can permanently delete fleet units." }, 403);
+            }
+            const existingUnit = await env.DB.prepare("SELECT unit_number FROM trucks WHERE id = ?1")
+              .bind(truckId)
+              .first<{ unit_number: string }>();
             // Delete any R2 objects belonging to this truck first
             const { results: files } = await env.DB.prepare(
               "SELECT r2_key FROM attachments WHERE truck_id = ?1"
@@ -558,7 +647,9 @@ export default {
               .bind(truckId)
               .all<{ r2_key: string }>();
 
-            for (const f of files || []) {
+            const { results: documents } = await env.DB.prepare('SELECT r2_key FROM shop_unit_documents WHERE truck_id = ?1')
+              .bind(truckId).all<{ r2_key: string }>();
+            for (const f of [...(files || []), ...(documents || [])]) {
               if (f.r2_key) {
                 await env.FILES.delete(f.r2_key);
               }
@@ -567,6 +658,16 @@ export default {
             await env.DB.prepare("DELETE FROM attachments WHERE truck_id = ?1").bind(truckId).run();
             await env.DB.prepare("DELETE FROM inspections WHERE truck_id = ?1").bind(truckId).run();
             await env.DB.prepare("DELETE FROM trucks WHERE id = ?1").bind(truckId).run();
+            if (existingUnit) {
+              await recordShopActivity(
+                env.DB,
+                currentActor,
+                'unit_deleted',
+                `Deleted Unit #${existingUnit.unit_number}`,
+                'unit',
+                truckId
+              );
+            }
             return jsonResponse({ ok: true });
           }
         }
@@ -605,8 +706,17 @@ export default {
               ...item,
               file_available: !item.r2_key.startsWith('truck-safety-missing-backup/'),
             }));
+            const inspectionIds = (inspections || []).map(ins => ins.id);
+            const attributions = await fetchTargetAttributions(env.DB, 'inspection', inspectionIds);
             const enrichedInspections = (inspections || []).map((ins) => ({
               ...ins,
+              ...(attributions[ins.id] ? {
+                logged_by_name: attributions[ins.id].actor_name,
+                logged_by_username: attributions[ins.id].actor_username,
+                logged_by_role: attributions[ins.id].actor_role,
+                logged_by_badge: attributions[ins.id].actor_badge,
+                logged_by_color: attributions[ins.id].actor_color,
+              } : {}),
               attachments: withAvailability(byInspection[ins.id] || []),
             }));
 
@@ -684,11 +794,21 @@ export default {
               await env.DB.batch([insertInspection, updateTruck]);
             }
 
+            await recordShopActivity(
+              env.DB,
+              currentActor,
+              'inspection_logged',
+              `Logged safety inspection for Unit #${truck.unit_number} (inspected ${inspection_date}, expires ${expiration_date}${sticker_number ? `, cert #${sticker_number}` : ''})`,
+              'inspection',
+              insId
+            );
+
             return jsonResponse(
               {
                 ok: true,
                 inspection_id: insId,
                 attachment: savedAttachment,
+                logged_by: currentActor,
               },
               201
             );
@@ -768,11 +888,15 @@ export default {
 
         // Read-only fleet exports omit private R2 content but include metadata and explicitly say so.
         if (request.method === 'GET' && subPath === '/api/backup') {
+          if (!canManageSettingsAndBackups(currentActor)) return jsonResponse({ error: 'Only shop owners or managers can export fleet backups.' }, 403);
           await ensureTruckColumns(env);
           return await exportFleetBackup(env, url.searchParams.get('include_files') === '1');
         }
 
         if (request.method === 'POST' && subPath === '/api/backup/restore') {
+          if (!canManageSettingsAndBackups(currentActor)) {
+            return jsonResponse({ error: 'Only shop owners, managers, or the shared shop passcode can restore fleet backups.' }, 403);
+          }
           await ensureTruckColumns(env);
           return await restoreFleetBackup(request, env);
         }
@@ -796,10 +920,13 @@ export default {
         if (subPath === "/api/settings") {
           if (request.method === "GET") {
             const settings = await getAppSettings(env);
-            return jsonResponse({ settings });
+            return jsonResponse({ settings: canManageSettingsAndBackups(currentActor) ? settings : { ...settings, webhook_url: '' } });
           }
 
           if (request.method === "PUT") {
+            if (!canManageSettingsAndBackups(currentActor)) {
+              return jsonResponse({ error: "Only shop owners, managers, or the shared shop passcode can change fleet settings." }, 403);
+            }
             const body = (await request.json()) as {
               warning_days?: number;
               webhook_url?: string;
@@ -807,6 +934,9 @@ export default {
               notify_days?: string | string[];
               new_passcode?: string;
             };
+            if (body.new_passcode && String(body.new_passcode).trim().length > 0 && currentActor.mode === 'account' && currentActor.role !== 'owner') {
+              return jsonResponse({ error: "Only shop owners or the shared shop passcode can rotate the main gate passcode." }, 403);
+            }
 
             if (body.webhook_url !== undefined) validateWebhookUrl(String(body.webhook_url).trim());
             const notifyDays = body.notify_days === undefined ? undefined : validateReminderDays(Array.isArray(body.notify_days) ? body.notify_days.join(',') : String(body.notify_days));
@@ -865,6 +995,7 @@ export default {
 
         // POST /api/notifications/test
         if (request.method === "POST" && subPath === "/api/notifications/test") {
+          if (!canManageSettingsAndBackups(currentActor)) return jsonResponse({ error: 'Only shop owners or managers can send webhook alerts.' }, 403);
           const body = (await request.json()) as {
             webhook_url?: string;
             webhook_type?: "auto" | "ntfy" | "discord" | "slack" | "generic";

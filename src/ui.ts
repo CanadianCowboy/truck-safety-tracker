@@ -71,7 +71,7 @@ ${renderPushWorkerScript(basePath)}
 `;
 }
 
-export function renderAppHtml(basePath: string, pushTestPage = false): string {
+export function renderAppHtml(basePath: string, pushTestPage = false, demoMode = false): string {
   return `<!DOCTYPE html>
 <html lang="en" class="dark">
 <head>
@@ -81,7 +81,7 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
   <meta name="theme-color" content="#0b0f19" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <link rel="manifest" href="${basePath}/manifest.json" />
+  ${demoMode ? '<meta name="robots" content="noindex,nofollow" />' : `<link rel="manifest" href="${basePath}/manifest.json" />`}
   <link rel="icon" type="image/svg+xml" href="${basePath}/icon.svg" />
   <link rel="apple-touch-icon" href="${basePath}/icon-192.png" />
   <style>
@@ -2523,6 +2523,174 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
       .modal-footer { flex-wrap: wrap; }
     }
 
+    @layer components {
+      .gate-mode-tabs {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 6px;
+        background: var(--input-bg);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 4px;
+        margin-bottom: 14px;
+      }
+      .gate-mode-tab {
+        min-height: 38px;
+        padding: 6px 10px;
+        border: 0;
+        border-radius: 7px;
+        background: transparent;
+        color: var(--text-muted);
+        font-size: 0.82rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 150ms ease, color 150ms ease;
+      }
+      .gate-mode-tab[aria-selected="true"] {
+        background: var(--card-bg);
+        color: var(--text);
+        box-shadow: 0 1px 3px rgba(0,0,0,0.18);
+      }
+      .staff-summary-strip {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+        gap: 8px;
+        margin: 12px 0;
+      }
+      .staff-stat-card {
+        background: var(--input-bg);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 9px 11px;
+        cursor: pointer;
+        text-align: left;
+        transition: border-color 150ms ease, background 150ms ease;
+      }
+      .staff-stat-card[aria-pressed="true"] {
+        border-color: var(--accent);
+        background: var(--accent-soft, rgba(59, 130, 246, 0.12));
+      }
+      .staff-stat-card small {
+        display: block;
+        color: var(--text-muted);
+        font-size: 0.72rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+      }
+      .staff-stat-card strong {
+        display: block;
+        font-size: 1.15rem;
+        color: var(--text);
+        margin-top: 2px;
+      }
+      .staff-card {
+        background: var(--input-bg);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 13px 14px;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 12px;
+        flex-wrap: wrap;
+      }
+      .staff-card.suspended {
+        opacity: 0.72;
+        border-style: dashed;
+      }
+      .staff-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 800;
+        font-size: 0.88rem;
+        color: #ffffff;
+        flex: 0 0 40px;
+        letter-spacing: 0.03em;
+        box-shadow: inset 0 0 0 1px rgba(255,255,255,0.22);
+      }
+      .staff-role-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        padding: 2px 8px;
+        border-radius: 999px;
+        font-size: 0.71rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+        border: 1px solid var(--border);
+      }
+      .staff-role-pill.owner { background: rgba(245, 158, 11, 0.15); color: var(--amber-text, #f59e0b); border-color: rgba(245, 158, 11, 0.35); }
+      .staff-role-pill.manager { background: rgba(139, 92, 246, 0.15); color: #a78bfa; border-color: rgba(139, 92, 246, 0.35); }
+      .staff-role-pill.technician { background: rgba(16, 185, 129, 0.15); color: var(--green-text); border-color: rgba(16, 185, 129, 0.35); }
+      .staff-role-pill.viewer { background: rgba(148, 163, 184, 0.15); color: var(--text-muted); border-color: var(--border); }
+      .staff-status-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        padding: 2px 8px;
+        border-radius: 999px;
+        font-size: 0.7rem;
+        font-weight: 600;
+      }
+      .staff-status-pill.active { background: rgba(16, 185, 129, 0.14); color: var(--green-text); }
+      .staff-status-pill.suspended { background: rgba(239, 68, 68, 0.14); color: var(--red-text); }
+      .color-swatch-row {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        margin-top: 4px;
+      }
+      .color-swatch-btn {
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        border: 2px solid transparent;
+        cursor: pointer;
+        padding: 0;
+        transition: transform 120ms ease, box-shadow 120ms ease;
+      }
+      .color-swatch-btn[aria-pressed="true"] {
+        border-color: var(--text);
+        transform: scale(1.12);
+        box-shadow: 0 0 0 2px var(--card-bg);
+      }
+      .pw-strength-bar {
+        height: 6px;
+        border-radius: 999px;
+        background: var(--border);
+        overflow: hidden;
+        margin-top: 6px;
+      }
+      .pw-strength-fill {
+        height: 100%;
+        width: 0%;
+        transition: width 160ms ease, background-color 160ms ease;
+      }
+      .actor-attribution-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 2px 8px;
+        border-radius: 999px;
+        font-size: 0.72rem;
+        background: var(--input-bg);
+        border: 1px solid var(--border);
+        color: var(--text-muted);
+      }
+      .actor-attribution-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        display: inline-block;
+      }
+    }
+
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after { transition: none !important; animation: none !important; }
       .kpi-card:hover, .truck-card:hover { transform: none; }
@@ -2530,24 +2698,55 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
   </style>
 </head>
 <body>
-  <!-- PASSCODE GATE VIEW -->
-  <div id="gate-view" class="gate-wrap">
+  <!-- PASSCODE & STAFF ACCOUNT GATE VIEW -->
+  <div id="gate-view" class="gate-wrap"${demoMode ? ' hidden' : ''}>
     <button type="button" class="btn btn-secondary gate-theme" data-theme-toggle aria-label="Switch to light mode">☀ Light mode</button>
     <div class="gate-card">
       <img src="${basePath}/icon.svg" alt="Truck Safety Logo" class="gate-logo" />
       <h1 class="gate-title">Truck Safety Tracker</h1>
-      <p class="gate-sub">Enter the fleet passcode to unlock inspection status & R2 certificates.</p>
+      <p class="gate-sub" id="gate-sub-text">Unlock with the shared shop passcode or sign in with your personal staff account.</p>
+      <div class="gate-mode-tabs" role="tablist" aria-label="Sign-in method">
+        <button type="button" id="gate-tab-passcode" class="gate-mode-tab" role="tab" aria-selected="true" data-gate-mode="passcode">🔑 Shared Passcode</button>
+        <button type="button" id="gate-tab-account" class="gate-mode-tab" role="tab" aria-selected="false" data-gate-mode="account">👤 Staff Account</button>
+      </div>
       <form id="gate-form">
-        <div class="input-group">
-          <label for="gate-passcode">Passcode</label>
-          <input
-            id="gate-passcode"
-            type="password"
-            class="input-control"
-            placeholder="Enter passcode..."
-            autocomplete="current-password"
-            required
-          />
+        <input type="hidden" id="gate-login-mode" value="passcode" />
+        <div id="gate-passcode-fields">
+          <div class="input-group">
+            <label for="gate-passcode">Passcode</label>
+            <input
+              id="gate-passcode"
+              type="password"
+              class="input-control"
+              placeholder="Enter passcode..."
+              autocomplete="current-password"
+              required
+            />
+          </div>
+        </div>
+        <div id="gate-account-fields" class="hidden">
+          <div class="input-group">
+            <label for="gate-username">Staff Username</label>
+            <input
+              id="gate-username"
+              type="text"
+              class="input-control"
+              placeholder="e.g. alex.tech"
+              autocomplete="username"
+              autocapitalize="none"
+              spellcheck="false"
+            />
+          </div>
+          <div class="input-group">
+            <label for="gate-account-password">Password</label>
+            <input
+              id="gate-account-password"
+              type="password"
+              class="input-control"
+              placeholder="Enter your staff password..."
+              autocomplete="current-password"
+            />
+          </div>
         </div>
         <p id="gate-error" class="hidden" style="color: var(--red-text); font-size: 0.84rem; margin-bottom: 12px;"></p>
         <button type="submit" id="gate-submit" class="btn btn-primary btn-full">
@@ -2560,7 +2759,7 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
   </div>
 
   <!-- MAIN APPLICATION VIEW -->
-  <div id="app-view" class="hidden">
+  <div id="app-view" class="${demoMode ? '' : 'hidden'}">
     <header class="app-header">
       <div class="header-inner">
         <div class="brand">
@@ -2591,6 +2790,14 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
               <div class="mobile-tools-extras">
                 <button type="button" class="btn btn-secondary btn-sm" data-theme-toggle aria-label="Switch to light mode">☀ Light mode</button>
               </div>
+              <div id="tools-active-actor" style="padding:8px 10px;border-bottom:1px solid var(--border);margin-bottom:4px;font-size:0.78rem;display:flex;align-items:center;gap:8px;">
+                <span id="header-actor-avatar" class="staff-avatar" style="width:28px;height:28px;flex:0 0 28px;font-size:0.72rem;background:#3b82f6;">🔑</span>
+                <div style="min-width:0;line-height:1.25;">
+                  <strong id="header-actor-name" style="display:block;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Shared Shop Passcode</strong>
+                  <span id="header-actor-role" style="color:var(--text-muted);font-size:0.72rem;">Owner · Full Access</span>
+                </div>
+              </div>
+              <button type="button" id="btn-tools-shop-accounts" class="btn btn-secondary btn-sm">👥 Staff & Shop Accounts</button>
               <button type="button" id="btn-vin-decoder" class="btn btn-secondary btn-sm">VIN decoder</button>
               <button type="button" id="btn-export-ics" class="btn btn-secondary btn-sm" title="Download Calendar (.ics) reminders">
                 📅 .ICS Calendar
@@ -2604,13 +2811,14 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
               </button>
             </div>
           </details>
-          <button type="button" id="btn-lock" class="btn btn-secondary btn-sm" title="Lock App">
+          <button type="button" id="btn-lock" class="btn btn-secondary btn-sm${demoMode ? ' hidden' : ''}" title="Lock App">
             🔒 Lock
           </button>
         </div>
       </div>
     </header>
 
+    ${demoMode ? '<div role="note" style="margin:12px auto;max-width:1200px;padding:12px 18px;border:1px solid var(--border);border-radius:10px;color:var(--text-muted)"><strong>Demo:</strong> Unit records, inspection dates and inspection history are stored only in this browser tab. VIN decoding, certificates, QR labels, alerts, settings, backups and calendar exports are not available in the demo. <button type="button" id="demo-reset" class="btn btn-secondary btn-sm" style="margin-left:12px">Reset demo</button></div>' : ''}
     <div class="workspace-shell">
       <!-- LEFT REGION: GRAPHITE NAVIGATION & QUICK FLEET VIEWS -->
       <nav class="workspace-nav" aria-label="Fleet views and navigation">
@@ -2658,6 +2866,7 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
             <li><button type="button" class="nav-tool-btn" data-nav-action="backup">📦 Fleet Backup</button></li>
             <li><button type="button" class="nav-tool-btn" data-nav-action="ics">📅 Export .ICS Schedule</button></li>
             <li><button type="button" class="nav-tool-btn" data-nav-action="alerts">🔔 Browser Alerts</button></li>
+            <li><button type="button" class="nav-tool-btn" data-nav-action="accounts">👥 Staff & Accounts</button></li>
             <li><button type="button" class="nav-tool-btn" data-nav-action="settings">⚙️ Fleet Settings</button></li>
           </ul>
         </div>
@@ -2851,6 +3060,22 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
                   <div id="detail-history-list"></div>
                 </div>
               </details>
+              <details id="detail-documents-section" class="detail-disclosure" open>
+                <summary>Unit Documents</summary>
+                <div class="detail-disclosure-body">
+                  <p class="muted-note">Keep registration, insurance, permits, maintenance records, and other unit documents together. Expiry dates are optional.</p>
+                  <form id="form-shop-document" class="form-grid" style="margin-bottom:16px;">
+                    <input type="hidden" id="shop-document-truck-id" />
+                    <div class="input-group"><label for="shop-document-type">Document type</label><select id="shop-document-type" class="input-control"><option value="registration">Registration</option><option value="insurance">Insurance</option><option value="permit">Permit</option><option value="maintenance">Maintenance</option><option value="general">General</option></select></div>
+                    <div class="input-group"><label for="shop-document-label">Description (optional)</label><input id="shop-document-label" class="input-control" maxlength="255" /></div>
+                    <div class="input-group"><label for="shop-document-expiry">Expiry date (optional)</label><input id="shop-document-expiry" type="date" class="input-control" /></div>
+                    <div class="input-group"><label for="shop-document-file">Document file</label><input id="shop-document-file" type="file" accept="application/pdf,image/jpeg,image/png,image/webp" class="input-control" required /><small>PDF, JPEG, PNG, or WebP; up to 10 MB.</small></div>
+                    <button type="submit" id="btn-shop-document-upload" class="btn btn-primary col-span-2">Upload unit document</button>
+                  </form>
+                  <div id="shop-document-status" class="muted-note" role="status" aria-live="polite"></div>
+                  <div id="shop-document-list" aria-live="polite"></div>
+                </div>
+              </details>
 
               <!-- QR LABEL & SECONDARY UNIT ACTIONS (retained but not exposed until ready) -->
               <details id="unit-qr-controls" class="detail-disclosure hidden" aria-hidden="true" inert>
@@ -2914,33 +3139,33 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
               <option value="Other">Other</option>
             </select>
           </div>
-          <div class="input-group">
+          <div class="input-group${demoMode ? ' hidden' : ''}">
             <label for="truck-plate">License Plate</label>
             <input id="truck-plate" class="input-control" placeholder="e.g. AB-12345" />
           </div>
-          <div class="input-group">
+          <div class="input-group${demoMode ? ' hidden' : ''}">
             <label for="truck-gvwr">GVWR / Weight Class</label>
             <input id="truck-gvwr" class="input-control" placeholder="e.g. 80,000 lbs / 36,287 kg" />
           </div>
-          <div class="input-group col-span-2">
+          <div class="input-group col-span-2${demoMode ? ' hidden' : ''}">
             <label for="truck-vin">VIN (Vehicle Identification Number)</label>
             <input id="truck-vin" class="input-control" placeholder="17-character VIN" />
             <button type="button" id="btn-truck-decode-vin" class="btn btn-secondary">Decode VIN…</button>
             <small>Preview NHTSA details before applying them. Nothing is saved automatically.</small>
           </div>
-          <div class="input-group">
+          <div class="input-group${demoMode ? ' hidden' : ''}">
             <label for="truck-year">Year</label>
             <input id="truck-year" type="number" min="1900" max="2100" class="input-control" placeholder="e.g. 2022" />
           </div>
-          <div class="input-group">
+          <div class="input-group${demoMode ? ' hidden' : ''}">
             <label for="truck-make">Make</label>
             <input id="truck-make" class="input-control" placeholder="e.g. Kenworth, Peterbilt, Wabash" />
           </div>
-          <div class="input-group">
+          <div class="input-group${demoMode ? ' hidden' : ''}">
             <label for="truck-model">Model</label>
             <input id="truck-model" class="input-control" placeholder="e.g. T680, 389, Dry Van 53'" />
           </div>
-          <div class="input-group">
+          <div class="input-group${demoMode ? ' hidden' : ''}">
             <label for="truck-equipment-type">Equipment / Body Type</label>
             <input id="truck-equipment-type" class="input-control" placeholder="e.g. Flatbed, Skid Steer, Reefer, Generator" />
           </div>
@@ -2952,7 +3177,7 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
               <option value="Inactive">Inactive</option>
             </select>
           </div>
-          <div class="input-group">
+          <div class="input-group${demoMode ? ' hidden' : ''}">
             <label for="truck-reminder-days">Reminder schedule</label>
             <select id="truck-reminder-days" class="input-control">
               <option value="">Use fleet default</option>
@@ -2965,7 +3190,7 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
             </select>
             <small>Overrides fleet-wide reminder days for this unit.</small>
           </div>
-          <div class="input-group">
+          <div class="input-group${demoMode ? ' hidden' : ''}">
             <label for="truck-interval">Inspection Interval</label>
             <select id="truck-interval" class="input-control">
               <option value="12">Annual (12 Months)</option>
@@ -2974,7 +3199,7 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
               <option value="24">Biennial (24 Months)</option>
             </select>
           </div>
-          <div class="input-group col-span-2" style="margin-bottom: 4px;">
+          <div class="input-group col-span-2${demoMode ? ' hidden' : ''}" style="margin-bottom: 4px;">
             <label for="truck-no-date" style="display: inline-flex; align-items: center; gap: 10px; cursor: pointer; text-transform: none; color: var(--text); font-size: 0.9rem;">
               <input id="truck-no-date" type="checkbox" style="width: 18px; height: 18px;" />
               <span>No inspection / due date yet (save unit info without dates)</span>
@@ -2989,15 +3214,15 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
             <input id="truck-due-date" type="date" class="input-control" />
             <small>Defaults to month-end, or leave blank if no date yet.</small>
           </div>
-          <div class="input-group">
+          <div class="input-group${demoMode ? ' hidden' : ''}">
             <label for="truck-sticker">Safety Sticker / Cert #</label>
             <input id="truck-sticker" class="input-control" placeholder="e.g. S-908412" />
           </div>
-          <div class="input-group col-span-2">
+          <div class="input-group col-span-2${demoMode ? ' hidden' : ''}">
             <label for="truck-shop">Inspection Shop / Mechanic</label>
             <input id="truck-shop" class="input-control" placeholder="e.g. Highway Heavy Duty Service" />
           </div>
-          <div class="input-group col-span-2">
+          <div class="input-group col-span-2${demoMode ? ' hidden' : ''}">
             <label for="truck-notes">Notes / Defects / Reminders</label>
             <textarea id="truck-notes" rows="2" class="input-control" placeholder="Any notes on tires, brakes, upcoming work..."></textarea>
           </div>
@@ -3011,7 +3236,7 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
   </div>
 
   <!-- Shared standalone / unit-form VIN preview. Only explicit lookups contact NHTSA. -->
-  <div id="modal-vin" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="vin-title">
+  <div id="modal-vin" class="modal-backdrop hidden${demoMode ? ' demo-disabled' : ''}" role="dialog" aria-modal="true" aria-labelledby="vin-title">
     <div class="modal-panel">
       <div class="modal-header">
         <h2 class="modal-title" id="vin-title">VIN decoder</h2>
@@ -3065,7 +3290,7 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
   </div>
 
   <!-- MODAL: LOG NEW SAFETY INSPECTION (+ R2 UPLOAD) -->
-  <div id="modal-inspect" class="modal-backdrop hidden">
+  <div id="modal-inspect" class="modal-backdrop hidden${demoMode ? ' demo-inspection' : ''}">
     <div class="modal-panel">
       <div class="modal-header">
         <h2 class="modal-title" id="modal-inspect-title">Log Safety Inspection</h2>
@@ -3090,9 +3315,12 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
           </div>
           <div class="input-group">
             <label for="inspect-shop">Shop / Certified Mechanic</label>
-            <input id="inspect-shop" class="input-control" placeholder="Shop name or inspector" />
+            <div style="display:flex;gap:6px;">
+              <input id="inspect-shop" class="input-control" placeholder="Shop name or inspector" />
+              <button type="button" id="btn-inspect-fill-me" class="btn btn-secondary btn-sm hidden" title="Fill with your signed-in staff profile" style="white-space:nowrap;">Use me</button>
+            </div>
           </div>
-          <div class="input-group col-span-2">
+          <div class="input-group col-span-2${demoMode ? ' hidden' : ''}">
             <label for="inspect-file">Upload Safety Certificate / Sheet (PDF, JPEG, PNG, WebP · max 10 MB)</label>
             <input id="inspect-file" type="file" accept="application/pdf,image/jpeg,image/png,image/webp" class="input-control" />
           </div>
@@ -3109,7 +3337,7 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
     </div>
   </div>
 
-  <div id="modal-scan" class="modal-backdrop hidden">
+  <div id="modal-scan" class="modal-backdrop hidden${demoMode ? ' demo-disabled' : ''}">
     <div class="modal-panel">
       <div class="modal-header">
         <h2 class="modal-title">Scan / Paste UUID</h2>
@@ -3234,6 +3462,7 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
           </div>
         </div>
         <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--border);">
+          <button type="button" id="btn-open-shop-accounts" class="btn btn-secondary btn-sm">👥 Shop accounts</button>
           <button type="button" id="btn-test-webhook" class="btn btn-secondary btn-sm">
             🚀 Send Test Webhook Now
           </button>
@@ -3246,19 +3475,176 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
     </div>
   </div>
 
+  <div id="modal-shop-accounts" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="shop-accounts-title">
+    <div class="modal-panel modal-lg">
+      <div class="modal-header">
+        <div>
+          <h2 id="shop-accounts-title" class="modal-title">Staff Directory & Shop Accounts</h2>
+          <p class="muted-note" style="margin:2px 0 0;">Both the shared shop passcode and active personal accounts can unlock the dashboard. Personal accounts attribute inspections & documents automatically.</p>
+        </div>
+        <button type="button" class="close-btn" data-close="modal-shop-accounts" aria-label="Close shop accounts">&times;</button>
+      </div>
+
+      <div id="shop-account-actor-banner" style="background:var(--input-bg);border:1px solid var(--border);border-radius:10px;padding:10px 12px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <span id="shop-modal-actor-avatar" class="staff-avatar" style="width:34px;height:34px;flex:0 0 34px;font-size:0.8rem;background:#3b82f6;">🔑</span>
+          <div>
+            <strong id="shop-modal-actor-title" style="display:block;font-size:0.88rem;">Signed in with Shared Shop Passcode</strong>
+            <span id="shop-modal-actor-sub" style="font-size:0.76rem;color:var(--text-muted);">Owner permissions · Full access to staff accounts, fleet records & settings</span>
+          </div>
+        </div>
+        <span id="shop-modal-actor-role-badge" class="staff-role-pill owner">Owner</span>
+      </div>
+
+      <div class="staff-summary-strip" role="group" aria-label="Filter staff accounts by role or status">
+        <button type="button" class="staff-stat-card" data-staff-filter="all" aria-pressed="true">
+          <small>Total Staff</small>
+          <strong id="staff-count-all">0</strong>
+        </button>
+        <button type="button" class="staff-stat-card" data-staff-filter="active" aria-pressed="false">
+          <small>🟢 Active</small>
+          <strong id="staff-count-active">0</strong>
+        </button>
+        <button type="button" class="staff-stat-card" data-staff-filter="technician" aria-pressed="false">
+          <small>🔧 Technicians</small>
+          <strong id="staff-count-tech">0</strong>
+        </button>
+        <button type="button" class="staff-stat-card" data-staff-filter="manager" aria-pressed="false">
+          <small>🛡️ Owners & Mgrs</small>
+          <strong id="staff-count-admin">0</strong>
+        </button>
+        <button type="button" class="staff-stat-card" data-staff-filter="suspended" aria-pressed="false">
+          <small>⏸️ Suspended</small>
+          <strong id="staff-count-suspended">0</strong>
+        </button>
+      </div>
+
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:12px;">
+        <input type="search" id="shop-account-search" class="input-control" placeholder="Search staff by name, @username, badge/cert #, job title, or phone…" aria-label="Search staff directory" style="flex:1 1 240px;min-height:40px;" />
+        <button type="button" id="btn-shop-account-new" class="btn btn-primary btn-sm">+ New Staff Account</button>
+      </div>
+
+      <div id="shop-account-list" class="form-grid" aria-live="polite"></div>
+
+      <form id="form-shop-account" style="margin-top:18px;background:var(--input-bg);border:1px solid var(--border);border-radius:12px;padding:16px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:12px;">
+          <h3 id="shop-account-form-title" style="margin:0;font-size:1rem;">Create a shop account</h3>
+          <button type="button" id="btn-shop-account-cancel-edit" class="btn btn-secondary btn-sm hidden">Cancel edit</button>
+        </div>
+        <input type="hidden" id="shop-account-edit-id" value="" />
+        <input type="hidden" id="shop-account-color" value="#3b82f6" />
+        <div class="form-grid">
+          <div class="input-group">
+            <label for="shop-account-name">Display name *</label>
+            <input id="shop-account-name" class="input-control" maxlength="100" autocomplete="name" placeholder="e.g. Jordan Friesen" required />
+          </div>
+          <div class="input-group">
+            <label for="shop-account-username">Username *</label>
+            <input id="shop-account-username" class="input-control" minlength="3" maxlength="32" pattern="[A-Za-z0-9][A-Za-z0-9._-]{2,31}" autocomplete="username" placeholder="e.g. jordan.tech" required />
+          </div>
+          <div class="input-group">
+            <label for="shop-account-role">Shop Role & Permissions</label>
+            <select id="shop-account-role" class="input-control">
+              <option value="technician">🔧 Technician (Log inspections, edit units & docs)</option>
+              <option value="manager">🛡️ Shop Manager (Manage staff, units, settings & backups)</option>
+              <option value="owner">Owner access (Full shop & gate passcode control)</option>
+              <option value="viewer">👁️ Viewer (Read-only fleet & certificate access)</option>
+            </select>
+          </div>
+          <div class="input-group">
+            <label for="shop-account-status-select">Account Status</label>
+            <select id="shop-account-status-select" class="input-control">
+              <option value="active">🟢 Active (Can sign in)</option>
+              <option value="suspended">⏸️ Suspended (Sign-in blocked)</option>
+            </select>
+          </div>
+          <div class="input-group">
+            <label for="shop-account-title">Job Title / Specialty</label>
+            <input id="shop-account-title" class="input-control" maxlength="80" placeholder="e.g. Lead Heavy-Duty Mechanic, Service Writer" />
+          </div>
+          <div class="input-group">
+            <label for="shop-account-badge">Inspector / Cert / Badge #</label>
+            <input id="shop-account-badge" class="input-control" maxlength="64" placeholder="e.g. Red Seal #4419 / CVIP #882" />
+          </div>
+          <div class="input-group">
+            <label for="shop-account-phone">Phone / Shift Contact</label>
+            <input id="shop-account-phone" class="input-control" maxlength="40" placeholder="e.g. (204) 555-0148 · Day Shift" />
+          </div>
+          <div class="input-group">
+            <label>Avatar Badge Color</label>
+            <div class="color-swatch-row" id="shop-account-swatches" role="radiogroup" aria-label="Avatar badge color">
+              <button type="button" class="color-swatch-btn" data-avatar-color="#3b82f6" style="background:#3b82f6;" aria-label="Blue" aria-pressed="true"></button>
+              <button type="button" class="color-swatch-btn" data-avatar-color="#10b981" style="background:#10b981;" aria-label="Emerald" aria-pressed="false"></button>
+              <button type="button" class="color-swatch-btn" data-avatar-color="#f59e0b" style="background:#f59e0b;" aria-label="Amber" aria-pressed="false"></button>
+              <button type="button" class="color-swatch-btn" data-avatar-color="#8b5cf6" style="background:#8b5cf6;" aria-label="Violet" aria-pressed="false"></button>
+              <button type="button" class="color-swatch-btn" data-avatar-color="#ec4899" style="background:#ec4899;" aria-label="Pink" aria-pressed="false"></button>
+              <button type="button" class="color-swatch-btn" data-avatar-color="#06b6d4" style="background:#06b6d4;" aria-label="Cyan" aria-pressed="false"></button>
+              <button type="button" class="color-swatch-btn" data-avatar-color="#f97316" style="background:#f97316;" aria-label="Orange" aria-pressed="false"></button>
+              <button type="button" class="color-swatch-btn" data-avatar-color="#6366f1" style="background:#6366f1;" aria-label="Indigo" aria-pressed="false"></button>
+            </div>
+          </div>
+          <div class="input-group col-span-2">
+            <label for="shop-account-notes">Staff Notes / Shift & Bay Assignment</label>
+            <input id="shop-account-notes" class="input-control" maxlength="500" placeholder="Optional notes: Bay 2 lead, trailer brake specialist, on-call weekends…" />
+          </div>
+          <div class="input-group col-span-2">
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;">
+              <label for="shop-account-password" id="shop-account-password-label">Password (8–128 characters) *</label>
+              <div style="display:flex;gap:6px;flex-wrap:wrap;">
+                <button type="button" id="btn-shop-pw-generate" class="btn btn-secondary btn-sm" style="padding:3px 8px;font-size:0.74rem;">🎲 Generate strong password</button>
+                <button type="button" id="btn-shop-pw-toggle" class="btn btn-secondary btn-sm" style="padding:3px 8px;font-size:0.74rem;">👁️ Show</button>
+                <button type="button" id="btn-shop-pw-copy" class="btn btn-secondary btn-sm" style="padding:3px 8px;font-size:0.74rem;">📋 Copy credentials</button>
+              </div>
+            </div>
+            <input id="shop-account-password" type="password" class="input-control" minlength="8" maxlength="128" autocomplete="new-password" required placeholder="8–128 characters" />
+            <div class="pw-strength-bar" aria-hidden="true"><div id="shop-pw-strength-fill" class="pw-strength-fill"></div></div>
+            <small id="shop-pw-strength-text">8–128 characters. Only a salted 600,000-iteration PBKDF2-SHA256 hash is stored.</small>
+          </div>
+        </div>
+        <p class="muted-note" style="margin-top:12px;">Anyone who knows the shared shop passcode has full owner-level access, regardless of their personal account role.</p>
+        <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:14px;">
+          <button type="submit" id="btn-shop-account-submit" class="btn btn-primary">Create account</button>
+        </div>
+      </form>
+      <p id="shop-account-status" class="muted-note" role="status" aria-live="polite" style="margin-top:10px;"></p>
+
+      <details class="detail-disclosure" style="margin-top:14px;" open>
+        <summary>Recent Shop Account & Inspection Activity</summary>
+        <div class="detail-disclosure-body">
+          <div id="shop-account-activity-list" style="display:flex;flex-direction:column;gap:8px;"></div>
+        </div>
+      </details>
+    </div>
+  </div>
+
   ${renderPushControls(basePath)}
   <div id="toast-container" class="toast-container"></div>
 
   <script>
     const BASE_PATH = ${JSON.stringify(basePath)};
     const API_BASE = BASE_PATH + '/api';
-    // The server owns the HttpOnly session cookie; never persist tokens in URLs or localStorage.
-    localStorage.removeItem('truck_safety_token');
+    const DEMO_MODE = ${JSON.stringify(demoMode)};
+    const DEMO_STORE_URL = BASE_PATH + '/demo-store.js';
+    // Demo data is scoped to this browser tab; no fleet token or server session is used.
+    if (!DEMO_MODE) localStorage.removeItem('truck_safety_token');
     let fleetData = [];
     let fleetLoading = false;
     let fleetLoadError = '';
     let appSettings = { warning_days: 30, webhook_url: '', webhook_type: 'auto' };
     let activeHistoryTruckId = null;
+    let currentShopActor = {
+      mode: 'passcode',
+      account_id: null,
+      display_name: 'Shared Shop Passcode',
+      username: 'shop-passcode',
+      role: 'owner',
+      badge_number: '',
+      job_title: 'Full Fleet Access',
+      avatar_color: '#3b82f6',
+    };
+    let shopAccountsData = [];
+    let shopActivityData = [];
+    let activeStaffFilter = 'all';
     let mobileLayout = readPreference('truck_safety_mobile_layout', 'dense');
 
     function readPreference(key, fallback) {
@@ -3390,6 +3776,22 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
       if (detailHistory) detailHistory.innerHTML = '';
       document.getElementById('viewer-container').innerHTML = '';
       document.getElementById('form-settings').reset();
+      shopAccountsData = [];
+      shopActivityData = [];
+      document.getElementById('shop-account-list').innerHTML = '';
+      document.getElementById('shop-account-activity-list').innerHTML = '';
+      resetShopAccountForm();
+      currentShopActor = {
+        mode: 'passcode',
+        account_id: null,
+        display_name: 'Shared Shop Passcode',
+        username: 'shop-passcode',
+        role: 'owner',
+        badge_number: '',
+        job_title: 'Full Fleet Access',
+        avatar_color: '#3b82f6',
+      };
+      updateActiveActorUI(currentShopActor);
       document.getElementById('app-view').classList.add('hidden');
       document.getElementById('gate-view').classList.remove('hidden');
       const errEl = document.getElementById('gate-error');
@@ -3401,46 +3803,162 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
       }
     }
 
-    function unlockApp() {
+    function getStaffInitials(name, username) {
+      const cleaned = String(name || username || '?').trim();
+      const parts = cleaned.split(/\\s+/).filter(Boolean);
+      if (parts.length >= 2) {
+        return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+      }
+      return cleaned.slice(0, 2).toUpperCase() || '👤';
+    }
+
+    function formatRoleLabel(role) {
+      const map = { owner: '👑 Owner', manager: '🛡️ Manager', technician: '🔧 Technician', viewer: '👁️ Viewer' };
+      return map[role] || '🔧 Technician';
+    }
+
+    function updateActiveActorUI(actor) {
+      if (!actor || typeof actor !== 'object') return;
+      currentShopActor = actor;
+      const isAccount = actor.mode === 'account';
+      const initials = isAccount ? getStaffInitials(actor.display_name, actor.username) : '🔑';
+      const color = actor.avatar_color || '#3b82f6';
+      const headerAvatar = document.getElementById('header-actor-avatar');
+      const headerName = document.getElementById('header-actor-name');
+      const headerRole = document.getElementById('header-actor-role');
+      if (headerAvatar) {
+        headerAvatar.textContent = initials;
+        headerAvatar.style.background = color;
+      }
+      if (headerName) {
+        headerName.textContent = isAccount ? actor.display_name + ' (@' + actor.username + ')' : 'Shared Shop Passcode';
+      }
+      if (headerRole) {
+        const parts = [formatRoleLabel(actor.role || 'owner')];
+        if (actor.job_title) parts.push(actor.job_title);
+        if (actor.badge_number) parts.push(actor.badge_number);
+        headerRole.textContent = parts.join(' · ');
+      }
+
+      const modalAvatar = document.getElementById('shop-modal-actor-avatar');
+      const modalTitle = document.getElementById('shop-modal-actor-title');
+      const modalSub = document.getElementById('shop-modal-actor-sub');
+      const modalBadge = document.getElementById('shop-modal-actor-role-badge');
+      if (modalAvatar) {
+        modalAvatar.textContent = initials;
+        modalAvatar.style.background = color;
+      }
+      if (modalTitle) {
+        modalTitle.textContent = isAccount
+          ? 'Signed in as ' + actor.display_name + ' (@' + actor.username + ')'
+          : 'Signed in with Shared Shop Passcode';
+      }
+      if (modalSub) {
+        if (isAccount) {
+          const extras = [actor.job_title, actor.badge_number ? 'Badge/Cert: ' + actor.badge_number : ''].filter(Boolean);
+          const permDesc = actor.role === 'viewer'
+            ? 'Read-only access · Can view fleet & certificates'
+            : actor.role === 'technician'
+            ? 'Technician access · Inspections & documents auto-tagged with your profile'
+            : 'Admin access · Can manage staff accounts, fleet & settings';
+          modalSub.textContent = (extras.length ? extras.join(' · ') + ' — ' : '') + permDesc;
+        } else {
+          modalSub.textContent = 'Owner permissions · Full access to staff accounts, fleet records & settings';
+        }
+      }
+      if (modalBadge) {
+        const r = actor.role || 'owner';
+        modalBadge.className = 'staff-role-pill ' + r;
+        modalBadge.textContent = r;
+      }
+
+      const fillMeBtn = document.getElementById('btn-inspect-fill-me');
+      if (fillMeBtn) {
+        fillMeBtn.classList.toggle('hidden', !isAccount);
+      }
+    }
+
+    function setGateLoginMode(mode) {
+      const isAccount = mode === 'account';
+      document.getElementById('gate-login-mode').value = isAccount ? 'account' : 'passcode';
+      const tabPasscode = document.getElementById('gate-tab-passcode');
+      const tabAccount = document.getElementById('gate-tab-account');
+      const passcodeFields = document.getElementById('gate-passcode-fields');
+      const accountFields = document.getElementById('gate-account-fields');
+      const passcodeInput = document.getElementById('gate-passcode');
+      const usernameInput = document.getElementById('gate-username');
+      const passwordInput = document.getElementById('gate-account-password');
+      const submitBtn = document.getElementById('gate-submit');
+      const errEl = document.getElementById('gate-error');
+      if (errEl) errEl.classList.add('hidden');
+      tabPasscode.setAttribute('aria-selected', String(!isAccount));
+      tabAccount.setAttribute('aria-selected', String(isAccount));
+      passcodeFields.classList.toggle('hidden', isAccount);
+      accountFields.classList.toggle('hidden', !isAccount);
+      passcodeInput.required = !isAccount;
+      usernameInput.required = isAccount;
+      passwordInput.required = isAccount;
+      submitBtn.textContent = isAccount ? '👤 Sign In with Staff Account' : '🔒 Unlock Fleet Dashboard';
+    }
+
+    document.querySelectorAll('[data-gate-mode]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const mode = btn.getAttribute('data-gate-mode');
+        setGateLoginMode(mode);
+        if (mode === 'account') document.getElementById('gate-username').focus();
+        else document.getElementById('gate-passcode').focus();
+      });
+    });
+
+    function unlockApp(actor) {
+      if (actor) updateActiveActorUI(actor);
       document.getElementById('gate-view').classList.add('hidden');
       document.getElementById('app-view').classList.remove('hidden');
       loadDashboard();
       if (${JSON.stringify(pushTestPage)}) openPushPanel();
     }
 
-    // Gate Login
+    // Gate Login (supports both Shared Passcode and Personal Staff Account)
     document.getElementById('gate-form').addEventListener('submit', async (e) => {
+      if (DEMO_MODE) { e.preventDefault(); return; }
       e.preventDefault();
+      const mode = document.getElementById('gate-login-mode').value;
+      const isAccount = mode === 'account';
       const passcode = document.getElementById('gate-passcode').value;
+      const username = document.getElementById('gate-username').value.trim();
+      const password = document.getElementById('gate-account-password').value;
       const errEl = document.getElementById('gate-error');
       const btn = document.getElementById('gate-submit');
       errEl.classList.add('hidden');
       btn.disabled = true;
       btn.textContent = 'Checking...';
       try {
+        const payload = isAccount ? { username, password } : { passcode };
         const res = await fetch(API_BASE + '/auth/login', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ passcode }),
+          body: JSON.stringify(payload),
         });
         const data = await res.json();
         if (!res.ok || !data.ok) {
-          errEl.textContent = data.error || 'Invalid passcode';
+          errEl.textContent = data.error || (isAccount ? 'Invalid username or password' : 'Invalid passcode');
           errEl.classList.remove('hidden');
         } else {
           document.getElementById('gate-passcode').value = '';
-          unlockApp();
+          document.getElementById('gate-account-password').value = '';
+          unlockApp(data.actor);
         }
       } catch (err) {
         errEl.textContent = 'Connection error. Please try again.';
         errEl.classList.remove('hidden');
       } finally {
         btn.disabled = false;
-        btn.textContent = '🔒 Unlock Fleet Dashboard';
+        btn.textContent = isAccount ? '👤 Sign In with Staff Account' : '🔒 Unlock Fleet Dashboard';
       }
     });
 
     document.getElementById('btn-lock').addEventListener('click', async () => {
+      if (DEMO_MODE) { showToast('Locking is not available in demo.'); return; }
       try {
         await apiFetch('/auth/logout', { method: 'POST' });
         lockApp();
@@ -3464,6 +3982,9 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
         fleetData = data.trucks || [];
         fleetLoading = false;
         if (loadingEl) loadingEl.classList.add('hidden');
+        if (data.actor) {
+          updateActiveActorUI(data.actor);
+        }
         if (data.settings) {
           appSettings = data.settings;
           document.getElementById('kpi-duesoon-label').textContent = 'Within ' + appSettings.warning_days + ' days';
@@ -3836,6 +4357,7 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
         else if (action === 'backup') document.getElementById('btn-fleet-backup').click();
         else if (action === 'ics') document.getElementById('btn-export-ics').click();
         else if (action === 'alerts') document.getElementById('btn-browser-notify').click();
+        else if (action === 'accounts') document.getElementById('btn-open-shop-accounts').click();
         else if (action === 'settings') document.getElementById('btn-settings').click();
       });
     });
@@ -4125,7 +4647,8 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
       if (vinReturnFocus) vinReturnFocus.focus();
     }
 
-    document.getElementById('btn-vin-decoder').addEventListener('click', () => openVinDecoder(false));
+    document.getElementById('btn-vin-decoder').addEventListener('click', () => { if (DEMO_MODE) showToast('VIN decoding is not available in the demo.'); else openVinDecoder(false); });
+    if (DEMO_MODE) document.getElementById('btn-truck-decode-vin').classList.add('hidden');
     document.getElementById('btn-truck-decode-vin').addEventListener('click', () => openVinDecoder(true));
     document.getElementById('form-vin').addEventListener('input', resetVinDecoder);
     document.getElementById('vin-all-data-section').addEventListener('toggle', renderVinRawData);
@@ -4377,7 +4900,10 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
           document.getElementById('inspect-date').value = today;
           const exp = addCalendarMonths(today, months);
           document.getElementById('inspect-exp-date').value = exp;
-          document.getElementById('inspect-shop').value = t.shop_name || '';
+          const defaultInspector = currentShopActor && currentShopActor.mode === 'account'
+            ? [currentShopActor.display_name, currentShopActor.badge_number ? '(' + currentShopActor.badge_number + ')' : ''].filter(Boolean).join(' ')
+            : (t.shop_name || '');
+          document.getElementById('inspect-shop').value = t.shop_name || defaultInspector;
           document.getElementById('modal-inspect').classList.remove('hidden');
         } else if (historyId) {
           openHistoryModal(historyId);
@@ -4416,6 +4942,19 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
       }
     });
 
+    const inspectFillMeBtn = document.getElementById('btn-inspect-fill-me');
+    if (inspectFillMeBtn) {
+      inspectFillMeBtn.addEventListener('click', () => {
+        if (!currentShopActor || currentShopActor.mode !== 'account') return;
+        const stamp = [
+          currentShopActor.display_name,
+          currentShopActor.badge_number ? '(' + currentShopActor.badge_number + ')' : '',
+        ].filter(Boolean).join(' ');
+        document.getElementById('inspect-shop').value = stamp;
+        inspectFormDirty = true;
+      });
+    }
+
     // Submit New Inspection (+ optional R2 file upload)
     document.getElementById('form-inspect').addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -4429,6 +4968,7 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
       try {
         const fileInput = document.getElementById('inspect-file');
         const hasFile = fileInput.files && fileInput.files.length > 0;
+        if (DEMO_MODE && hasFile) throw new Error('Certificates are not available in the demo.');
 
         if (hasFile) {
           const fd = new FormData();
@@ -4508,6 +5048,7 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
                   <strong>Inspected: \${escapeHtml(ins.inspection_date)}</strong>
                   <span style="color: var(--text-muted); margin-left: 8px;">→ Expires: \${escapeHtml(ins.expiration_date)}</span>
                   \${idx === 0 ? '<span class="type-pill" style="margin-left:8px;">Latest</span>' : ''}
+                  \${ins.logged_by_name ? \`<span class="actor-attribution-chip" style="margin-left:8px;"><span class="actor-attribution-dot" style="background:\${escapeHtml(ins.logged_by_color || '#3b82f6')};"></span>Logged by \${escapeHtml(ins.logged_by_name)}\${ins.logged_by_badge ? ' · ' + escapeHtml(ins.logged_by_badge) : ''}</span>\` : ''}
                 </div>
                 <span class="op-pill">\${escapeHtml([ins.sticker_number ? 'Cert #' + ins.sticker_number : '', ins.shop_name].filter(Boolean).join(' • ') || 'Logged')}</span>
               </div>
@@ -4578,6 +5119,7 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
     }
 
     async function handleQuickCertificateUpload(inputEl, btnEl) {
+      if (DEMO_MODE) { showToast('Certificates are not available in the demo.'); return; }
       const targetTruckId = activeHistoryTruckId || (typeof selectedUnitId !== 'undefined' ? selectedUnitId : null);
       const feedbackEl = document.getElementById('detail-upload-feedback');
       if (!targetTruckId) return;
@@ -4633,6 +5175,9 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
     }
 
     // Quick upload inside History Modal and Detail Workspace Panel
+    if (DEMO_MODE) {
+      document.querySelectorAll('#btn-quick-upload, #btn-detail-quick-upload').forEach(button => button.addEventListener('click', () => showToast('Certificates are not available in the demo.')));
+    }
     document.getElementById('btn-quick-upload').addEventListener('click', () => {
       handleQuickCertificateUpload(document.getElementById('quick-upload-input'), document.getElementById('btn-quick-upload'));
     });
@@ -4680,7 +5225,11 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
 
     // In-App Photo / PDF Viewer
     function openFileViewer(attachmentId, fileName, contentType) {
-      const fileUrl = API_BASE + '/attachments/' + encodeURIComponent(attachmentId);
+      if (DEMO_MODE) { showToast('Certificates are not available in the demo.'); return; }
+      const shopDocument = String(attachmentId).match(/^shop:([^:]+):([^:]+)$/);
+      const fileUrl = shopDocument
+        ? API_BASE + '/trucks/' + encodeURIComponent(shopDocument[1]) + '/documents/' + encodeURIComponent(shopDocument[2])
+        : API_BASE + '/attachments/' + encodeURIComponent(attachmentId);
       const downloadUrl = fileUrl + '?download=1';
       document.getElementById('viewer-title').textContent = fileName;
       const dl = document.getElementById('viewer-download');
@@ -4705,10 +5254,22 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
 
     // Calendar (.ics) export
     document.getElementById('btn-export-ics').addEventListener('click', () => {
+      if (DEMO_MODE) { showToast('Calendar export is not available in the demo.'); return; }
       window.location.href = API_BASE + '/calendar.ics';
     });
+      if (DEMO_MODE) {
+        document.getElementById('btn-export-ics').classList.add('hidden');
+        document.getElementById('btn-fleet-backup').classList.add('hidden');
+        document.getElementById('btn-browser-notify').classList.add('hidden');
+        document.getElementById('btn-vin-decoder').classList.add('hidden');
+        document.getElementById('btn-scan-unit').classList.add('hidden');
+        const toolsAccountsBtn = document.getElementById('btn-tools-shop-accounts');
+        if (toolsAccountsBtn) toolsAccountsBtn.classList.add('hidden');
+        document.querySelectorAll('[data-nav-action="scan"], [data-nav-action="vin"], [data-nav-action="backup"], [data-nav-action="ics"], [data-nav-action="alerts"], [data-nav-action="accounts"], [data-nav-action="settings"]').forEach(el => el.classList.add('hidden'));
+      }
 
     document.getElementById('btn-fleet-backup').addEventListener('click', () => {
+      if (DEMO_MODE) { showToast('Backups are not available in the demo.'); return; }
       document.getElementById('backup-status').textContent = '';
       document.getElementById('backup-restore-file').value = '';
       const previewBox = document.getElementById('backup-preview-box');
@@ -4775,10 +5336,11 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
       } catch (error) { status.textContent = 'Restore failed: ' + error.message; }
     });
 
-    ${renderPushScript()}
+    ${demoMode ? `document.getElementById('btn-browser-notify').addEventListener('click', () => showToast('Alerts are not available in the demo.'));` : renderPushScript()}
 
     // Settings Modal
     document.getElementById('btn-settings').addEventListener('click', async () => {
+      if (DEMO_MODE) { showToast('Settings are not available in the demo.'); return; }
       try {
         const res = await apiFetch('/settings');
         const data = await res.json();
@@ -4816,6 +5378,494 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
       } catch (err) {
         showToast(err.message, true);
       }
+    });
+
+    function selectAvatarColorSwatch(hex) {
+      const normalized = String(hex || '#3b82f6').toLowerCase();
+      document.getElementById('shop-account-color').value = normalized;
+      document.querySelectorAll('#shop-account-swatches [data-avatar-color]').forEach(btn => {
+        const match = btn.getAttribute('data-avatar-color').toLowerCase() === normalized;
+        btn.setAttribute('aria-pressed', String(match));
+      });
+    }
+
+    document.querySelectorAll('#shop-account-swatches [data-avatar-color]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        selectAvatarColorSwatch(btn.getAttribute('data-avatar-color'));
+      });
+    });
+
+    function evaluatePasswordStrength(pw) {
+      if (!pw) return { pct: 0, color: 'var(--border)', label: '8–128 characters. Only a salted 600,000-iteration PBKDF2-SHA256 hash is stored.' };
+      if (pw.length < 8) return { pct: 20, color: 'var(--red-text)', label: 'Too short (' + pw.length + '/8 minimum characters).' };
+      let score = 1;
+      if (pw.length >= 12) score++;
+      if (/[a-z]/.test(pw) && /[A-Z]/.test(pw)) score++;
+      if (/\\d/.test(pw)) score++;
+      if (/[^A-Za-z0-9]/.test(pw)) score++;
+      if (score <= 2) return { pct: 45, color: '#f59e0b', label: 'Fair password (' + pw.length + ' chars) — meets 8-char minimum.' };
+      if (score <= 3) return { pct: 75, color: '#3b82f6', label: 'Good shop password (' + pw.length + ' chars).' };
+      return { pct: 100, color: 'var(--green-text)', label: 'Strong shop password (' + pw.length + ' chars).' };
+    }
+
+    function updateShopPasswordStrengthUI() {
+      const pw = document.getElementById('shop-account-password').value;
+      const editId = document.getElementById('shop-account-edit-id').value;
+      const fill = document.getElementById('shop-pw-strength-fill');
+      const text = document.getElementById('shop-pw-strength-text');
+      if (editId && !pw) {
+        fill.style.width = '0%';
+        text.textContent = 'Leave blank to keep existing password unchanged, or enter 8–128 characters to reset it.';
+        return;
+      }
+      const res = evaluatePasswordStrength(pw);
+      fill.style.width = res.pct + '%';
+      fill.style.background = res.color;
+      text.textContent = res.label;
+    }
+
+    document.getElementById('shop-account-password').addEventListener('input', updateShopPasswordStrengthUI);
+
+    document.getElementById('btn-shop-pw-toggle').addEventListener('click', () => {
+      const input = document.getElementById('shop-account-password');
+      const btn = document.getElementById('btn-shop-pw-toggle');
+      const isHidden = input.type === 'password';
+      input.type = isHidden ? 'text' : 'password';
+      btn.textContent = isHidden ? '🙈 Hide' : '👁️ Show';
+    });
+
+    document.getElementById('btn-shop-pw-generate').addEventListener('click', () => {
+      const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_';
+      const bytes = crypto.getRandomValues(new Uint8Array(20));
+      const generated = Array.from(bytes, byte => alphabet[byte & 63]).join('');
+      const input = document.getElementById('shop-account-password');
+      input.value = generated;
+      input.type = 'text';
+      document.getElementById('btn-shop-pw-toggle').textContent = '🙈 Hide';
+      updateShopPasswordStrengthUI();
+      showToast('Generated shop password — click Copy credentials to share.');
+    });
+
+    document.getElementById('btn-shop-pw-copy').addEventListener('click', async () => {
+      const name = document.getElementById('shop-account-name').value.trim() || 'Staff Member';
+      const username = document.getElementById('shop-account-username').value.trim();
+      const pw = document.getElementById('shop-account-password').value;
+      const role = document.getElementById('shop-account-role').value;
+      if (!username) {
+        showToast('Enter a username first to copy credentials.', true);
+        return;
+      }
+      const summary = [
+        'Truck Safety Tracker — Staff Sign-In',
+        'Name: ' + name + ' (' + role + ')',
+        'Username: ' + username,
+        pw ? 'Password: ' + pw : '(Use your existing staff password)',
+      ].join('\\n');
+      try {
+        await navigator.clipboard.writeText(summary);
+        showToast('Credentials copied to clipboard!');
+      } catch {
+        showToast('Clipboard copy not available in this browser.', true);
+      }
+    });
+
+    function resetShopAccountForm() {
+      document.getElementById('form-shop-account').reset();
+      document.getElementById('shop-account-edit-id').value = '';
+      document.getElementById('shop-account-form-title').textContent = 'Create a shop account';
+      document.getElementById('btn-shop-account-submit').textContent = 'Create account';
+      document.getElementById('btn-shop-account-cancel-edit').classList.add('hidden');
+      const pwInput = document.getElementById('shop-account-password');
+      pwInput.required = true;
+      pwInput.type = 'password';
+      pwInput.placeholder = '8–128 characters';
+      document.getElementById('shop-account-password-label').textContent = 'Password (8–128 characters) *';
+      document.getElementById('btn-shop-pw-toggle').textContent = '👁️ Show';
+      selectAvatarColorSwatch('#3b82f6');
+      updateShopPasswordStrengthUI();
+    }
+
+    function populateShopAccountEditForm(account) {
+      document.getElementById('shop-account-edit-id').value = account.id;
+      document.getElementById('shop-account-form-title').textContent = 'Edit staff account · ' + account.display_name;
+      document.getElementById('btn-shop-account-submit').textContent = 'Save account changes';
+      document.getElementById('btn-shop-account-cancel-edit').classList.remove('hidden');
+      document.getElementById('shop-account-name').value = account.display_name || '';
+      document.getElementById('shop-account-username').value = account.username || '';
+      document.getElementById('shop-account-role').value = account.role || 'technician';
+      document.getElementById('shop-account-status-select').value = account.status || 'active';
+      document.getElementById('shop-account-title').value = account.job_title || '';
+      document.getElementById('shop-account-badge').value = account.badge_number || '';
+      document.getElementById('shop-account-phone').value = account.phone || '';
+      document.getElementById('shop-account-notes').value = account.notes || '';
+      const pwInput = document.getElementById('shop-account-password');
+      pwInput.value = '';
+      pwInput.required = false;
+      pwInput.type = 'password';
+      pwInput.placeholder = 'Leave blank to keep current password';
+      document.getElementById('shop-account-password-label').textContent = 'Reset Password (optional · 8–128 chars)';
+      document.getElementById('btn-shop-pw-toggle').textContent = '👁️ Show';
+      selectAvatarColorSwatch(account.avatar_color || '#3b82f6');
+      updateShopPasswordStrengthUI();
+      document.getElementById('form-shop-account').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      document.getElementById('shop-account-name').focus();
+    }
+
+    document.getElementById('btn-shop-account-cancel-edit').addEventListener('click', () => {
+      resetShopAccountForm();
+      document.getElementById('shop-account-status').textContent = 'Edit cancelled.';
+    });
+
+    document.getElementById('btn-shop-account-new').addEventListener('click', () => {
+      resetShopAccountForm();
+      document.getElementById('form-shop-account').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      document.getElementById('shop-account-name').focus();
+    });
+
+    function renderShopAccountsDirectory() {
+      const list = document.getElementById('shop-account-list');
+      const q = (document.getElementById('shop-account-search')?.value || '').trim().toLowerCase();
+      const canManage = !currentShopActor || currentShopActor.mode === 'passcode' || currentShopActor.role === 'owner' || currentShopActor.role === 'manager';
+      const formEl = document.getElementById('form-shop-account');
+      const newBtn = document.getElementById('btn-shop-account-new');
+      if (formEl) formEl.classList.toggle('hidden', !canManage);
+      if (newBtn) newBtn.classList.toggle('hidden', !canManage);
+
+      const totalCount = shopAccountsData.length;
+      const activeCount = shopAccountsData.filter(a => a.status !== 'suspended').length;
+      const techCount = shopAccountsData.filter(a => (a.role || 'technician') === 'technician').length;
+      const adminCount = shopAccountsData.filter(a => a.role === 'owner' || a.role === 'manager').length;
+      const suspendedCount = shopAccountsData.filter(a => a.status === 'suspended').length;
+
+      document.getElementById('staff-count-all').textContent = totalCount;
+      document.getElementById('staff-count-active').textContent = activeCount;
+      document.getElementById('staff-count-tech').textContent = techCount;
+      document.getElementById('staff-count-admin').textContent = adminCount;
+      document.getElementById('staff-count-suspended').textContent = suspendedCount;
+
+      const filtered = shopAccountsData.filter(account => {
+        const role = account.role || 'technician';
+        const status = account.status || 'active';
+        if (activeStaffFilter === 'active' && status !== 'active') return false;
+        if (activeStaffFilter === 'suspended' && status !== 'suspended') return false;
+        if (activeStaffFilter === 'technician' && role !== 'technician') return false;
+        if (activeStaffFilter === 'manager' && role !== 'owner' && role !== 'manager') return false;
+        if (!q) return true;
+        const hay = [
+          account.display_name,
+          '@' + account.username,
+          role,
+          status,
+          account.job_title,
+          account.badge_number,
+          account.phone,
+          account.notes,
+        ].join(' ').toLowerCase();
+        return hay.includes(q);
+      });
+
+      if (!filtered.length) {
+        list.innerHTML = '<p class="muted-note col-span-2">' + (totalCount === 0
+          ? 'No shop accounts created yet. Add your mechanics, managers, or viewers below.'
+          : 'No staff accounts match the current filter or search.') + '</p>';
+        return;
+      }
+
+      const roleLabels = {
+        owner: '👑 Owner',
+        manager: '🛡️ Manager',
+        technician: '🔧 Technician',
+        viewer: '👁️ Viewer',
+      };
+
+      list.innerHTML = filtered.map(account => {
+        const role = account.role || 'technician';
+        const status = account.status || 'active';
+        const isSuspended = status === 'suspended';
+        const initials = getStaffInitials(account.display_name, account.username);
+        const color = account.avatar_color || '#3b82f6';
+        const isCurrentUser = currentShopActor && currentShopActor.account_id === account.id;
+        const metaChips = [];
+        if (account.job_title) metaChips.push('<span>🏷️ ' + escapeHtml(account.job_title) + '</span>');
+        if (account.badge_number) metaChips.push('<span>🪪 ' + escapeHtml(account.badge_number) + '</span>');
+        if (account.phone) metaChips.push('<span>📞 ' + escapeHtml(account.phone) + '</span>');
+        const loginNote = account.last_login_at
+          ? 'Last sign-in ' + escapeHtml(account.last_login_at) + ' (' + Number(account.login_count || 1) + '×)'
+          : 'Never signed in yet · Created ' + escapeHtml(account.created_at);
+
+        const actionsHtml = canManage
+          ? '<div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;">' +
+              '<button type="button" class="btn btn-secondary btn-sm" data-shop-account-fill-login="' + escapeHtml(account.username) + '" title="Switch lock screen to sign in as @' + escapeHtml(account.username) + '">Sign in as</button>' +
+              '<button type="button" class="btn btn-secondary btn-sm" data-shop-account-toggle-status="' + escapeHtml(account.id) + '">' + (isSuspended ? '▶ Activate' : '⏸ Suspend') + '</button>' +
+              '<button type="button" class="btn btn-secondary btn-sm" data-shop-account-edit="' + escapeHtml(account.id) + '">✎ Edit</button>' +
+              '<button type="button" class="btn btn-danger btn-sm" data-shop-account-delete="' + escapeHtml(account.id) + '">Remove</button>' +
+            '</div>'
+          : '';
+
+        return '<div class="staff-card col-span-2' + (isSuspended ? ' suspended' : '') + '">' +
+          '<div style="display:flex;gap:12px;align-items:flex-start;min-width:0;flex:1 1 260px;">' +
+            '<span class="staff-avatar" style="background:' + escapeHtml(color) + ';">' + escapeHtml(initials) + '</span>' +
+            '<div style="min-width:0;flex:1;">' +
+              '<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">' +
+                '<strong style="font-size:0.95rem;">' + escapeHtml(account.display_name) + ' · @' + escapeHtml(account.username) + '</strong>' +
+                (isCurrentUser ? '<span class="type-pill">You</span>' : '') +
+                '<span class="staff-role-pill ' + escapeHtml(role) + '">' + escapeHtml(roleLabels[role] || role) + '</span>' +
+                '<span class="staff-status-pill ' + escapeHtml(status) + '">' + (isSuspended ? '⏸ Suspended' : '🟢 Active') + '</span>' +
+              '</div>' +
+              (metaChips.length ? '<div style="display:flex;gap:12px;flex-wrap:wrap;font-size:0.79rem;color:var(--text);margin-top:5px;">' + metaChips.join('') + '</div>' : '') +
+              (account.notes ? '<div style="font-size:0.78rem;color:var(--text-muted);margin-top:4px;">' + escapeHtml(account.notes) + '</div>' : '') +
+              '<div style="font-size:0.73rem;color:var(--text-muted);margin-top:5px;">' + loginNote + '</div>' +
+            '</div>' +
+          '</div>' +
+          actionsHtml +
+        '</div>';
+      }).join('');
+    }
+
+    function renderShopActivityFeed() {
+      const feed = document.getElementById('shop-account-activity-list');
+      if (!feed) return;
+      if (!shopActivityData || !shopActivityData.length) {
+        feed.innerHTML = '<p class="muted-note" style="margin:0;">No account or inspection activity recorded yet.</p>';
+        return;
+      }
+      feed.innerHTML = shopActivityData.slice(0, 15).map(item => {
+        const initials = item.actor_username === 'shop-passcode' ? '🔑' : getStaffInitials(item.actor_name, item.actor_username);
+        const color = item.actor_color || '#3b82f6';
+        return '<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding:7px 10px;border-radius:8px;background:var(--input-bg);border:1px solid var(--border);font-size:0.8rem;flex-wrap:wrap;">' +
+          '<div style="display:flex;align-items:center;gap:8px;min-width:0;">' +
+            '<span class="staff-avatar" style="width:24px;height:24px;flex:0 0 24px;font-size:0.66rem;background:' + escapeHtml(color) + ';">' + escapeHtml(initials) + '</span>' +
+            '<div>' +
+              '<strong>' + escapeHtml(item.actor_name) + '</strong>' +
+              (item.actor_badge ? ' <small style="color:var(--text-muted);">(' + escapeHtml(item.actor_badge) + ')</small>' : '') +
+              ' — <span>' + escapeHtml(item.summary) + '</span>' +
+            '</div>' +
+          '</div>' +
+          '<small style="color:var(--text-muted);white-space:nowrap;">' + escapeHtml(item.created_at) + '</small>' +
+        '</div>';
+      }).join('');
+    }
+
+    document.querySelectorAll('[data-staff-filter]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        activeStaffFilter = btn.getAttribute('data-staff-filter') || 'all';
+        document.querySelectorAll('[data-staff-filter]').forEach(other => {
+          other.setAttribute('aria-pressed', String(other === btn));
+        });
+        renderShopAccountsDirectory();
+      });
+    });
+
+    document.getElementById('shop-account-search').addEventListener('input', renderShopAccountsDirectory);
+
+    async function loadShopAccounts() {
+      const list = document.getElementById('shop-account-list');
+      const status = document.getElementById('shop-account-status');
+      list.textContent = 'Loading accounts…';
+      try {
+        const response = await apiFetch('/shop-accounts');
+        const data = await response.json();
+        shopAccountsData = data.accounts || [];
+        shopActivityData = data.recent_activity || [];
+        if (data.actor) updateActiveActorUI(data.actor);
+        renderShopAccountsDirectory();
+        renderShopActivityFeed();
+        status.textContent = 'Active staff accounts can sign in directly on the lock screen alongside the shared shop passcode.';
+      } catch (error) {
+        list.textContent = 'Could not load shop accounts.';
+        status.textContent = error.message;
+      }
+    }
+
+    document.getElementById('shop-account-list').addEventListener('click', async event => {
+      const edit = event.target.closest('[data-shop-account-edit]');
+      const remove = event.target.closest('[data-shop-account-delete]');
+      const toggleStatus = event.target.closest('[data-shop-account-toggle-status]');
+      const fillLogin = event.target.closest('[data-shop-account-fill-login]');
+      if (fillLogin) {
+        const uname = fillLogin.getAttribute('data-shop-account-fill-login');
+        if (!confirm('Lock the current session and switch to the Staff Account sign-in screen for @' + uname + '?')) return;
+        try {
+          await apiFetch('/auth/logout', { method: 'POST' });
+        } catch (error) {
+          showToast('Unable to end the session. Check your connection and retry.', true);
+          return;
+        }
+        lockApp();
+        setGateLoginMode('account');
+        document.getElementById('gate-username').value = uname;
+        document.getElementById('gate-account-password').focus();
+        return;
+      }
+      const accountId = edit?.getAttribute('data-shop-account-edit')
+        || remove?.getAttribute('data-shop-account-delete')
+        || toggleStatus?.getAttribute('data-shop-account-toggle-status');
+      if (!accountId) return;
+      const account = shopAccountsData.find(item => item.id === accountId);
+      if (!account) return;
+      if (edit) {
+        populateShopAccountEditForm(account);
+      } else if (toggleStatus) {
+        const nextStatus = account.status === 'suspended' ? 'active' : 'suspended';
+        try {
+          const result = await apiFetch('/shop-accounts/' + encodeURIComponent(accountId), {
+            method: 'PUT',
+            body: JSON.stringify({
+              display_name: account.display_name,
+              username: account.username,
+              role: account.role || 'technician',
+              status: nextStatus,
+              job_title: account.job_title || '',
+              badge_number: account.badge_number || '',
+              phone: account.phone || '',
+              notes: account.notes || '',
+              avatar_color: account.avatar_color || '#3b82f6',
+            }),
+          });
+          const data = await result.json();
+          if (!result.ok) throw new Error(data.error || 'Could not update account status.');
+          showToast(nextStatus === 'suspended' ? 'Suspended @' + account.username : 'Activated @' + account.username);
+          await loadShopAccounts();
+        } catch (error) {
+          document.getElementById('shop-account-status').textContent = error.message;
+        }
+      } else if (remove && confirm('Permanently remove the shop account for ' + account.display_name + ' (@' + account.username + ')?')) {
+        try {
+          const result = await apiFetch('/shop-accounts/' + encodeURIComponent(accountId), { method: 'DELETE' });
+          const data = await result.json();
+          if (!result.ok) throw new Error(data.error || 'Could not remove shop account.');
+          if (document.getElementById('shop-account-edit-id').value === accountId) resetShopAccountForm();
+          showToast('Removed @' + account.username);
+          await loadShopAccounts();
+        } catch (error) { document.getElementById('shop-account-status').textContent = error.message; }
+      }
+    });
+
+    async function openShopAccountsModal() {
+      if (DEMO_MODE) { showToast('Shop account management is not available in the demo.'); return; }
+      document.getElementById('modal-shop-accounts').classList.remove('hidden');
+      await loadShopAccounts();
+    }
+
+    document.getElementById('btn-open-shop-accounts').addEventListener('click', openShopAccountsModal);
+    const btnToolsShopAccounts = document.getElementById('btn-tools-shop-accounts');
+    if (btnToolsShopAccounts) btnToolsShopAccounts.addEventListener('click', openShopAccountsModal);
+
+    document.getElementById('form-shop-account').addEventListener('submit', async event => {
+      event.preventDefault();
+      const status = document.getElementById('shop-account-status');
+      const submit = document.getElementById('btn-shop-account-submit');
+      const editId = document.getElementById('shop-account-edit-id').value;
+      const password = document.getElementById('shop-account-password').value;
+      submit.disabled = true;
+      status.textContent = editId ? 'Saving account changes…' : 'Creating account…';
+      try {
+        const payload = {
+          display_name: document.getElementById('shop-account-name').value,
+          username: document.getElementById('shop-account-username').value,
+          role: document.getElementById('shop-account-role').value,
+          status: document.getElementById('shop-account-status-select').value,
+          job_title: document.getElementById('shop-account-title').value,
+          badge_number: document.getElementById('shop-account-badge').value,
+          phone: document.getElementById('shop-account-phone').value,
+          notes: document.getElementById('shop-account-notes').value,
+          avatar_color: document.getElementById('shop-account-color').value,
+          ...(password ? { password } : {}),
+        };
+        const response = await apiFetch(
+          editId ? '/shop-accounts/' + encodeURIComponent(editId) : '/shop-accounts',
+          { method: editId ? 'PUT' : 'POST', body: JSON.stringify(payload) }
+        );
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || 'Could not save account.');
+        resetShopAccountForm();
+        status.textContent = editId
+          ? 'Staff account updated.'
+          : 'Staff account created! They can now sign in with @' + data.account.username + ' on the lock screen.';
+        showToast(editId ? 'Staff account updated!' : 'Created @' + data.account.username);
+        await loadShopAccounts();
+      } catch (error) {
+        status.textContent = error.message;
+      } finally { submit.disabled = false; }
+    });
+
+    async function loadShopDocuments(truckId) {
+      const list = document.getElementById('shop-document-list');
+      const status = document.getElementById('shop-document-status');
+      list.textContent = 'Loading unit documents…';
+      try {
+        const response = await apiFetch('/trucks/' + encodeURIComponent(truckId) + '/documents');
+        const data = await response.json();
+        const labels = { registration: 'Registration', insurance: 'Insurance', permit: 'Permit', maintenance: 'Maintenance', general: 'General' };
+        list.innerHTML = data.documents.length
+          ? data.documents.map(document => '<div class="history-item" style="display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap;"><div><strong>' + escapeHtml(labels[document.document_type] || document.document_type) + (document.label ? ' · ' + escapeHtml(document.label) : '') + '</strong>' + (document.logged_by_name ? ' <span class="actor-attribution-chip"><span class="actor-attribution-dot" style="background:' + escapeHtml(document.logged_by_color || '#3b82f6') + ';"></span>' + escapeHtml(document.logged_by_name) + '</span>' : '') + '<div><small>' + escapeHtml(document.file_name) + ' · ' + Math.max(1, Math.round(document.size_bytes / 1024)) + ' KB' + (document.expiry_date ? ' · Expires ' + escapeHtml(document.expiry_date) : ' · No expiry date') + '</small></div></div><div style="display:flex;gap:6px;"><button type="button" class="btn btn-secondary btn-sm" data-shop-document-view="' + escapeHtml(document.id) + '" data-name="' + escapeHtml(document.file_name) + '" data-type="' + escapeHtml(document.content_type) + '">View</button><button type="button" class="btn btn-secondary btn-sm" data-shop-document-edit="' + escapeHtml(document.id) + '" data-label="' + escapeHtml(document.label) + '" data-expiry="' + escapeHtml(document.expiry_date) + '" data-document-type="' + escapeHtml(document.document_type) + '">Edit details</button><button type="button" class="btn btn-danger btn-sm" data-shop-document-delete="' + escapeHtml(document.id) + '">Delete</button></div></div>').join('')
+          : '<p class="muted-note">No unit documents uploaded.</p>';
+        status.textContent = '';
+      } catch (error) { list.textContent = 'Could not load unit documents.'; status.textContent = error.message; }
+      if (typeof fleetData !== 'undefined') {
+        const unit = fleetData.find(item => item.id === truckId);
+        if (unit) {
+          const response = await apiFetch('/trucks/' + encodeURIComponent(truckId));
+          const data = await response.json();
+          unit.document_expiries = data.truck.document_expiries || [];
+          if (typeof renderFleet === 'function') renderFleet();
+        }
+      }
+    }
+
+    document.getElementById('form-shop-document').addEventListener('submit', async event => {
+      event.preventDefault();
+      const truckId = document.getElementById('shop-document-truck-id').value;
+      const file = document.getElementById('shop-document-file').files[0];
+      const status = document.getElementById('shop-document-status');
+      const button = document.getElementById('btn-shop-document-upload');
+      if (!truckId || !file) { status.textContent = 'Select a unit and document file.'; return; }
+      const form = new FormData();
+      form.set('document_type', document.getElementById('shop-document-type').value);
+      form.set('label', document.getElementById('shop-document-label').value);
+      form.set('expiry_date', document.getElementById('shop-document-expiry').value);
+      form.set('file', file);
+      button.disabled = true;
+      status.textContent = 'Uploading private document…';
+      try {
+        const response = await apiFetch('/trucks/' + encodeURIComponent(truckId) + '/documents', { method: 'POST', body: form });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || 'Document upload failed.');
+        document.getElementById('form-shop-document').reset();
+        document.getElementById('shop-document-truck-id').value = truckId;
+        status.textContent = 'Document uploaded privately.';
+        await loadShopDocuments(truckId);
+      } catch (error) { status.textContent = error.message; }
+      finally { button.disabled = false; }
+    });
+
+    document.getElementById('shop-document-list').addEventListener('click', async event => {
+      const view = event.target.closest('[data-shop-document-view]');
+      const edit = event.target.closest('[data-shop-document-edit]');
+      const remove = event.target.closest('[data-shop-document-delete]');
+      const button = view || edit || remove;
+      if (!button) return;
+      const id = button.getAttribute('data-shop-document-view') || button.getAttribute('data-shop-document-edit') || button.getAttribute('data-shop-document-delete');
+      const truckId = document.getElementById('shop-document-truck-id').value;
+      if (view) { openFileViewer('shop:' + truckId + ':' + id, view.getAttribute('data-name'), view.getAttribute('data-type')); return; }
+      try {
+        if (edit) {
+          const label = prompt('Document description (blank to clear)', edit.getAttribute('data-label') || '');
+          if (label === null) return;
+          const expiryDate = prompt('Expiry date YYYY-MM-DD (blank for none)', edit.getAttribute('data-expiry') || '');
+          if (expiryDate === null) return;
+          const type = prompt('Type: registration, insurance, permit, maintenance, general', edit.getAttribute('data-document-type') || 'general');
+          if (!type) return;
+          const response = await apiFetch('/trucks/' + encodeURIComponent(truckId) + '/documents/' + encodeURIComponent(id), { method: 'PUT', body: JSON.stringify({ label, expiry_date: expiryDate, document_type: type }) });
+          const data = await response.json();
+          if (!response.ok) throw new Error(data.error || 'Document update failed.');
+        } else if (remove && confirm('Permanently delete this unit document and its private file?')) {
+          const response = await apiFetch('/trucks/' + encodeURIComponent(truckId) + '/documents/' + encodeURIComponent(id), { method: 'DELETE' });
+          const data = await response.json();
+          if (!response.ok) throw new Error(data.error || 'Document delete failed.');
+        } else return;
+        await loadShopDocuments(truckId);
+      } catch (error) { document.getElementById('shop-document-status').textContent = error.message; }
     });
 
     document.getElementById('btn-test-webhook').addEventListener('click', async () => {
@@ -4929,23 +5979,41 @@ export function renderAppHtml(basePath: string, pushTestPage = false): string {
         }
         return;
       }
+      const shopAccountsModal = document.getElementById('modal-shop-accounts');
+      if (shopAccountsModal && !shopAccountsModal.classList.contains('hidden')) {
+        shopAccountsModal.classList.add('hidden');
+        return;
+      }
       const unitPanel = document.getElementById('modal-unit');
       if (unitPanel && !unitPanel.classList.contains('hidden')) {
         clearPendingUnit();
       }
     });
 
+    if (DEMO_MODE) document.getElementById('demo-reset').addEventListener('click', () => {
+      sessionStorage.removeItem('truck_safety_demo_store');
+      location.reload();
+    });
+
     // Register PWA Service Worker
-    if ('serviceWorker' in navigator && 'PushManager' in window) {
+    if (!DEMO_MODE && 'serviceWorker' in navigator && 'PushManager' in window) {
       navigator.serviceWorker.register(BASE_PATH + '/sw.js').catch(err => console.error('Service worker registration failed:', err));
     }
 
-    ${renderQrScript()}
+    ${demoMode ? '' : renderQrScript()}
 
     // Initial session check
-    fetch(API_BASE + '/auth/verify').then(res => {
-      if (res.ok) unlockApp();
-    }).catch(() => showToast('Offline. Reconnect to unlock your fleet.', true));
+    ${demoMode ? `const demoScript = document.createElement('script');
+    demoScript.src = DEMO_STORE_URL;
+    demoScript.onload = () => unlockApp();
+    demoScript.onerror = () => showToast('Demo storage could not start. Reload to try again.', true);
+    document.head.appendChild(demoScript);` : `fetch(API_BASE + '/auth/verify').then(async res => {
+      if (res.ok) {
+        let data = {};
+        try { data = await res.json(); } catch {}
+        unlockApp(data.actor);
+      }
+    }).catch(() => showToast('Offline. Reconnect to unlock your fleet.', true));`}
     setInterval(() => {
       if (!document.getElementById('app-view').classList.contains('hidden') && document.visibilityState === 'visible') loadDashboard();
     }, 5 * 60 * 1000);
