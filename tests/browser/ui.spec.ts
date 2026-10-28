@@ -7,6 +7,7 @@ test('real UI persists theme and view preferences and remains responsive', async
   await page.goto(basePath + '/');
   await expect(page.locator('#app-view')).toBeVisible();
   await expect(page.locator('#btn-scan-unit')).toBeHidden();
+  await expect(page.locator('#btn-export-ics, [data-nav-action="ics"]')).toHaveCount(0);
   await expect(page.locator('#mobile-nav-scan')).toHaveCount(0);
   await expect(page.locator('#gate-scan-unit')).toBeHidden();
   await expect(page.locator('[data-nav-action="scan"]')).toBeHidden();
@@ -40,7 +41,15 @@ test('real UI persists theme and view preferences and remains responsive', async
   for (const width of [320, 390, 820, 1280]) {
     await page.setViewportSize({ width, height: 900 });
     for (const theme of ['light', 'dark']) {
-      if (await page.locator('html').getAttribute('data-theme') !== theme) await page.locator('.header-actions > [data-theme-toggle]').click();
+      if (await page.locator('html').getAttribute('data-theme') !== theme) {
+        if (width <= 700) {
+          await page.locator('#header-tools > summary').click();
+          await page.locator('.mobile-tools-extras [data-theme-toggle]').click();
+          await page.keyboard.press('Escape');
+        } else {
+          await page.locator('.header-actions > [data-theme-toggle]').click();
+        }
+      }
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), `${theme} at ${width}px`).toBe(true);
       for (const id of ['btn-add-truck', 'btn-lock', 'filter-status', 'search-input']) {
         const box = await page.locator('#' + id).boundingBox();
@@ -66,6 +75,105 @@ test('real UI persists theme and view preferences and remains responsive', async
     await expect(page.locator('#fleet-container')).toHaveAttribute('data-mobile-layout', layout);
   }
   expect(errors).toEqual([]);
+});
+
+test('desktop filters fit without scrolling and units expose three actions with files inside Details', async ({ page, request }, testInfo) => {
+  const { trucks } = await readFleet(request);
+  await page.goto(basePath + '/');
+  await expect(page.locator('#fleet-grid .truck-card')).toHaveCount(trucks.length);
+  for (const width of [960, 1199, 1200, 1280, 1440, 1920]) {
+    await page.setViewportSize({ width, height: 900 });
+    for (const dueFilter of ['all', 'range']) {
+      await page.locator('#filter-status').selectOption(dueFilter);
+      const controls = page.locator('#fleet-toolbar select, #fleet-toolbar input:visible, #view-list, #view-cards, #btn-clear-filters, #btn-refresh, #filter-help > summary');
+      const boxes = await controls.evaluateAll(elements => elements.map(element => {
+        const rect = element.getBoundingClientRect();
+        return { x: rect.x, y: rect.y, width: rect.width, height: rect.height, bottom: rect.bottom };
+      }));
+      const rowDifference = Math.max(...boxes.map(box => box.bottom)) - Math.min(...boxes.map(box => box.bottom));
+      if ((dueFilter === 'all' && ![1200, 1280].includes(width)) || width === 1920) expect(rowDifference, 'One row where space allows at ' + width).toBeLessThanOrEqual(2);
+      else expect(rowDifference, 'Compact wrapping at ' + width).toBeLessThanOrEqual(80);
+      for (const box of boxes) {
+        expect(box.width).toBeGreaterThanOrEqual(44);
+        expect(box.height).toBeGreaterThanOrEqual(42);
+        expect(box.x).toBeGreaterThanOrEqual(0);
+        expect(box.x + box.width).toBeLessThanOrEqual(width);
+      }
+      const actionBottoms = await page.locator('#fleet-toolbar .toolbar-right button:visible, #filter-help > summary').evaluateAll(elements => elements.map(element => element.getBoundingClientRect().bottom));
+      expect(Math.max(...actionBottoms) - Math.min(...actionBottoms), 'Keep toolbar actions together at ' + width).toBeLessThanOrEqual(2);
+      const toolbarFits = await page.locator('#fleet-toolbar').evaluate(element => element.scrollWidth <= element.clientWidth);
+      expect(toolbarFits, 'No toolbar scrolling at ' + width).toBe(true);
+      expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+    }
+  }
+  await page.setViewportSize({ width: 1280, height: 900 });
+  const sidebarToggle = page.locator('#btn-toggle-sidebar');
+  const mainWidth = (await page.locator('.workspace-main').boundingBox())!.width;
+  await expect(sidebarToggle).toHaveAttribute('aria-expanded', 'true');
+  await sidebarToggle.click();
+  await expect(page.locator('#workspace-nav')).toBeHidden();
+  await expect(sidebarToggle).toHaveAccessibleName('Expand sidebar');
+  await expect(sidebarToggle).toHaveAttribute('aria-expanded', 'false');
+  expect((await page.locator('.workspace-main').boundingBox())!.width).toBeGreaterThan(mainWidth);
+  await page.reload();
+  await expect(page.locator('#app-view')).toBeVisible();
+  await expect(page.locator('#workspace-nav')).toBeHidden();
+  await expect(sidebarToggle).toHaveAttribute('aria-expanded', 'false');
+  await expect(sidebarToggle).toHaveAccessibleName('Expand sidebar');
+  await page.setViewportSize({ width: 390, height: 900 });
+  await page.reload();
+  await expect(page.locator('#app-view')).toBeVisible();
+  await expect(sidebarToggle).toBeHidden();
+  await expect(page.locator('#mobile-nav-tools')).toBeVisible();
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await expect(page.locator('#workspace-nav')).toBeHidden();
+  await sidebarToggle.focus();
+  await page.keyboard.press('Enter');
+  await expect(page.locator('#workspace-nav')).toBeVisible();
+  await expect(sidebarToggle).toHaveAccessibleName('Collapse sidebar');
+  await expect(sidebarToggle).toHaveAttribute('aria-expanded', 'true');
+  await page.reload();
+  await expect(page.locator('#app-view')).toBeVisible();
+  await expect(page.locator('#workspace-nav')).toBeVisible();
+  await expect(sidebarToggle).toHaveAttribute('aria-expanded', 'true');
+  await page.locator('#btn-clear-filters').click();
+  await page.locator('#filter-help > summary').click();
+  await expect(page.locator('#filter-help > p')).toBeVisible();
+  await expect(page.locator('#filter-help')).toContainText('“Within” includes today, but not overdue units.');
+  await page.locator('#filter-help > summary').click();
+  if (!trucks.length) {
+    testInfo.annotations.push({ type: 'coverage', description: 'The actual fleet is empty; unit action layout and file navigation require existing records. No units were created.' });
+    return;
+  }
+  for (const width of [320, 390, 820, 1280, 1920]) {
+    await page.setViewportSize({ width, height: 900 });
+    for (const layout of width < 960 ? ['rows', 'dense', 'full'] : ['list', 'cards']) {
+      await page.locator(width < 960 ? '#mobile-layout-' + layout : '#view-' + layout).click();
+      const actions = page.locator(layout === 'rows' || layout === 'list' ? '#fleet-table-body .list-actions' : '#fleet-grid .truck-actions').first();
+      await expect(actions.locator('button')).toHaveText(['Details', 'Log Safety', 'Edit']);
+      const boxes = await actions.locator('button').evaluateAll(buttons => buttons.map(button => {
+        const rect = button.getBoundingClientRect();
+        return { y: rect.y, width: rect.width, height: rect.height };
+      }));
+      expect(new Set(boxes.map(box => box.y)).size).toBe(1);
+      for (const box of boxes) {
+        expect(box.width).toBeGreaterThanOrEqual(44);
+        expect(box.height).toBeGreaterThanOrEqual(44);
+      }
+      await actions.locator('[data-details]').click();
+      await expect(page.locator('#modal-unit')).toBeVisible();
+      await expect(page.locator('#unit-actions [data-history]')).toBeVisible();
+      await expect(page.locator('#detail-history-section')).toBeVisible();
+      const selectedId = await page.locator('#unit-actions [data-history]').getAttribute('data-history');
+      const selected = trucks.find(truck => truck.id === selectedId)!;
+      await expect(page.locator('#unit-actions [data-view-file]')).toHaveCount(selected.latest_attachment ? 1 : 0);
+      await page.locator('#unit-actions [data-history]').click();
+      await expect(page.locator('#modal-history')).toBeVisible();
+      await page.locator('#modal-history [data-close="modal-history"]').first().click();
+      if (await page.locator('#modal-unit').isVisible()) await page.locator('#modal-unit .close-btn[data-close="modal-unit"]').click();
+      expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), layout + ' at ' + width).toBe(true);
+    }
+  }
 });
 
 test('real staff directory and password tools work without changing accounts', async ({ page, request, playwright, baseURL }) => {

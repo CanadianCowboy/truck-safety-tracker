@@ -19,6 +19,8 @@ VIN browser checks verify the initial **not checked** state, **checking** during
 
 Browser tests require an explicit `APP_PASSCODE`. Credentials are never written to tracked files. A shared worker session minimizes login attempts; on a real 429, the suite respects Retry-After and retries once. Browser tests do not change fleet records, settings, credentials, files or subscriptions. The security check ends only its own browser session.
 
+Calendar checks exercise date-key navigation, focus containment/restoration, discard confirmation, client validation, filters, print-preview DOM and sensitive-content clearing on lock. `POST /api/calendar/conflicts` validates an unsaved draft and only reads saved shop appointments; it never inserts, updates or deletes records. Pure overlap tests cover timed/all-day/overnight boundaries, same-unit matching, series exclusion and recurring dates beyond the displayed month. Positive conflict rendering is exercised only when an actual linked appointment exists; otherwise that integration gap is annotated. No saved appointments are created to fill coverage gaps.
+
 The suite reads actual fleet records for filters, enrichment, calendars, duplicate warnings and unit details. With no units, it validates the actual empty state. QR implementation tests remain available but the feature is hidden from the shipped UI. No temporary units are created. Do not run against a changing fleet if exact snapshot comparisons would be unreliable.
 
 ## Coverage boundaries after removing mocked tests
