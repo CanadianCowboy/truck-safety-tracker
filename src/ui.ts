@@ -1,4 +1,5 @@
 import { renderQrScript } from './qr-ui';
+import { renderCalendarControls, renderCalendarScript, renderCalendarStyles } from './calendar-ui';
 import { renderPushControls, renderPushScript, renderPushWorkerScript } from './push-ui';
 
 export function renderPwaManifest(basePath: string): string {
@@ -653,6 +654,8 @@ export function renderAppHtml(basePath: string, pushTestPage = false, demoMode =
 
       /* Override .modal-backdrop when #modal-unit is docked inside .workspace-detail-col on wide desktop */
       @media (min-width: 1200px) {
+        .workspace-shell.sidebar-collapsed { grid-template-columns: minmax(0, 1fr) 420px; }
+        .workspace-shell.sidebar-collapsed .workspace-nav { display: none; }
         .workspace-detail-col:has(#modal-unit:not(.hidden)) #detail-empty-state {
           display: none;
         }
@@ -992,7 +995,8 @@ export function renderAppHtml(basePath: string, pushTestPage = false, demoMode =
         }
 
         .toolbar:not(.mobile-sheet-open) #btn-clear-filters,
-        .toolbar:not(.mobile-sheet-open) #btn-refresh {
+        .toolbar:not(.mobile-sheet-open) #btn-refresh,
+        .toolbar:not(.mobile-sheet-open) .filter-help {
           display: none;
         }
 
@@ -1333,6 +1337,11 @@ export function renderAppHtml(basePath: string, pushTestPage = false, demoMode =
         width: 100%;
       }
 
+      #btn-toggle-sidebar { display: none; }
+      @media (min-width: 1200px) {
+        #btn-toggle-sidebar { display: inline-flex; padding: 8px; flex: 0 0 44px; }
+      }
+
       button:focus-visible, a:focus-visible, summary:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible, .kpi-card:focus-visible {
         outline: 2px solid var(--accent);
         outline-offset: 2px;
@@ -1470,7 +1479,18 @@ export function renderAppHtml(basePath: string, pushTestPage = false, demoMode =
         width: 100%;
         font-size: 0.78rem;
         color: var(--text-muted);
-        padding-top: 2px;
+      }
+
+      .filter-help > summary {
+        cursor: pointer;
+        min-height: 44px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .filter-help > p {
+        padding: 8px 0;
       }
 
       .filter-results {
@@ -1831,6 +1851,22 @@ export function renderAppHtml(basePath: string, pushTestPage = false, demoMode =
 
       .truck-actions .btn {
         flex: 1 1 110px;
+      }
+
+      #fleet-container .truck-actions,
+      #fleet-container .list-actions {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 6px;
+      }
+
+      #fleet-container .truck-actions .btn,
+      #fleet-container .list-actions .btn {
+        min-width: 44px;
+        min-height: 44px;
+        padding: 6px;
+        font-size: 0.76rem;
+        white-space: normal;
       }
 
       .truck-card.is-selected {
@@ -2323,6 +2359,67 @@ export function renderAppHtml(basePath: string, pushTestPage = false, demoMode =
     }
 
     @media (min-width: 960px) {
+      /* Compact desktop row; wrap only when the fleet column needs readable fields. */
+      #fleet-toolbar {
+        flex-wrap: wrap;
+        align-items: flex-end;
+        gap: 6px;
+        padding: 10px;
+        position: relative;
+      }
+      #fleet-toolbar .toolbar-left { display: contents; }
+      #fleet-toolbar .toolbar-right { flex: 0 0 auto; flex-wrap: nowrap; gap: 6px; }
+      #fleet-toolbar .mobile-filter-sheet-btn { display: none; }
+      #fleet-toolbar .filter-field {
+        flex: 1 1 120px;
+        min-width: 120px;
+        font-size: 0.72rem;
+        letter-spacing: 0;
+        text-transform: none;
+      }
+      #fleet-toolbar .select-filter {
+        height: 44px;
+        min-height: 44px;
+        padding: 6px;
+        font-size: 0.8rem;
+      }
+      #fleet-toolbar .view-switch { flex: 0 0 auto; gap: 0; padding: 0; }
+      #fleet-toolbar .view-switch .btn { min-height: 42px; padding: 6px; font-size: 0.74rem; }
+      #fleet-toolbar .toolbar-right > .btn { flex: 0 0 44px; width: 44px; padding: 6px; }
+      #fleet-toolbar .toolbar-button-label,
+      #fleet-toolbar .filter-help-label {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        overflow: hidden;
+        clip-path: inset(50%);
+        white-space: nowrap;
+      }
+      #fleet-toolbar .filter-help { flex: 0 0 44px; width: 44px; }
+      #fleet-toolbar .filter-help > summary {
+        width: 44px;
+        justify-content: center;
+        list-style: none;
+        border: 1px solid var(--border);
+        border-radius: 9px;
+        background: var(--bg-card);
+        color: var(--text);
+        font-weight: 700;
+      }
+      #fleet-toolbar .filter-help > summary::-webkit-details-marker { display: none; }
+      #fleet-toolbar .filter-help > p {
+        position: absolute;
+        right: 0;
+        top: calc(100% + 4px);
+        z-index: 15;
+        width: min(340px, 100%);
+        padding: 12px;
+        border: 1px solid var(--border);
+        border-radius: 9px;
+        background: var(--bg-card-solid);
+        box-shadow: var(--shadow-sm);
+      }
       .view-switch { display: flex; }
       #fleet-container[data-view="list"] #fleet-grid { display: none; }
       #fleet-container[data-view="list"] .fleet-table-wrap:not(.hidden) { display: block; }
@@ -2399,12 +2496,6 @@ export function renderAppHtml(basePath: string, pushTestPage = false, demoMode =
           min-height: 44px;
           padding: 6px 8px;
           font-size: 0.76rem;
-        }
-
-        /* Hide secondary Edit/Cert buttons on compact phone cards so primary Details / Log Safety / Files buttons are clean and tappable */
-        #fleet-container[data-mobile-layout="dense"] .truck-actions [data-edit],
-        #fleet-container[data-mobile-layout="dense"] .truck-actions [data-view-file] {
-          display: none;
         }
 
         .mobile-layout-switch {
@@ -2696,6 +2787,7 @@ export function renderAppHtml(basePath: string, pushTestPage = false, demoMode =
       .kpi-card:hover, .truck-card:hover { transform: none; }
     }
   </style>
+  ${renderCalendarStyles()}
 </head>
 <body>
   <!-- PASSCODE & STAFF ACCOUNT GATE VIEW -->
@@ -2763,6 +2855,7 @@ export function renderAppHtml(basePath: string, pushTestPage = false, demoMode =
     <header class="app-header">
       <div class="header-inner">
         <div class="brand">
+          <button type="button" id="btn-toggle-sidebar" class="btn btn-secondary btn-sm" aria-label="Collapse sidebar" aria-expanded="true" aria-controls="workspace-nav" title="Collapse sidebar"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M4 6h16M4 12h16M4 18h16" /></svg></button>
           <img src="${basePath}/icon.svg" alt="Icon" />
           <div>
             <div class="brand-title">Truck Safety Tracker</div>
@@ -2798,10 +2891,8 @@ export function renderAppHtml(basePath: string, pushTestPage = false, demoMode =
                 </div>
               </div>
               <button type="button" id="btn-tools-shop-accounts" class="btn btn-secondary btn-sm">👥 Staff & Shop Accounts</button>
+              <button type="button" id="btn-calendar" class="btn btn-secondary btn-sm">📅 Shop Calendar</button>
               <button type="button" id="btn-vin-decoder" class="btn btn-secondary btn-sm">VIN decoder</button>
-              <button type="button" id="btn-export-ics" class="btn btn-secondary btn-sm" title="Download Calendar (.ics) reminders">
-                📅 .ICS Calendar
-              </button>
               <button type="button" id="btn-browser-notify" class="btn btn-secondary btn-sm" title="Enable Browser Alerts">
                 🔔 Alerts
               </button>
@@ -2821,7 +2912,7 @@ export function renderAppHtml(basePath: string, pushTestPage = false, demoMode =
     ${demoMode ? '<div role="note" style="margin:12px auto;max-width:1200px;padding:12px 18px;border:1px solid var(--border);border-radius:10px;color:var(--text-muted)"><strong>Demo:</strong> Unit records, inspection dates and inspection history are stored only in this browser tab. VIN decoding, certificates, QR labels, alerts, settings, backups and calendar exports are not available in the demo. <button type="button" id="demo-reset" class="btn btn-secondary btn-sm" style="margin-left:12px">Reset demo</button></div>' : ''}
     <div class="workspace-shell">
       <!-- LEFT REGION: GRAPHITE NAVIGATION & QUICK FLEET VIEWS -->
-      <nav class="workspace-nav" aria-label="Fleet views and navigation">
+      <nav id="workspace-nav" class="workspace-nav" aria-label="Fleet views and navigation">
         <div>
           <div class="nav-section-title">Quick Fleet Views</div>
           <ul class="nav-list">
@@ -2864,7 +2955,7 @@ export function renderAppHtml(basePath: string, pushTestPage = false, demoMode =
             <li><button type="button" class="nav-tool-btn" data-nav-action="add">+ Add Unit</button></li>
             <li><button type="button" class="nav-tool-btn" data-nav-action="vin">🔍 VIN Decoder</button></li>
             <li><button type="button" class="nav-tool-btn" data-nav-action="backup">📦 Fleet Backup</button></li>
-            <li><button type="button" class="nav-tool-btn" data-nav-action="ics">📅 Export .ICS Schedule</button></li>
+            <li><button type="button" class="nav-tool-btn" data-nav-action="calendar">📅 Shop Calendar</button></li>
             <li><button type="button" class="nav-tool-btn" data-nav-action="alerts">🔔 Browser Alerts</button></li>
             <li><button type="button" class="nav-tool-btn" data-nav-action="accounts">👥 Staff & Accounts</button></li>
             <li><button type="button" class="nav-tool-btn" data-nav-action="settings">⚙️ Fleet Settings</button></li>
@@ -2959,7 +3050,6 @@ export function renderAppHtml(basePath: string, pushTestPage = false, demoMode =
                 <option value="unit">Unit number</option>
               </select>
             </label>
-            <p id="filter-help" class="filter-help">“Within” includes today, but not overdue units. “Close” uses the warning days in Settings.</p>
           </div>
           <div class="toolbar-right">
             <button type="button" id="btn-mobile-filter-sheet" class="btn btn-secondary btn-sm mobile-filter-sheet-btn" aria-expanded="false" aria-controls="fleet-toolbar">
@@ -2972,13 +3062,14 @@ export function renderAppHtml(basePath: string, pushTestPage = false, demoMode =
               <button type="button" id="mobile-layout-full" class="btn btn-secondary btn-sm" aria-pressed="false" title="Full cards show every unit detail">Full</button>
             </div>
             <div class="view-switch" role="group" aria-label="Desktop fleet view">
-              <button type="button" id="view-list" class="btn btn-secondary btn-sm" aria-pressed="true">Compact list</button>
+              <button type="button" id="view-list" class="btn btn-secondary btn-sm" aria-pressed="true" aria-label="Compact list" title="Compact list">List</button>
               <button type="button" id="view-cards" class="btn btn-secondary btn-sm" aria-pressed="false">Cards</button>
             </div>
-            <button type="button" id="btn-clear-filters" class="btn btn-secondary btn-sm">Clear filters</button>
-            <button type="button" id="btn-refresh" class="btn btn-secondary btn-sm">
-              ↻ Refresh
+            <button type="button" id="btn-clear-filters" class="btn btn-secondary btn-sm" title="Clear filters"><span aria-hidden="true">✕</span><span class="toolbar-button-label">Clear filters</span></button>
+            <button type="button" id="btn-refresh" class="btn btn-secondary btn-sm" title="Refresh fleet">
+              <span aria-hidden="true">↻</span><span class="toolbar-button-label">Refresh</span>
             </button>
+            <details id="filter-help" class="filter-help"><summary title="Filter help"><span aria-hidden="true">ⓘ</span><span class="filter-help-label">Filter help</span></summary><p>“Within” includes today, but not overdue units. “Close” uses the warning days in Settings.</p></details>
           </div>
           <div class="mobile-sheet-footer">
             <button type="button" id="btn-filter-sheet-reset" class="btn btn-secondary">Reset</button>
@@ -3617,6 +3708,7 @@ export function renderAppHtml(basePath: string, pushTestPage = false, demoMode =
     </div>
   </div>
 
+  ${renderCalendarControls()}
   ${renderPushControls(basePath)}
   <div id="toast-container" class="toast-container"></div>
 
@@ -3668,6 +3760,20 @@ export function renderAppHtml(basePath: string, pushTestPage = false, demoMode =
       updateThemeControls();
     }));
     updateThemeControls();
+
+    function setSidebarCollapsed(collapsed, persist = true) {
+      document.querySelector('.workspace-shell').classList.toggle('sidebar-collapsed', collapsed);
+      const button = document.getElementById('btn-toggle-sidebar');
+      const label = collapsed ? 'Expand sidebar' : 'Collapse sidebar';
+      button.setAttribute('aria-expanded', String(!collapsed));
+      button.setAttribute('aria-label', label);
+      button.title = label;
+      if (persist) savePreference('truck_safety_sidebar_collapsed', String(collapsed));
+    }
+    setSidebarCollapsed(readPreference('truck_safety_sidebar_collapsed', 'false') === 'true', false);
+    document.getElementById('btn-toggle-sidebar').addEventListener('click', () => {
+      setSidebarCollapsed(!document.querySelector('.workspace-shell').classList.contains('sidebar-collapsed'));
+    });
 
     function setFleetView(view) {
       const selected = view === 'list' ? 'list' : 'cards';
@@ -3749,6 +3855,7 @@ export function renderAppHtml(basePath: string, pushTestPage = false, demoMode =
     }
 
     function lockApp(reason = '') {
+      resetCalendar();
       fleetData = [];
       fleetLoading = false;
       fleetLoadError = '';
@@ -4227,15 +4334,12 @@ export function renderAppHtml(basePath: string, pushTestPage = false, demoMode =
         const isSel = curSelected && curSelected === t.id;
         const dueLabel = t.next_due_date ? 'Due ' + escapeHtml(t.next_due_date) : 'Inspection date pending';
         const vehicleLine = [t.year, t.make, t.model, t.equipment_type].filter(Boolean).join(' ');
-        const latestFileBtn = (t.latest_attachment && t.latest_attachment.file_available !== false)
-          ? '<button type="button" class="btn btn-secondary btn-sm" data-view-file="' + escapeHtml(t.latest_attachment.id) + '" data-file-name="' + escapeHtml(t.latest_attachment.file_name) + '" data-file-type="' + escapeHtml(t.latest_attachment.content_type) + '">📄 View Cert</button>'
-          : '';
         const remTag = formatReminderTag(t.reminder_days);
         return '<tr data-unit-row="' + id + '" class="' + (isSel ? 'is-selected' : '') + '" aria-selected="' + String(Boolean(isSel)) + '">' +
           '<td><button type="button" class="unit-row-link" data-select-unit="' + id + '"><strong>Unit #' + escapeHtml(t.unit_number) + '</strong></button><span class="list-sub">' + escapeHtml(t.vehicle_type) + (t.status !== 'Active' ? ' · ' + escapeHtml(t.status) : '') + (remTag ? ' · ' + escapeHtml(remTag) : '') + '</span><span class="list-sub">' + escapeHtml(vehicleLine) + '</span></td>' +
           '<td><span class="safety-badge ' + escapeHtml(t.safety_status) + '">' + escapeHtml(formatStatusWithIcon(t)) + '<small>' + dueLabel + '</small></span></td>' +
           '<td>' + escapeHtml(t.last_inspection_date || '—') + '<span class="list-sub">' + escapeHtml(t.license_plate || '') + '</span></td>' +
-          '<td><div class="list-actions"><button type="button" class="btn btn-secondary btn-sm" data-details="' + id + '">Details</button><button type="button" class="btn btn-success btn-sm" data-inspect="' + id + '">Log Safety</button>' + latestFileBtn + '<button type="button" class="btn btn-secondary btn-sm" data-history="' + id + '">Files (' + (t.attachment_count || 0) + ')</button><button type="button" class="btn btn-secondary btn-sm" data-edit="' + id + '">Edit</button></div></td></tr>';
+          '<td><div class="list-actions"><button type="button" class="btn btn-secondary btn-sm" data-details="' + id + '">Details</button><button type="button" class="btn btn-success btn-sm" data-inspect="' + id + '">Log Safety</button><button type="button" class="btn btn-secondary btn-sm" data-edit="' + id + '">Edit</button></div></td></tr>';
       }).join('');
       const hasFleet = fleetData.length > 0;
       document.getElementById('fleet-empty-title').textContent = hasFleet ? 'No units match these filters' : 'No trucks or trailers found';
@@ -4255,9 +4359,6 @@ export function renderAppHtml(basePath: string, pushTestPage = false, demoMode =
         .map((t) => {
           const isSel = curSelected && curSelected === t.id;
           const ymm = [t.year, t.make, t.model, t.equipment_type].filter(Boolean).join(' ') || 'Vehicle details not set';
-          const latestFileBtn = (t.latest_attachment && t.latest_attachment.file_available !== false)
-            ? \`<button type="button" class="btn btn-secondary btn-sm" data-view-file="\${escapeHtml(t.latest_attachment.id)}" data-file-name="\${escapeHtml(t.latest_attachment.file_name)}" data-file-type="\${escapeHtml(t.latest_attachment.content_type)}">📄 View Cert</button>\`
-            : '';
           const remTag = formatReminderTag(t.reminder_days);
           const dueSmall = t.next_due_date ? 'Due ' + escapeHtml(t.next_due_date) : 'Inspection date pending';
           const dueValue = t.next_due_date ? \`\${escapeHtml(t.next_due_date)} (\${t.interval_months || 12}m)\` : \`No date set (\${t.interval_months || 12}m)\`;
@@ -4314,10 +4415,8 @@ export function renderAppHtml(basePath: string, pushTestPage = false, demoMode =
 
               <div class="truck-actions">
                 <button type="button" class="btn btn-secondary btn-sm" data-details="\${escapeHtml(t.id)}">Details</button>
-                <button type="button" class="btn btn-success btn-sm" data-inspect="\${escapeHtml(t.id)}">✓ Log Safety</button>
-                \${latestFileBtn}
-                <button type="button" class="btn btn-secondary btn-sm" data-history="\${escapeHtml(t.id)}">📂 Files (\${t.attachment_count || 0})</button>
-                <button type="button" class="btn btn-secondary btn-sm" data-edit="\${escapeHtml(t.id)}">✎ Edit</button>
+                <button type="button" class="btn btn-success btn-sm" data-inspect="\${escapeHtml(t.id)}">Log Safety</button>
+                <button type="button" class="btn btn-secondary btn-sm" data-edit="\${escapeHtml(t.id)}">Edit</button>
               </div>
             </article>
           \`;
@@ -4355,8 +4454,8 @@ export function renderAppHtml(basePath: string, pushTestPage = false, demoMode =
         else if (action === 'add') document.getElementById('btn-add-truck').click();
         else if (action === 'vin') document.getElementById('btn-vin-decoder').click();
         else if (action === 'backup') document.getElementById('btn-fleet-backup').click();
-        else if (action === 'ics') document.getElementById('btn-export-ics').click();
         else if (action === 'alerts') document.getElementById('btn-browser-notify').click();
+        else if (action === 'calendar') document.getElementById('btn-calendar').click();
         else if (action === 'accounts') document.getElementById('btn-open-shop-accounts').click();
         else if (action === 'settings') document.getElementById('btn-settings').click();
       });
@@ -5252,20 +5351,16 @@ export function renderAppHtml(basePath: string, pushTestPage = false, demoMode =
       document.getElementById('modal-viewer').classList.remove('hidden');
     }
 
-    // Calendar (.ics) export
-    document.getElementById('btn-export-ics').addEventListener('click', () => {
-      if (DEMO_MODE) { showToast('Calendar export is not available in the demo.'); return; }
-      window.location.href = API_BASE + '/calendar.ics';
-    });
       if (DEMO_MODE) {
-        document.getElementById('btn-export-ics').classList.add('hidden');
         document.getElementById('btn-fleet-backup').classList.add('hidden');
         document.getElementById('btn-browser-notify').classList.add('hidden');
         document.getElementById('btn-vin-decoder').classList.add('hidden');
         document.getElementById('btn-scan-unit').classList.add('hidden');
+        document.getElementById('btn-calendar').classList.add('hidden');
+        document.querySelector('[data-nav-action="calendar"]').classList.add('hidden');
         const toolsAccountsBtn = document.getElementById('btn-tools-shop-accounts');
         if (toolsAccountsBtn) toolsAccountsBtn.classList.add('hidden');
-        document.querySelectorAll('[data-nav-action="scan"], [data-nav-action="vin"], [data-nav-action="backup"], [data-nav-action="ics"], [data-nav-action="alerts"], [data-nav-action="accounts"], [data-nav-action="settings"]').forEach(el => el.classList.add('hidden'));
+        document.querySelectorAll('[data-nav-action="scan"], [data-nav-action="vin"], [data-nav-action="backup"], [data-nav-action="alerts"], [data-nav-action="accounts"], [data-nav-action="settings"]').forEach(el => el.classList.add('hidden'));
       }
 
     document.getElementById('btn-fleet-backup').addEventListener('click', () => {
@@ -5900,7 +5995,11 @@ export function renderAppHtml(basePath: string, pushTestPage = false, demoMode =
           if (!confirm('Discard unsaved inspection changes?')) return;
           inspectFormDirty = false;
         }
+        if (target === 'modal-calendar-event') { closeCalendarEvent(); return; }
         document.getElementById(target).classList.add('hidden');
+        if (target === 'modal-calendar-print') { clearCalendarPrint(); document.getElementById('calendar-print-preview').focus(); }
+        if (target === 'modal-calendar') { calendarGeneration++; syncCalendarDialogs(); if (calendarReturnFocus?.isConnected) calendarReturnFocus.focus(); }
+        if (target === 'modal-calendar-event' && calendarEventReturnFocus?.isConnected) calendarEventReturnFocus.focus();
         if (target === 'modal-scan') stopUnitCamera();
         if (target === 'modal-vin') closeVinDecoder();
         if (target === 'modal-unit') clearPendingUnit();
@@ -6001,6 +6100,8 @@ export function renderAppHtml(basePath: string, pushTestPage = false, demoMode =
     }
 
     ${demoMode ? '' : renderQrScript()}
+
+    ${renderCalendarScript()}
 
     // Initial session check
     ${demoMode ? `const demoScript = document.createElement('script');

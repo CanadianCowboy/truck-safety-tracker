@@ -7,6 +7,7 @@ for (const mobile of [false, true]) {
     await page.goto(basePath + '/');
     await expect(page.locator('#app-view')).toBeVisible();
     await expect(page.locator('#fleet-grid .truck-card')).toHaveCount(trucks.length);
+    if (mobile) await page.locator('#btn-mobile-filter-sheet').click();
     const filter = page.locator('#filter-status');
     await expect(filter.locator('option[value="due_soon"]')).toContainText(String(settings.warning_days));
     for (const [value, count] of [
@@ -34,9 +35,10 @@ for (const mobile of [false, true]) {
     await page.locator('#filter-to').fill('2026-10-23');
     await expect(page.locator('#filter-results')).toHaveText('End date must be on or after the start date.');
     await expect(page.locator('#fleet-grid .truck-card')).toHaveCount(0);
-    await page.locator('#btn-clear-filters').click();
+    await page.locator(mobile ? '#btn-filter-sheet-reset' : '#btn-clear-filters').click();
     await expect(filter).toHaveValue('all');
     await expect(page.locator('#fleet-grid .truck-card')).toHaveCount(trucks.length);
+    if (mobile) await page.locator('#btn-filter-sheet-apply').click();
     if (trucks.length) {
       await page.locator('#search-input').fill(trucks[0].unit_number);
       const matches = trucks.filter(truck => [truck.unit_number, truck.vehicle_type, truck.equipment_type, truck.gvwr, truck.license_plate, truck.vin, truck.year, truck.make, truck.model, truck.shop_name, truck.sticker_number, truck.notes].join(' ').toLowerCase().includes(trucks[0].unit_number.toLowerCase()));

@@ -48,6 +48,7 @@ import {
   type ShopActor,
 } from './shop-accounts';
 import { handleShopDocumentsApi } from './shop-documents';
+import { handleCalendarApi } from './calendar';
 
 const corsHeaders: Record<string, string> = {
   'Cache-Control': 'no-store',
@@ -319,6 +320,9 @@ export default {
         if (!['GET', 'HEAD'].includes(request.method)) {
           const allowed = await env.WRITE_LIMITER.limit({ key: 'fleet-writes' });
           if (!allowed.success) return jsonResponse({ error: 'Too many changes. Try again in a minute.' }, 429);
+        }
+        if (subPath === '/api/calendar' || subPath === '/api/calendar/conflicts' || subPath === '/api/calendar/events' || /^\/api\/calendar\/events\/[^/]+$/.test(subPath)) {
+          return await handleCalendarApi(request, env.DB, currentActor);
         }
         if (subPath === '/api/shop-accounts' || subPath.startsWith('/api/shop-accounts/')) {
           return await handleShopAccountsApi(request, env.DB, currentActor);
